@@ -30,6 +30,13 @@ module.exports = {
       center: true,
     },
     extend: {
+      colors: {
+        fontbase: "rgb(var(--color-fontbase) / <alpha-value>)",
+        primary: "rgb(var(--color-primary) / <alpha-value>)",
+        secondary: "rgb(var(--color-secondary) / <alpha-value>)",
+        success: "rgb(var(--color-success) / <alpha-value>)",
+        failure: "rgb(var(--color-failure) / <alpha-value>)",
+      },
       fontFamily: {
         sans: [...defaultSans],
       },

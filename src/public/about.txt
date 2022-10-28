@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Caveat Brush
+- Font Author: Copyright 2015 Google Inc. All Rights Reserved.
+- Font Source: http://fonts.gstatic.com/s/caveatbrush/v11/EYq0maZfwr9S9-ETZc3fKXtMW7mT03pdQw.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

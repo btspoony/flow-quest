@@ -22,6 +22,7 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@heroicons/vue": "^2.0.12",
+    "@nuxt/content": "^2.2.1",
     "@nuxtjs/tailwindcss": "^6.1.1",
     "@tailwindcss/typography": "^0.5.7",
     "@types/node": "^18.11.7",
