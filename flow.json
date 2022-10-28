@@ -12,20 +12,20 @@
   },
   "contracts": {
     "NonFungibleToken": {
-      "source": "./cadence/contracts/core/NonFungibleToken.cdc",
+      "source": "./cadence/core-contracts/NonFungibleToken.cdc",
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0x631e88ae7f1d7c20"
       }
     },
     "MetadataViews": {
-      "source": "./cadence/contracts/core/MetadataViews.cdc",
+      "source": "./cadence/core-contracts/MetadataViews.cdc",
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20"
       }
     },
     "FungibleToken": {
-      "source": "./cadence/contracts/core/FungibleToken.cdc",
+      "source": "./cadence/core-contracts/FungibleToken.cdc",
       "aliases": {
         "emulator": "0xee82856bf20e2aa6",
         "testnet": "0x9a0766d93b6608b7"

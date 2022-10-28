@@ -648,25 +648,25 @@
     tailwindcss "^3.2.0"
     ufo "^0.8.6"
 
-"@onflow/config@^1.0.3", "@onflow/config@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@onflow/config/-/config-1.0.4.tgz#1d02b13da0265c66b2fbed7820da88c893142a02"
-  integrity sha512-Bw7OYd7IgTJa56ZDF6e2oGiuEM6kV3QAZbuKs8dXXqyUmvlVo6ImiXv9eqp9JNCP2AlK4m0LaW+3NnlpUqraZQ==
+"@onflow/config@^1.0.3", "@onflow/config@^1.0.4", "@onflow/config@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@onflow/config/-/config-1.0.5.tgz#7fb476c64eb6932420323a5bdd70b1c63dea6973"
+  integrity sha512-r2IUyY4SJgAY6YCzKL0cOOertHETp9BgVfCjTIq236WAHr7aMS1oNyqcVPPR++zjDK8n64lRgrxlcYSZB/LrFg==
   dependencies:
     "@babel/runtime" "^7.18.6"
     "@onflow/util-actor" "^1.1.2"
 
-"@onflow/fcl@latest":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-1.3.1.tgz#3b89c9aff46963a9bdb1d15fe0ea6742380fb9cf"
-  integrity sha512-A01c1kh892uJZ7+4UbkoafMd0iLzCwNZbLvl+15mMSHr2MUDLV/y7E3v8YZZW2Ltp7vKrqtONoppHyksNEtyZg==
+"@onflow/fcl@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-1.3.2.tgz#8ba7a91b9d80e1179832d2eac702e1b885a098f8"
+  integrity sha512-H2YduE8JUMqjUBR9R3YOFgWrT/yMg+aE5w8uwrMD3YJ/wGpF6iKo0XJGRa7kPVn5pP0HjKQnOlmCLvHwEGEhQQ==
   dependencies:
     "@babel/runtime" "^7.18.6"
-    "@onflow/config" "^1.0.3"
+    "@onflow/config" "^1.0.5"
     "@onflow/interaction" "0.0.11"
     "@onflow/rlp" "^1.0.2"
     "@onflow/sdk" "^1.1.2"
-    "@onflow/types" "^1.0.3"
+    "@onflow/types" "^1.0.5"
     "@onflow/util-actor" "^1.1.1"
     "@onflow/util-address" "^1.0.2"
     "@onflow/util-invariant" "^1.0.2"
@@ -717,10 +717,17 @@
     "@onflow/util-template" "^1.0.3"
     node-fetch "^2.6.7"
 
-"@onflow/types@^1.0.3", "@onflow/types@^1.0.4":
+"@onflow/types@^1.0.4":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@onflow/types/-/types-1.0.4.tgz#56a0e1aeb4ae98dcbbf2026db81f74f583e5952a"
   integrity sha512-2XLUFo/r622ZQqUgmxrFuZ1cR7Bvwd7jtXwfHFtNd96UONPWED2AX4pIzZ/4e8nERxhCGjvTjYipXwZGCj97OA==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+
+"@onflow/types@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@onflow/types/-/types-1.0.5.tgz#beaaed646a21d2e4e95939932033dc9a5a0609e8"
+  integrity sha512-Uf6APOwgkxPwgonQ8JRrOB0KZ5eJpNBVXlEiZIv5ddzsfM6qd9p3csEE5YmuLhAooAcisG3ROTzw2hT/zUNGbw==
   dependencies:
     "@babel/runtime" "^7.18.6"
 
