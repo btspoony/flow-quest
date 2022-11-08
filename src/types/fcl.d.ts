@@ -110,6 +110,11 @@ declare module "@onflow/fcl" {
     signature: string;
   }
 
+  export interface FTypeSignature extends TransactionSignature {
+    f_type: "CompositeSignature";
+    f_vsn: "1.0.0";
+  }
+
   export interface SigningData {
     message: string;
   }
@@ -252,7 +257,7 @@ declare module "@onflow/fcl" {
   export type Pipe = (ix: Interaction) => Interaction;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface IJsonArray extends Array<AnyJson> { }
+  interface IJsonArray extends Array<AnyJson> {}
 
   export type Decoder = (dictionary, decoders, stack) => Record<any, any>;
   export type DecoderGroup = Record<string, Decoder>;
@@ -340,6 +345,40 @@ declare module "@onflow/fcl" {
   export const currentUser: CurrentUser;
 
   export function config(): FlowConfig;
+
+  // Utils
+  export interface AccountProofData {
+    address: string;
+    nonce: string;
+    signatures: [FTypeSignature];
+  }
+  export interface VerifySigOption {
+    fclCryptoContract?: string;
+  }
+
+  export interface AppUtils {
+    verifyAccountProof: (
+      appIdentifier: string,
+      accountProofData: AccountProofData,
+      opts?: VerifySigOption
+    ) => Promise<boolean>;
+
+    verifyUserSignatures: (
+      message: string,
+      signatures: [FTypeSignature],
+      opts?: VerifySigOption
+    ) => Promise<boolean>;
+  }
+  export const AppUtils: AppUtils;
+
+  export interface WalletUtils {
+    encodeAccountProof: (
+      accountProofData: AccountProofData,
+      includeDomainTag?: boolean
+    ) => string;
+    // TODO add more
+  }
+  export const WalletUtils: WalletUtils;
 
   // SDK
   export function getBlock(isSealed?: boolean): Pipe;
