@@ -12,23 +12,35 @@
   },
   "contracts": {
     "NonFungibleToken": {
-      "source": "./cadence/core-contracts/NonFungibleToken.cdc",
+      "source": "./cadence/deps/NonFungibleToken.cdc",
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0x631e88ae7f1d7c20"
       }
     },
     "MetadataViews": {
-      "source": "./cadence/core-contracts/MetadataViews.cdc",
+      "source": "./cadence/deps/MetadataViews.cdc",
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20"
       }
     },
     "FungibleToken": {
-      "source": "./cadence/core-contracts/FungibleToken.cdc",
+      "source": "./cadence/deps/FungibleToken.cdc",
       "aliases": {
         "emulator": "0xee82856bf20e2aa6",
         "testnet": "0x9a0766d93b6608b7"
+      }
+    },
+    "ArrayUtils": {
+      "source": "./cadence/deps/ArrayUtils.cdc",
+      "aliases": {
+        "testnet": "0x31ad40c07a2a9788"
+      }
+    },
+    "StringUtils": {
+      "source": "./cadence/deps/StringUtils.cdc",
+      "aliases": {
+        "testnet": "0x31ad40c07a2a9788"
       }
     }
   },
