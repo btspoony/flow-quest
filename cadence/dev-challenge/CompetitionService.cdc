@@ -28,6 +28,8 @@ pub contract CompetitionService {
 
     pub event ContractInitialized()
 
+    pub event SeasonCreated(seasonId: UInt64)
+
     /**    ____ ___ ____ ___ ____
        *   [__   |  |__|  |  |___
         *  ___]  |  |  |  |  |___
@@ -47,6 +49,11 @@ pub contract CompetitionService {
         init(season: UInt64, questKey: String) {
             self.seasonId = season
             self.questKey = questKey
+        }
+
+        pub fun getConfig(): QuestConfig {
+            let season = CompetitionService.getService().getSeasonRef(self.seasonId)
+            return season.getQuestConfig(key: self.questKey)
         }
     }
 
@@ -79,60 +86,143 @@ pub contract CompetitionService {
 
     pub resource interface CompetitionSeasonPublic {
         pub fun isActive(): Bool
+        pub fun getQuestKeys(): [String]
+        pub fun getQuestConfig(key: String): QuestConfig
     }
 
     pub resource CompetitionSeason: CompetitionSeasonPublic {
-        pub let endDate: UFix64
+        pub var endDate: UFix64
+        access(contract) var quests: {String: QuestConfig}
 
         init(
-            endDate: UFix64
+            endDate: UFix64,
+            quests: [QuestConfig]
         ) {
             self.endDate = endDate
+            self.quests = {}
         }
 
-        destroy() {
-            // TODO
-        }
+        // ---- readonly methods ----
 
         pub fun isActive(): Bool {
             return self.endDate > getCurrentBlock().timestamp
         }
+
+        pub fun getQuestKeys(): [String] {
+            return self.quests.keys
+        }
+
+        pub fun getQuestConfig(key: String): QuestConfig {
+            return self.quests[key] ?? panic("Missing quest of key: ".concat(key))
+        }
+
+        // ---- writable methods ----
+
+        access(contract) fun addQuestConfig(quest: QuestConfig) {
+            pre {
+                self.quests[quest.questKey] == nil: "Quest exists"
+            }
+            self.quests[quest.questKey] = quest
+        }
+
+        access(contract) fun updateEndDate(datetime: UFix64) {
+            pre {
+                datetime > getCurrentBlock().timestamp: "Cannot update end date before now."
+            }
+            self.endDate = datetime
+        }
+
+        // ---- internal methods ----
     }
 
     pub resource interface CompetitionServicePublic {
-        pub fun getActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic}
+        pub fun getLatestActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic}
     }
 
     // The singleton instance of competition service
     pub resource CompetitionServiceStore: CompetitionServicePublic {
         // all seasons in the
         access(self) var seasons: @{UInt64: CompetitionSeason}
-        access(self) var currentSeasonId: UInt64
+        access(self) var latestActiveSeasonId: UInt64
 
         init() {
             self.seasons <- {}
-            self.currentSeasonId = 0
+            self.latestActiveSeasonId = 0
         }
 
         destroy() {
             destroy self.seasons
         }
 
-        pub fun getActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic} {
-            let season = &self.seasons[self.currentSeasonId] as &CompetitionSeason{CompetitionSeasonPublic}?
+        // ---- factory methods ----
+
+        pub fun createCompetitionAdmin(): @CompetitionAdmin {
+            return <- create CompetitionAdmin()
+        }
+
+        pub fun createSeasonPointsController(): @SeasonPointsController {
+            return <- create SeasonPointsController()
+        }
+
+        access(contract) fun startNewSeason(
+            endDate: UFix64,
+            quests: [QuestConfig]
+        ): UInt64 {
+            let season <- create CompetitionSeason(
+                endDate: endDate,
+                quests: quests,
+            )
+            let seasonId = season.uuid
+            self.seasons[seasonId] <-! season
+            self.latestActiveSeasonId = seasonId
+
+            emit SeasonCreated(seasonId: seasonId)
+            return seasonId
+        }
+
+        // ---- readonly methods ----
+
+        pub fun getLatestActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic} {
+            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{CompetitionSeasonPublic}?
                 ?? panic("Failed to get current active season.")
             assert(season.isActive(), message: "The current season is not active.")
             return season
         }
+
+        access(contract) fun getSeasonRef(_ seasonId: UInt64): &CompetitionSeason {
+            return &self.seasons[seasonId] as &CompetitionSeason?
+                ?? panic("Failed to get the season: ".concat(seasonId.toString()))
+        }
+
+        // ---- writable methods ----
     }
 
     // ---- Admin resource ----
+
+    /// Mainly used to manage competition
     pub resource CompetitionAdmin {
 
+        pub fun startNewSeason(endDate: UFix64, quests: [QuestConfig]): UInt64 {
+            let serviceIns = CompetitionService.getService()
+            return serviceIns.startNewSeason(endDate: endDate, quests: quests)
+        }
+
+        pub fun addQuestConfig(seasonId: UInt64, quest: QuestConfig) {
+            let serviceIns = CompetitionService.getService()
+            let season = serviceIns.getSeasonRef(seasonId)
+            season.addQuestConfig(quest: quest)
+        }
+
+        pub fun updateEndDate(seasonId: UInt64, datetime: UFix64) {
+            let serviceIns = CompetitionService.getService()
+            let season = serviceIns.getSeasonRef(seasonId)
+            season.updateEndDate(datetime: datetime)
+        }
     }
 
+    /// Mainly used to update user profile
     pub resource SeasonPointsController {
-
+        // TODO
     }
 
     // ---- public methods ----
