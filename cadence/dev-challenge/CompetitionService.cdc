@@ -40,13 +40,90 @@ pub contract CompetitionService {
         *  |    |__| | \| |___  |  | |__| | \| |  | |___ |  |    |
          ***********************************************************/
 
-    pub resource interface CompetitionServicePublic {
+    pub struct QuestIdentifier {
+        pub let seasonId: UInt64
+        pub let questKey: String
 
+        init(season: UInt64, questKey: String) {
+            self.seasonId = season
+            self.questKey = questKey
+        }
+    }
+
+    pub struct QuestConfig {
+        // The offchain key of the quest
+        pub let questKey: String
+        // how many points user can obtain when quest completed
+        pub let rewardPoints: UInt64
+        // how many points inviter can obtain when quest completed
+        pub let referalPoints: UInt64
+        // Whether it can be completed repeatedly
+        pub let stackable: Bool
+        // how many times can be completed
+        pub let limitation: UInt64
+
+        init(
+            questKey: String,
+            rewardPoints: UInt64,
+            referalPoints: UInt64?,
+            stackable: Bool?,
+            limitation: UInt64?,
+        ) {
+            self.questKey = questKey
+            self.rewardPoints = rewardPoints
+            self.referalPoints = referalPoints ?? 0
+            self.stackable = stackable ?? false
+            self.limitation = limitation ?? 1
+        }
+    }
+
+    pub resource interface CompetitionSeasonPublic {
+        pub fun isActive(): Bool
+    }
+
+    pub resource CompetitionSeason: CompetitionSeasonPublic {
+        pub let endDate: UFix64
+
+        init(
+            endDate: UFix64
+        ) {
+            self.endDate = endDate
+        }
+
+        destroy() {
+            // TODO
+        }
+
+        pub fun isActive(): Bool {
+            return self.endDate > getCurrentBlock().timestamp
+        }
+    }
+
+    pub resource interface CompetitionServicePublic {
+        pub fun getActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic}
     }
 
     // The singleton instance of competition service
     pub resource CompetitionServiceStore: CompetitionServicePublic {
-        // acesss(self) let seasons:
+        // all seasons in the
+        access(self) var seasons: @{UInt64: CompetitionSeason}
+        access(self) var currentSeasonId: UInt64
+
+        init() {
+            self.seasons <- {}
+            self.currentSeasonId = 0
+        }
+
+        destroy() {
+            destroy self.seasons
+        }
+
+        pub fun getActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic} {
+            let season = &self.seasons[self.currentSeasonId] as &CompetitionSeason{CompetitionSeasonPublic}?
+                ?? panic("Failed to get current active season.")
+            assert(season.isActive(), message: "The current season is not active.")
+            return season
+        }
     }
 
     // ---- Admin resource ----
