@@ -5,6 +5,8 @@
 
 Join a flow development competition.
 */
+import UserProfile from "./UserProfile.cdc"
+
 pub contract CompetitionService {
 
     /**    ___  ____ ___ _  _ ____
@@ -85,6 +87,7 @@ pub contract CompetitionService {
     }
 
     pub resource interface CompetitionSeasonPublic {
+        pub fun getId(): UInt64
         pub fun isActive(): Bool
         pub fun getQuestKeys(): [String]
         pub fun getQuestConfig(key: String): QuestConfig
@@ -103,6 +106,10 @@ pub contract CompetitionService {
         }
 
         // ---- readonly methods ----
+
+        pub fun getId(): UInt64 {
+            return self.uuid
+        }
 
         pub fun isActive(): Bool {
             return self.endDate > getCurrentBlock().timestamp
@@ -142,8 +149,8 @@ pub contract CompetitionService {
     // The singleton instance of competition service
     pub resource CompetitionServiceStore: CompetitionServicePublic {
         // all seasons in the
-        access(self) var seasons: @{UInt64: CompetitionSeason}
         access(self) var latestActiveSeasonId: UInt64
+        access(self) var seasons: @{UInt64: CompetitionSeason}
 
         init() {
             self.seasons <- {}
@@ -164,22 +171,6 @@ pub contract CompetitionService {
             return <- create SeasonPointsController()
         }
 
-        access(contract) fun startNewSeason(
-            endDate: UFix64,
-            quests: [QuestConfig]
-        ): UInt64 {
-            let season <- create CompetitionSeason(
-                endDate: endDate,
-                quests: quests,
-            )
-            let seasonId = season.uuid
-            self.seasons[seasonId] <-! season
-            self.latestActiveSeasonId = seasonId
-
-            emit SeasonCreated(seasonId: seasonId)
-            return seasonId
-        }
-
         // ---- readonly methods ----
 
         pub fun getLatestActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic} {
@@ -195,6 +186,22 @@ pub contract CompetitionService {
         }
 
         // ---- writable methods ----
+
+        access(contract) fun startNewSeason(
+            endDate: UFix64,
+            quests: [QuestConfig]
+        ): UInt64 {
+            let season <- create CompetitionSeason(
+                endDate: endDate,
+                quests: quests,
+            )
+            let seasonId = season.uuid
+            self.seasons[seasonId] <-! season
+            self.latestActiveSeasonId = seasonId
+
+            emit SeasonCreated(seasonId: seasonId)
+            return seasonId
+        }
     }
 
     // ---- Admin resource ----
@@ -222,7 +229,17 @@ pub contract CompetitionService {
 
     /// Mainly used to update user profile
     pub resource SeasonPointsController {
-        // TODO
+
+        pub fun fetchUserQuestParameters(acct: Address, seasonId: UInt64, questKey: String): {String: AnyStruct} {
+            let profileRef = getAccount(acct)
+                .getCapability<&UserProfile.Profile{UserProfile.ProfilePublic}>(UserProfile.ProfilePublicPath)
+                .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
+            return profileRef.getLatestSeasonQuestParameters(seasonId: seasonId, questKey: questKey)
+        }
+
+        pub fun completeQuestAndDistributePoints(acct: Address, seasonId: UInt64, questKey: String) {
+            // TODO
+        }
     }
 
     // ---- public methods ----
