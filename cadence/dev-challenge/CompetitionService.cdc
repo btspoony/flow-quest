@@ -238,6 +238,18 @@ pub contract CompetitionService {
         }
 
         pub fun completeQuestAndDistributePoints(acct: Address, seasonId: UInt64, questKey: String) {
+            // get quest config
+            let serviceIns = CompetitionService.getService()
+            let seasonRef = serviceIns.getSeasonRef(seasonId)
+            let questCfg = seasonRef.getQuestConfig(key: questKey)
+
+            // get profile and update points
+            let profileRef = getAccount(acct)
+                .getCapability<&UserProfile.Profile{UserProfile.ProfilePublic}>(UserProfile.ProfilePublicPath)
+                .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
+            // TODO
+
+            // get inviter profile and update referral points
             // TODO
         }
     }

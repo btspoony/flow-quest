@@ -70,13 +70,15 @@ pub contract UserProfile {
     }
 
     pub struct SeasonRecord {
-        pub let referredFrom: String?
+        pub let referredFromCode: String?
+        pub let referredFromAddress: Address?
         pub var referralCode: String?
         pub var points: UInt64
         access(contract) var questScores: {String: QuestRecord}
 
         init(_ referredFrom: String?) {
-            self.referredFrom = referredFrom
+            self.referredFromCode = referredFrom
+            self.referredFromAddress = nil // TODO: parse address?
             self.referralCode = nil
             self.points = 0
             self.questScores = {}
