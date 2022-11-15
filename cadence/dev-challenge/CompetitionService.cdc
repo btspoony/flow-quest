@@ -55,7 +55,7 @@ pub contract CompetitionService {
         }
 
         pub fun getConfig(): QuestConfig {
-            let season = CompetitionService.getService().getSeasonRef(self.seasonId)
+            let season = CompetitionService.borrowServiceRef().borrowSeasonRef(self.seasonId)
             return season.getQuestConfig(key: self.questKey)
         }
     }
@@ -182,7 +182,7 @@ pub contract CompetitionService {
         // ---- readonly methods ----
 
         pub fun getLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
-            return self.getLatestActiveSeasonFull() as &{Interfaces.CompetitionPublic}
+            return self.getLatestActiveSeasonFull()
         }
 
         pub fun getLatestActiveSeasonFull(): &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic} {
@@ -192,7 +192,7 @@ pub contract CompetitionService {
             return season
         }
 
-        access(contract) fun getSeasonRef(_ seasonId: UInt64): &CompetitionSeason {
+        access(contract) fun borrowSeasonRef(_ seasonId: UInt64): &CompetitionSeason {
             return &self.seasons[seasonId] as &CompetitionSeason?
                 ?? panic("Failed to get the season: ".concat(seasonId.toString()))
         }
@@ -222,19 +222,19 @@ pub contract CompetitionService {
     pub resource CompetitionAdmin {
 
         pub fun startNewSeason(endDate: UFix64, quests: [QuestConfig]): UInt64 {
-            let serviceIns = CompetitionService.getService()
+            let serviceIns = CompetitionService.borrowServiceRef()
             return serviceIns.startNewSeason(endDate: endDate, quests: quests)
         }
 
         pub fun addQuestConfig(seasonId: UInt64, quest: QuestConfig) {
-            let serviceIns = CompetitionService.getService()
-            let season = serviceIns.getSeasonRef(seasonId)
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonRef(seasonId)
             season.addQuestConfig(quest: quest)
         }
 
         pub fun updateEndDate(seasonId: UInt64, datetime: UFix64) {
-            let serviceIns = CompetitionService.getService()
-            let season = serviceIns.getSeasonRef(seasonId)
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonRef(seasonId)
             season.updateEndDate(datetime: datetime)
         }
     }
@@ -242,40 +242,71 @@ pub contract CompetitionService {
     /// Mainly used to update user profile
     pub resource SeasonPointsController {
 
-        pub fun fetchUserQuestParameters(acct: Address, seasonId: UInt64, questKey: String): {String: AnyStruct} {
-            let profileRef = getAccount(acct)
-                .getCapability<&UserProfile.Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
-                .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
-            return profileRef.getLatestSeasonQuestParameters(seasonId: seasonId, questKey: questKey)
-        }
-
-        pub fun completeQuestAndDistributePoints(acct: Address, seasonId: UInt64, questKey: String) {
+        pub fun questCompletedAndDistributePoints(acct: Address, seasonId: UInt64, questKey: String) {
             // get quest config
-            let serviceIns = CompetitionService.getService()
-            let seasonRef = serviceIns.getSeasonRef(seasonId)
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let seasonRef = serviceIns.borrowSeasonRef(seasonId)
             let questCfg = seasonRef.getQuestConfig(key: questKey)
 
             // get profile and update points
-            let profileRef = getAccount(acct)
-                .getCapability<&UserProfile.Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
-                .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
-            // TODO
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            let paramsIndex = profileRef.getLatestSeasonQuestIndex(seasonId: seasonId, questKey: questKey)
+            let timesCompleted = profileRef.getTimesCompleted(seasonId: seasonId, questKey: questKey)
+
+            assert(timesCompleted == 0 || (questCfg.stackable && timesCompleted < questCfg.limitation), message: "Cannot complete more times.")
+
+            self.updateQuestVerificationResult(acct: acct, seasonId: seasonId, questKey: questKey, idx: paramsIndex, result: true)
+            self.addPoints(acct: acct, seasonId: seasonId, points: questCfg.rewardPoints)
 
             // get inviter profile and update referral points
-            // TODO
+            let referralFrom = profileRef.getReferredFrom(seasonId: seasonId)
+            if referralFrom != nil && questCfg.referalPoints > 0 {
+                self.addPoints(acct: referralFrom!, seasonId: seasonId, points: questCfg.referalPoints)
+            }
+        }
+
+        pub fun questFailure(acct: Address, seasonId: UInt64, questKey: String) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            let paramsIndex = profileRef.getLatestSeasonQuestIndex(seasonId: seasonId, questKey: questKey)
+            self.updateQuestVerificationResult(acct: acct, seasonId: seasonId, questKey: questKey, idx: paramsIndex, result: false)
+        }
+
+        pub fun appendNewParams(acct: Address, seasonId: UInt64, questKey: String, params: {String: AnyStruct}) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.appendNewParams(seasonId: seasonId, questKey: questKey, params: params)
+        }
+
+        pub fun setupReferralCode(acct: Address, seasonId: UInt64) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.setupReferralCode(seasonId: seasonId)
+        }
+
+        access(contract) fun addPoints(acct: Address, seasonId: UInt64, points: UInt64) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.addPoints(seasonId: seasonId, points: points)
+        }
+
+        access(contract) fun updateQuestVerificationResult(acct: Address, seasonId: UInt64, questKey: String, idx: Int, result: Bool) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.updateVerificationResult(seasonId: seasonId, questKey: questKey, idx: idx, result: result)
         }
     }
 
     // ---- public methods ----
 
-    pub fun getServicePublic(): &CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic} {
+    pub fun borrowServicePublic(): &CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic} {
         return self.account
             .getCapability<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
             .borrow()
             ?? panic("Missing the capability of service store resource")
     }
 
-    access(account) fun getService(): &CompetitionServiceStore {
+    access(account) fun borrowServiceRef(): &CompetitionServiceStore {
         return self.account.borrow<&CompetitionServiceStore>(from: self.ServiceStoragePath)
             ?? panic("Missing the service store resource")
     }

@@ -20,11 +20,13 @@ pub contract Interfaces {
         pub fun getIdentity(platform: String): LinkedIdentity
 
         pub fun getSeasonPoints(seasonId: UInt64): UInt64
+        pub fun getReferredFrom(seasonId: UInt64): Address?
 
         // readable
-        access(account) fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct}
-        access(account) fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int
-        access(account) fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool?
+        pub fun getTimesCompleted(seasonId: UInt64, questKey: String): UInt64
+        pub fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct}
+        pub fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int
+        pub fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool?
 
         // writable
         access(account) fun addPoints(seasonId: UInt64, points: UInt64)

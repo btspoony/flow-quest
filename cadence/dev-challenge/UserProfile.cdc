@@ -54,6 +54,9 @@ pub contract UserProfile {
         }
 
         pub fun getLatestIndex(): Int {
+            pre {
+                self.verificationParams.length > 0: "no params"
+            }
             return self.verificationParams.length - 1
         }
 
@@ -160,19 +163,30 @@ pub contract UserProfile {
             return seasonRef.points
         }
 
-        access(account) fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct} {
+        pub fun getReferredFrom(seasonId: UInt64): Address? {
+            let seasonRef = self.getSeasonRecordRef(seasonId)
+            return seasonRef.referredFromAddress
+        }
+
+        pub fun getTimesCompleted(seasonId: UInt64, questKey: String): UInt64 {
+            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
+            return questScoreRef.timesCompleted
+        }
+
+        pub fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct} {
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             return questScoreRef.getLatestParams()
         }
 
-        access(account) fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int {
+        pub fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int {
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             return questScoreRef.getLatestIndex()
         }
 
-        access(account) fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool? {
+        pub fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool? {
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             return questScoreRef.getLatestResult()
@@ -258,8 +272,13 @@ pub contract UserProfile {
         }
 
         access(account) fun setupReferralCode(seasonId: UInt64) {
-            // TODO
-            // pub event QuestRecordSetupReferralCode(profile: Address, seasonId: UInt64, code: String)
+            let code = "" // TODO
+
+            emit QuestRecordSetupReferralCode(
+                profile: self.owner!.address,
+                seasonId: seasonId,
+                code: code,
+            )
         }
 
         // ---- internal methods ----
@@ -276,7 +295,7 @@ pub contract UserProfile {
         return <- create Profile()
     }
 
-    pub fun borrowUserProfilePublic(acct: Address): &Profile{Interfaces.ProfilePublic} {
+    pub fun borrowUserProfilePublic(_ acct: Address): &Profile{Interfaces.ProfilePublic} {
         return getAccount(acct)
             .getCapability<&Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
             .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
