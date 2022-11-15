@@ -276,6 +276,12 @@ pub contract UserProfile {
         return <- create Profile()
     }
 
+    pub fun borrowUserProfilePublic(acct: Address): &Profile{Interfaces.ProfilePublic} {
+        return getAccount(acct)
+            .getCapability<&Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
+            .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
+    }
+
     init() {
         self.totalProfiles = 0
 
