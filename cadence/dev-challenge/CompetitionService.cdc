@@ -5,6 +5,7 @@
 
 Join a flow development competition.
 */
+import Interfaces from "./Interfaces.cdc"
 import UserProfile from "./UserProfile.cdc"
 
 pub contract CompetitionService {
@@ -86,16 +87,15 @@ pub contract CompetitionService {
         }
     }
 
-    pub resource interface CompetitionSeasonPublic {
-        pub fun getId(): UInt64
-        pub fun isActive(): Bool
+    pub resource interface CompetitionSeasonQuestsPublic {
         pub fun getQuestKeys(): [String]
         pub fun getQuestConfig(key: String): QuestConfig
     }
 
-    pub resource CompetitionSeason: CompetitionSeasonPublic {
+    pub resource CompetitionSeason: CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic {
         pub var endDate: UFix64
         access(contract) var quests: {String: QuestConfig}
+        access(contract) var profiles: {Address: Bool}
 
         init(
             endDate: UFix64,
@@ -103,6 +103,7 @@ pub contract CompetitionService {
         ) {
             self.endDate = endDate
             self.quests = {}
+            self.profiles = {}
         }
 
         // ---- readonly methods ----
@@ -125,6 +126,13 @@ pub contract CompetitionService {
 
         // ---- writable methods ----
 
+        access(account) fun registerProfile(acct: Address) {
+            pre {
+                self.profiles[acct] == nil: "Profile registered."
+            }
+            self.profiles[acct] = true
+        }
+
         access(contract) fun addQuestConfig(quest: QuestConfig) {
             pre {
                 self.quests[quest.questKey] == nil: "Quest exists"
@@ -143,11 +151,11 @@ pub contract CompetitionService {
     }
 
     pub resource interface CompetitionServicePublic {
-        pub fun getLatestActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic}
+        pub fun getLatestActiveSeasonFull(): &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
     }
 
     // The singleton instance of competition service
-    pub resource CompetitionServiceStore: CompetitionServicePublic {
+    pub resource CompetitionServiceStore: CompetitionServicePublic, Interfaces.CompetitionServicePublic {
         // all seasons in the
         access(self) var latestActiveSeasonId: UInt64
         access(self) var seasons: @{UInt64: CompetitionSeason}
@@ -173,8 +181,12 @@ pub contract CompetitionService {
 
         // ---- readonly methods ----
 
-        pub fun getLatestActiveSeason(): &CompetitionSeason{CompetitionSeasonPublic} {
-            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{CompetitionSeasonPublic}?
+        pub fun getLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
+            return self.getLatestActiveSeasonFull() as &{Interfaces.CompetitionPublic}
+        }
+
+        pub fun getLatestActiveSeasonFull(): &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic} {
+            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}?
                 ?? panic("Failed to get current active season.")
             assert(season.isActive(), message: "The current season is not active.")
             return season
@@ -232,7 +244,7 @@ pub contract CompetitionService {
 
         pub fun fetchUserQuestParameters(acct: Address, seasonId: UInt64, questKey: String): {String: AnyStruct} {
             let profileRef = getAccount(acct)
-                .getCapability<&UserProfile.Profile{UserProfile.ProfilePublic}>(UserProfile.ProfilePublicPath)
+                .getCapability<&UserProfile.Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
                 .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
             return profileRef.getLatestSeasonQuestParameters(seasonId: seasonId, questKey: questKey)
         }
@@ -245,7 +257,7 @@ pub contract CompetitionService {
 
             // get profile and update points
             let profileRef = getAccount(acct)
-                .getCapability<&UserProfile.Profile{UserProfile.ProfilePublic}>(UserProfile.ProfilePublicPath)
+                .getCapability<&UserProfile.Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
                 .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
             // TODO
 
@@ -256,9 +268,9 @@ pub contract CompetitionService {
 
     // ---- public methods ----
 
-    pub fun getServicePublic(): &CompetitionServiceStore{CompetitionServicePublic} {
+    pub fun getServicePublic(): &CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic} {
         return self.account
-            .getCapability<&CompetitionServiceStore{CompetitionServicePublic}>(self.ServicePublicPath)
+            .getCapability<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
             .borrow()
             ?? panic("Missing the capability of service store resource")
     }
@@ -280,7 +292,10 @@ pub contract CompetitionService {
         self.ServiceStoragePath = /storage/DevCompetitionServicePathV1
         self.ServicePublicPath = /public/DevCompetitionServicePathV1
         self.account.save(<- create CompetitionServiceStore(), to: self.ServiceStoragePath)
-        self.account.link<&CompetitionServiceStore{CompetitionServicePublic}>(self.ServicePublicPath, target: self.ServiceStoragePath)
+        self.account.link<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
+            self.ServicePublicPath,
+            target: self.ServiceStoragePath
+        )
 
         emit ContractInitialized()
     }

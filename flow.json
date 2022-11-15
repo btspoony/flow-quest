@@ -47,13 +47,19 @@
         "testnet": "0x31ad40c07a2a9788",
         "mainnet": "0xa340dc0a4ec828ab"
       }
-    }
+    },
+    "Interfaces": "./cadence/dev-challenge/Interfaces.cdc",
+    "UserProfile": "./cadence/dev-challenge/UserProfile.cdc",
+    "CompetitionService": "./cadence/dev-challenge/CompetitionService.cdc"
   },
   "deployments": {
     "emulator": {
       "emulator-account": [
         "NonFungibleToken",
-        "MetadataViews"
+        "MetadataViews",
+        "Interfaces",
+        "UserProfile",
+        "CompetitionService"
       ]
     }
   }

@@ -4,7 +4,7 @@
 > Author: Bohao Tang<tech@btang.cn>
 
 */
-import MetadataViews from "../deps/MetadataViews.cdc"
+import Interfaces from "./Interfaces.cdc"
 
 pub contract UserProfile {
 
@@ -15,7 +15,6 @@ pub contract UserProfile {
 
     pub let ProfileStoragePath: StoragePath;
     pub let ProfilePublicPath: PublicPath;
-    pub let ProfilePrivatePath: PrivatePath;
 
     /**    ____ _  _ ____ _  _ ___ ____
        *   |___ |  | |___ |\ |  |  [__
@@ -25,7 +24,8 @@ pub contract UserProfile {
     pub event ProfileCreated(profileId: UInt64)
     pub event ProfileUpsertIdentity(profile: Address, platform: String, uid: String, name: String, image: String)
 
-    pub event ProfileAddPoints(profile: Address, seasonId: UInt64, points: UInt64)
+    pub event ProfileSeasonAddPoints(profile: Address, seasonId: UInt64, points: UInt64)
+    pub event ProfileSeasonNewSeason(profile: Address, seasonId: UInt64, referredFrom: String?)
     pub event QuestRecordAppendNewParams(profile: Address, seasonId: UInt64, questKey: String, keys: [String])
     pub event QuestRecordUpdateVerificationResult(profile: Address, seasonId: UInt64, questKey: String, index: Int, result: Bool)
     pub event QuestRecordSetupReferralCode(profile: Address, seasonId: UInt64, code: String)
@@ -89,9 +89,14 @@ pub contract UserProfile {
         pub var referralCode: String?
         pub var points: UInt64
 
+        access(self) let campetitionServiceCap: Capability<&{Interfaces.CompetitionServicePublic}>
         access(contract) var questScores: {String: QuestRecord}
 
-        init(_ referredFrom: String?) {
+        init(
+            cap: Capability<&{Interfaces.CompetitionServicePublic}>,
+            referredFrom: String?
+        ) {
+            self.campetitionServiceCap = cap
             self.referredFromCode = referredFrom
             self.referredFromAddress = nil // TODO: parse address from code?
             self.referralCode = nil
@@ -118,42 +123,18 @@ pub contract UserProfile {
         }
     }
 
-    pub struct LinkedIdentity {
-        pub let platform: String
-        pub let uid: String
-        pub let display: MetadataViews.Display
-
-        init(platform: String, uid: String, display: MetadataViews.Display) {
-            self.platform = platform
-            self.uid = uid
-            self.display = display
-        }
-    }
-
-    pub resource interface ProfilePublic {
-        pub fun getIdentities(): [LinkedIdentity]
-        pub fun getIdentity(platform: String): LinkedIdentity
-
-        pub fun getSeasonPoints(seasonId: UInt64): UInt64
-
-        access(account) fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct}
-        access(account) fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int
-        access(account) fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool?
-    }
-
+    // Profile writable
     pub resource interface ProfilePrivate {
-        pub fun upsertIdentity(platform: String, identity: LinkedIdentity)
-
-        access(account) fun addPoints(seasonId: UInt64, points: UInt64)
-        access(account) fun appendNewParams(seasonId: UInt64, questKey: String, params: {String: AnyStruct})
-        access(account) fun updateVerificationResult(seasonId: UInt64, questKey: String, idx: Int, result: Bool)
-
-        access(account) fun setupReferralCode(seasonId: UInt64)
+        pub fun registerForNewSeason(
+            serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
+            referredFrom: String?
+        )
+        pub fun upsertIdentity(platform: String, identity: Interfaces.LinkedIdentity)
     }
 
-    pub resource Profile: ProfilePublic {
+    pub resource Profile: Interfaces.ProfilePublic, ProfilePrivate {
         access(self) var seasonScores: {UInt64: SeasonRecord}
-        access(self) var linkedIdentities: {String: LinkedIdentity}
+        access(self) var linkedIdentities: {String: Interfaces.LinkedIdentity}
 
         init() {
             self.seasonScores = {}
@@ -164,16 +145,13 @@ pub contract UserProfile {
             emit ProfileCreated(profileId: self.uuid)
         }
 
-        // ---- factory methods ----
-        // nothing
-
         // ---- readonly methods ----
 
-        pub fun getIdentities(): [LinkedIdentity] {
+        pub fun getIdentities(): [Interfaces.LinkedIdentity] {
             return self.linkedIdentities.values
         }
 
-        pub fun getIdentity(platform: String): LinkedIdentity {
+        pub fun getIdentity(platform: String): Interfaces.LinkedIdentity {
             return self.linkedIdentities[platform] ?? panic("Platform not found.")
         }
 
@@ -203,7 +181,32 @@ pub contract UserProfile {
 
         // ---- writable methods ----
 
-        pub fun upsertIdentity(platform: String, identity: LinkedIdentity) {
+        pub fun registerForNewSeason(
+            serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
+            referredFrom: String?
+        ) {
+            let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
+            let competitionCap = serviceRef.getLatestActiveSeason()
+            assert(competitionCap.isActive(), message: "Competition is not active.")
+
+            // add to competition
+            let profileAddress = self.owner!.address
+            competitionCap.registerProfile(acct: profileAddress)
+
+            let seasonId = competitionCap.getId()
+            self.seasonScores[seasonId] = SeasonRecord(
+                cap: serviceCap,
+                referredFrom: referredFrom
+            )
+
+            emit ProfileSeasonNewSeason(
+                profile: profileAddress,
+                seasonId: seasonId,
+                referredFrom: referredFrom,
+            )
+        }
+
+        pub fun upsertIdentity(platform: String, identity: Interfaces.LinkedIdentity) {
             self.linkedIdentities[platform] = identity
 
             emit ProfileUpsertIdentity(
@@ -219,7 +222,7 @@ pub contract UserProfile {
             let seasonRef = self.getSeasonRecordRef(seasonId)
             seasonRef.addPoints(points: points)
 
-            emit ProfileAddPoints(
+            emit ProfileSeasonAddPoints(
                 profile: self.owner!.address,
                 seasonId: seasonId,
                 points: points,
@@ -278,7 +281,6 @@ pub contract UserProfile {
 
         self.ProfileStoragePath = /storage/DevCompetitionProfilePathV1
         self.ProfilePublicPath = /public/DevCompetitionProfilePathV1
-        self.ProfilePrivatePath = /private/DevCompetitionProfilePathV1
 
         emit ContractInitialized()
     }
