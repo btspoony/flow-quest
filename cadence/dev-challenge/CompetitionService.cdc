@@ -16,10 +16,7 @@ pub contract CompetitionService {
          *************************/
 
     pub let AdminStoragePath: StoragePath;
-    pub let AdminPublicPath: PublicPath;
-
     pub let ControllerStoragePath: StoragePath;
-    pub let ControllerPublicPath: PublicPath;
 
     pub let ServiceStoragePath: StoragePath;
     pub let ServicePublicPath: PublicPath;
@@ -318,10 +315,7 @@ pub contract CompetitionService {
     init() {
         // Admin resource paths
         self.AdminStoragePath = /storage/DevCompetitionAdminPathV1
-        self.AdminPublicPath = /public/DevCompetitionAdminPathV1
-
         self.ControllerStoragePath = /storage/DevCompetitionControllerPathV1
-        self.ControllerPublicPath = /public/DevCompetitionControllerPathV1
 
         // Store the resource of Challenge Seasons in the account
         self.ServiceStoragePath = /storage/DevCompetitionServicePathV1
