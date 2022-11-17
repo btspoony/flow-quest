@@ -306,6 +306,10 @@ pub contract CompetitionService {
             ?? panic("Missing the capability of service store resource")
     }
 
+    pub fun getPublicCapability(): Capability<&{Interfaces.CompetitionServicePublic}> {
+        return self.account.getCapability<&{Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
+    }
+
     access(account) fun borrowServiceRef(): &CompetitionServiceStore {
         return self.account.borrow<&CompetitionServiceStore>(from: self.ServiceStoragePath)
             ?? panic("Missing the service store resource")
