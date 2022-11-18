@@ -2,6 +2,8 @@ import fcl from "@onflow/fcl";
 import { flow, assert } from "../helpers";
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+
   const body = await readBody(event);
 
   // Step.0 verify body parameters
@@ -13,8 +15,14 @@ export default defineEventHandler(async (event) => {
   const questAddress = body.questAddr; // required, quest related
   const questTransaction = body.questTrx; // optional, quest related transaction
 
+  const isProduction = config.public.network === "mainnet";
+
   // Step.1 Verify account proof on mainnet
-  flow.switchToMainnet();
+  if (isProduction) {
+    flow.switchToMainnet();
+  } else {
+    flow.switchToTestnet();
+  }
   const isValid = await fcl.AppUtils.verifyAccountProof(
     flow.appIdentifier,
     {
@@ -31,11 +39,19 @@ export default defineEventHandler(async (event) => {
   assert(isValid, "mainnet account proof invalid");
 
   // Step.2 Verify the quest result on testnet
-  flow.switchToTestnet();
+  if (isProduction) {
+    flow.switchToTestnet();
+  } else {
+    flow.switchToEmulator();
+  }
   // TODO: run a script to ensure transactions
 
   // Step.3 Run a transaction on mainnet
-  flow.switchToMainnet();
+  if (isProduction) {
+    flow.switchToMainnet();
+  } else {
+    flow.switchToTestnet();
+  }
   // TODO: run the reward transaction
 
   // Step.4 Return the transaction id

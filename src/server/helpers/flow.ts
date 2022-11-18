@@ -17,3 +17,11 @@ export function switchToTestnet() {
     .put("flow.network", "testnet")
     .put("accessNode.api", "https://rest-testnet.onflow.org");
 }
+
+export function switchToEmulator() {
+  fcl
+    .config()
+    .put("fcl.limit", 9999)
+    .put("flow.network", "emulator")
+    .put("accessNode.api", "http://localhost:8080");
+}
