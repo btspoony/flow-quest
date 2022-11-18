@@ -316,11 +316,15 @@ pub contract CompetitionService {
         // Admin resource paths
         self.AdminStoragePath = /storage/DevCompetitionAdminPathV1
         self.ControllerStoragePath = /storage/DevCompetitionControllerPathV1
-
-        // Store the resource of Challenge Seasons in the account
         self.ServiceStoragePath = /storage/DevCompetitionServicePathV1
         self.ServicePublicPath = /public/DevCompetitionServicePathV1
-        self.account.save(<- create CompetitionServiceStore(), to: self.ServiceStoragePath)
+
+        let store <- create CompetitionServiceStore()
+        // Store admin and controller resources
+        self.account.save(<- store.createCompetitionAdmin(), to: self.AdminStoragePath)
+        self.account.save(<- store.createSeasonPointsController(), to: self.ControllerStoragePath)
+        // Store the resource of Challenge Seasons in the account
+        self.account.save(<- store, to: self.ServiceStoragePath)
         self.account.link<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
             self.ServicePublicPath,
             target: self.ServiceStoragePath
