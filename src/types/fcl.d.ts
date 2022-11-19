@@ -119,12 +119,22 @@ declare module "@onflow/fcl" {
     message: string;
   }
 
+  export interface KeyObject {
+    index: number;
+    publicKey: string;
+    signAlgo: number;
+    hashAlgo: number;
+    weight: number;
+    sequenceNumber: number;
+    revoked: boolean;
+  }
+
   export interface Account {
     address: string; // The address of the account
     balance: number; // The FLOW balance of the account in 10*6.
     code: string; //	The code of any Cadence contracts stored in the account.
     contracts: Record<string, unknown>; //	Map of deployed contract name to cadence string.
-    keys: Record<string, unknown>; // Any contracts deployed to this account.
+    keys: Record<string, KeyObject>; // Any contracts deployed to this account.
   }
 
   export interface AuthZ extends Account {
@@ -297,6 +307,7 @@ declare module "@onflow/fcl" {
     limit?: number;
     proposer?: AuthorizationFunction;
     payer?: AuthorizationFunction;
+    authorizations?: [AuthorizationFunction];
   }): Promise<string>;
 
   export function send(args: any, opts?: any): Promise<Response>;
@@ -310,6 +321,8 @@ declare module "@onflow/fcl" {
   export function latestBlock(isSealed: boolean): Promise<BlockObject>;
 
   export function sansPrefix(address: string): string;
+
+  export function withPrefix(address: string): string;
 
   export function tx(transactionId: any): TransactionResult;
 
@@ -381,6 +394,7 @@ declare module "@onflow/fcl" {
   export const WalletUtils: WalletUtils;
 
   // SDK
+  export function getAccount(address: string): Pipe;
   export function getBlock(isSealed?: boolean): Pipe;
   export function getTransaction(transactionId: string): Pipe;
   export function getTransactionStatus(transactionId: string): Pipe;

@@ -1,4 +1,5 @@
 import fcl from "@onflow/fcl";
+import * as cadence from "./cadence";
 
 export const appIdentifier = "Flow Dev Challenge V1.0";
 

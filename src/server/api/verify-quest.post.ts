@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
   } else {
     flow.switchToTestnet();
   }
+
   const isValid = await fcl.AppUtils.verifyAccountProof(
     flow.appIdentifier,
     {
@@ -33,7 +34,9 @@ export default defineEventHandler(async (event) => {
     {
       // use blocto adddres to avoid self-custodian
       // https://docs.blocto.app/blocto-sdk/javascript-sdk/flow/account-proof
-      fclCryptoContract: "0xdb6b70764af4ff68",
+      fclCryptoContract: isProduction
+        ? "0xdb6b70764af4ff68"
+        : "0x5b250a8a85b44a67",
     }
   );
   assert(isValid, "mainnet account proof invalid");
