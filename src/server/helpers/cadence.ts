@@ -7,7 +7,7 @@
  */
 export function replaceImportAddresses(
   code: string,
-  addressMap: (key: string) => string | { [key: string]: string },
+  addressMap: ((key: string) => string) | { [key: string]: string },
   byName = true
 ): string {
   const REGEXP_IMPORT = /(\s*import\s*)([\w\d]+)(\s+from\s*)([\w\d"-.\\/]+)/g;

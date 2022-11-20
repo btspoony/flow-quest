@@ -6,9 +6,9 @@ transaction(
     endDate: UFix64,
     questKeys: [String],
     rewardPoints: [UInt64],
-    referalPoints: [UInt64],
-    stackable: [Bool],
-    limitation: [UInt64],
+    referalPoints: [UInt64?],
+    stackable: [Bool?],
+    limitation: [UInt64?],
 ) {
     let admin: &CompetitionService.CompetitionAdmin
 

@@ -66,15 +66,8 @@ class FlowSigner {
    *
    * @param code
    * @param args
-   * @param onSealed
    */
-  async sendTransaction(
-    code: string,
-    args: fcl.ArugmentFunction,
-    onSealed?: (txId: string, errorMsg?: string) => void,
-    onStatusUpdated?: (code: fcl.TransactionStatus) => void,
-    onErrorOccured?: (errorMsg: string) => void
-  ) {
+  async sendTransaction(code: string, args: fcl.ArugmentFunction) {
     let transactionId: string;
     const authz = this._buildAuthorization();
 
@@ -87,34 +80,37 @@ class FlowSigner {
         authorizations: [authz],
       });
       console.log("Tx Sent:", transactionId);
-
-      return new Promise((resolve, reject) => {
-        fcl.tx(transactionId).subscribe((res) => {
-          if (onStatusUpdated) {
-            onStatusUpdated(res.status);
-          }
-
-          if (res.status === 4) {
-            if (res.statusCode !== 0 && onErrorOccured) {
-              onErrorOccured(res.errorMessage);
-            }
-            // on sealed callback
-            if (typeof onSealed === "function") {
-              onSealed(
-                transactionId,
-                res.statusCode === 0 ? undefined : res.errorMessage
-              );
-            }
-            resolve(null);
-          }
-        });
-      });
+      return transactionId;
     } catch (e: any) {
-      if (onErrorOccured) {
-        onErrorOccured(e.message);
-      }
       console.log(e);
+      return null;
     }
+  }
+
+  watchTransaction(
+    transactionId: string,
+    onSealed?: (txId: string, errorMsg?: string) => void,
+    onStatusUpdated?: (code: fcl.TransactionStatus) => void,
+    onErrorOccured?: (errorMsg: string) => void
+  ) {
+    fcl.tx(transactionId).subscribe((res) => {
+      if (onStatusUpdated) {
+        onStatusUpdated(res.status);
+      }
+
+      if (res.status === 4) {
+        if (res.statusCode !== 0 && onErrorOccured) {
+          onErrorOccured(res.errorMessage);
+        }
+        // on sealed callback
+        if (typeof onSealed === "function") {
+          onSealed(
+            transactionId,
+            res.statusCode === 0 ? undefined : res.errorMessage
+          );
+        }
+      }
+    });
   }
 
   async executeScript(
