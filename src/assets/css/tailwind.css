@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --color-primary: 0, 170, 85;
+    --color-primary: 67, 160, 71;
     --color-secondary: 255, 136, 0;
     --color-success: 155 192 75;
     --color-failure: 243 47 117;
@@ -17,19 +17,7 @@
   p {
     @apply font-sans;
     @apply font-light;
-    @apply text-base mb-2;
-  }
-
-  pre {
-    @apply font-mono;
-    @apply font-light;
-    @apply text-sm mb-2;
-  }
-
-  label {
-    @apply font-sans;
-    @apply font-semibold;
-    @apply text-sm;
+    @apply text-base;
   }
 }
 
