@@ -1,13 +1,16 @@
 {
   "accounts": {
     "testnet-admin": {
-      "address": "${ADMIN_ADDRESS}",
-      "keys": "${FLOW_PRIVATE_KEY}"
+      "address": "${NUXT_FLOW_ADMIN_ADDRESS}",
+      "keys": "${NUXT_FLOW_PRIVATE_KEY}"
     }
   },
   "deployments": {
     "testnet": {
       "testnet-admin": [
+        "Interfaces",
+        "UserProfile",
+        "CompetitionService"
       ]
     }
   }

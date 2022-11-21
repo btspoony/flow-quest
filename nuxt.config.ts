@@ -11,7 +11,9 @@ export default defineNuxtConfig({
   // Environment Variables
   runtimeConfig: {
     // The private keys which are only available within server-side
-    // NOTHING
+    flowAdminAddress: "",
+    flowPrivateKey: "",
+    flowPublicKey: "",
     // Keys within public, will be also exposed to the client-side
     public: {
       network: "",

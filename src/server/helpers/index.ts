@@ -1,4 +1,5 @@
 export * as flow from "./flow";
+export { default as Signer } from "./signer";
 
 /**
  * assert

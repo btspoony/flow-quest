@@ -28,92 +28,74 @@ export function switchToEmulator() {
     .put("accessNode.api", "http://localhost:8080");
 }
 
-const ADDRESS_MAP = {
-  Interfaces: "0x",
-  UserProfile: "0x",
-  CompetitionService: "0x",
-};
-
 export async function txProfileRegister(
   signer: Signer,
   opts: OptionProfileRegister
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(cadence.txProfileRegister, ADDRESS_MAP),
-    (arg, t) => [arg(opts.referredFrom, t.Optional(t.String))]
-  );
+  return signer.sendTransaction(cadence.txProfileRegister, (arg, t) => [
+    arg(opts.referredFrom, t.Optional(t.String)),
+  ]);
 }
 
 export async function txAdminAddQuestConfig(
   signer: Signer,
   opts: OptionAdminAddQuestConfig
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(cadence.txAdminAddQuestConfig, ADDRESS_MAP),
-    (arg, t) => [
-      arg(String(opts.seasonId), t.UInt64),
-      arg(opts.questCfg.questKey, t.String),
-      arg(String(opts.questCfg.rewardPoints), t.UInt64),
-      arg(
-        opts.questCfg.referalPoints
-          ? String(opts.questCfg.referalPoints)
-          : null,
-        t.Optional(t.UInt64)
-      ),
-      arg(opts.questCfg.stackable, t.Optional(t.Bool)),
-      arg(
-        opts.questCfg.limitation ? String(opts.questCfg.limitation) : null,
-        t.Optional(t.UInt64)
-      ),
-    ]
-  );
+  return signer.sendTransaction(cadence.txAdminAddQuestConfig, (arg, t) => [
+    arg(String(opts.seasonId), t.UInt64),
+    arg(opts.questCfg.questKey, t.String),
+    arg(String(opts.questCfg.rewardPoints), t.UInt64),
+    arg(
+      opts.questCfg.referalPoints ? String(opts.questCfg.referalPoints) : null,
+      t.Optional(t.UInt64)
+    ),
+    arg(opts.questCfg.stackable, t.Optional(t.Bool)),
+    arg(
+      opts.questCfg.limitation ? String(opts.questCfg.limitation) : null,
+      t.Optional(t.UInt64)
+    ),
+  ]);
 }
 
 export async function txAdminStartNewSeason(
   signer: Signer,
   opts: OptionAdminStartNewSeason
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(cadence.txAdminStartNewSeason, ADDRESS_MAP),
-    (arg, t) => [
-      arg(opts.endDate, t.UFix64),
-      arg(
-        opts.questCfgs.map((o) => o.questKey),
-        t.Array(t.String)
+  return signer.sendTransaction(cadence.txAdminStartNewSeason, (arg, t) => [
+    arg(opts.endDate, t.UFix64),
+    arg(
+      opts.questCfgs.map((o) => o.questKey),
+      t.Array(t.String)
+    ),
+    arg(
+      opts.questCfgs.map((o) => o.rewardPoints),
+      t.Array(t.UInt64)
+    ),
+    arg(
+      opts.questCfgs.map((o) =>
+        o.referalPoints ? String(o.referalPoints) : null
       ),
-      arg(
-        opts.questCfgs.map((o) => o.rewardPoints),
-        t.Array(t.UInt64)
-      ),
-      arg(
-        opts.questCfgs.map((o) =>
-          o.referalPoints ? String(o.referalPoints) : null
-        ),
-        t.Array(t.Optional(t.UInt64))
-      ),
-      arg(
-        opts.questCfgs.map((o) => o.stackable),
-        t.Array(t.Optional(t.Bool))
-      ),
-      arg(
-        opts.questCfgs.map((o) => (o.limitation ? String(o.limitation) : null)),
-        t.Array(t.Optional(t.UInt64))
-      ),
-    ]
-  );
+      t.Array(t.Optional(t.UInt64))
+    ),
+    arg(
+      opts.questCfgs.map((o) => o.stackable),
+      t.Array(t.Optional(t.Bool))
+    ),
+    arg(
+      opts.questCfgs.map((o) => (o.limitation ? String(o.limitation) : null)),
+      t.Array(t.Optional(t.UInt64))
+    ),
+  ]);
 }
 
 export async function txAdminUpdateEndDate(
   signer: Signer,
   opts: OptionAdminUpdateEndDate
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(cadence.txAdminUpdateEndDate, ADDRESS_MAP),
-    (arg, t) => [
-      arg(String(opts.seasonId), t.UInt64),
-      arg(String(opts.endDate), t.UFix64),
-    ]
-  );
+  return signer.sendTransaction(cadence.txAdminUpdateEndDate, (arg, t) => [
+    arg(String(opts.seasonId), t.UInt64),
+    arg(String(opts.endDate), t.UFix64),
+  ]);
 }
 
 export async function txCtrlerAppendQuestParams(
@@ -124,54 +106,38 @@ export async function txCtrlerAppendQuestParams(
   for (const key in opts.params) {
     params.push({ key, value: opts.params[key] });
   }
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(
-      cadence.txCtrlerAppendQuestParams,
-      ADDRESS_MAP
-    ),
-    (arg, t) => [
-      arg(opts.target, t.String),
-      arg(opts.questKey, t.String),
-      arg(params, t.Dictionary({ key: t.String, value: t.String })),
-    ]
-  );
+  return signer.sendTransaction(cadence.txCtrlerAppendQuestParams, (arg, t) => [
+    arg(opts.target, t.String),
+    arg(opts.questKey, t.String),
+    arg(params, t.Dictionary({ key: t.String, value: t.String })),
+  ]);
 }
 
 export async function txCtrlerSetQuestCompleted(
   signer: Signer,
   opts: OptionCtrlerSetQuestCompleted
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(
-      cadence.txCtrlerSetQuestCompleted,
-      ADDRESS_MAP
-    ),
-    (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
-  );
+  return signer.sendTransaction(cadence.txCtrlerSetQuestCompleted, (arg, t) => [
+    arg(opts.target, t.Address),
+    arg(opts.questKey, t.String),
+  ]);
 }
 
 export async function txCtrlerSetQuestFailure(
   signer: Signer,
   opts: OptionCtrlerSetQuestFailure
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(
-      cadence.txCtrlerSetQuestFailure,
-      ADDRESS_MAP
-    ),
-    (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
-  );
+  return signer.sendTransaction(cadence.txCtrlerSetQuestFailure, (arg, t) => [
+    arg(opts.target, t.Address),
+    arg(opts.questKey, t.String),
+  ]);
 }
 
 export async function txCtrlerSetupReferralCode(
   signer: Signer,
   opts: OptionCtrlerSetupReferralCode
 ) {
-  return signer.sendTransaction(
-    cadence.replaceImportAddresses(
-      cadence.txCtrlerSetupReferralCode,
-      ADDRESS_MAP
-    ),
-    (arg, t) => [arg(opts.target, t.String)]
-  );
+  return signer.sendTransaction(cadence.txCtrlerSetupReferralCode, (arg, t) => [
+    arg(opts.target, t.String),
+  ]);
 }
