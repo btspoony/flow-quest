@@ -44,3 +44,8 @@ interface OptionCtrlerSetQuestFailure {
 interface OptionCtrlerSetupReferralCode {
   target: string;
 }
+
+interface QuestSchema {
+  key: string;
+  type: string;
+}

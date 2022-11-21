@@ -54,9 +54,9 @@ export default defineEventHandler(async function (event) {
     flow.switchToEmulator();
   }
   // run a script to ensure transactions
-  const isQuestValid = await flow.scVerifyQuest(signer, questKey, (arg, t) => [
-    arg(questAddress, t.Address),
-  ]);
+  const isQuestValid = await flow.scVerifyQuest(signer, questKey, {
+    acct: questAddress,
+  });
 
   // Step.3 Run a transaction on mainnet
   if (isProduction) {
