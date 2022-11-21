@@ -1,11 +1,9 @@
-import Interfaces from "../Interfaces.cdc"
-import UserProfile from "../UserProfile.cdc"
-import CompetitionService from "../CompetitionService.cdc"
+import Interfaces from "../../../../cadence/dev-challenge/Interfaces.cdc"
+import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
+import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
     target: Address,
-    questKey: String,
-    params: {String: AnyStruct}
 ) {
     let season: &CompetitionService.CompetitionSeason{CompetitionService.CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
     let ctrler: &CompetitionService.SeasonPointsController
@@ -21,11 +19,6 @@ transaction(
     execute {
         let seasonId = self.season.getId()
 
-        self.ctrler.appendNewParams(
-            acct: target,
-            seasonId: seasonId,
-            questKey: questKey,
-            params: params
-        )
+        self.ctrler.setupReferralCode(acct: target, seasonId: seasonId)
     }
 }

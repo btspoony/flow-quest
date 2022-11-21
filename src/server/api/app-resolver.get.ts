@@ -1,5 +1,5 @@
 import * as uuid from "uuid";
-import { flow } from "../helpers";
+import { APP_IDENTIFIER } from "../helpers/flow";
 
 export default defineEventHandler((event) => {
   const bytesA = uuid.parse(uuid.v1()) as Uint8Array;
@@ -12,7 +12,7 @@ export default defineEventHandler((event) => {
     .join("");
   // return account proof data
   return {
-    appIdentifier: flow.appIdentifier,
+    appIdentifier: APP_IDENTIFIER,
     nonce,
     datetime: new Date(),
   };

@@ -2,7 +2,7 @@ import * as fcl from "@onflow/fcl";
 import Signer from "./signer";
 import * as cadence from "./cadence";
 
-export const appIdentifier = "Flow Dev Challenge V1.0";
+export const APP_IDENTIFIER = "Flow Dev Challenge V1.0";
 
 export function switchToMainnet() {
   fcl
