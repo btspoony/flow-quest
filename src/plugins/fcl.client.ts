@@ -1,7 +1,6 @@
 import * as fcl from "@onflow/fcl";
 
 export default defineNuxtPlugin((nuxtApp) => {
-  console.log(1111);
   const config = useRuntimeConfig();
 
   const isMainnet = config.public.network === "mainnet";
@@ -32,7 +31,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("app.detail.icon", config.app.cdnURL + "/apple-touch-icon.png")
     .put("service.OpenID.scopes", "email email_verified name zoneinfo")
     .put("fcl.limit", 9999)
-    .put("fcl.accountProof.resolver", $fetch("/api/app-nonce"));
+    .put("fcl.accountProof.resolver", $fetch("/api/app-resolver"));
   // ------ Build scripts ------
 
   // ------ Build transactions ------

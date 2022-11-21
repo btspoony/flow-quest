@@ -14,5 +14,6 @@ export default defineEventHandler((event) => {
   return {
     appIdentifier: flow.appIdentifier,
     nonce,
+    datetime: new Date(),
   };
 });
