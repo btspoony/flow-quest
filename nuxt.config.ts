@@ -1,8 +1,4 @@
-import nodePolyfills from "rollup-plugin-polyfill-node";
-import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
-import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
-
-const isProduction = process.env.NODE_ENV === "production";
+import svgLoader from "vite-svg-loader";
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
@@ -36,52 +32,19 @@ export default defineNuxtConfig({
     // https://content.nuxtjs.org/api/configuration
   },
   build: {
-    transpile: ["@heroicons/vue"],
+    transpile: ["@heroicons/vue", "@onflow/fcl"],
   },
+  css: ["@/assets/css/pico-customize.css"],
   // vite configure
   vite: {
     // raw assets
     assetsInclude: ["**/*.cdc"],
     // plugins
     plugins: [
-      // ↓ Needed for development mode
-      !isProduction &&
-        nodePolyfills({
-          include: [
-            "node_modules/**/*.js",
-            new RegExp("node_modules/.vite/.*js"),
-          ],
-        }),
+      svgLoader({
+        defaultImport: "component",
+      }),
     ],
-    // Dependency Pre-Bundling
-    optimizeDeps: {
-      esbuildOptions: {
-        // Node.js global to browser globalThis
-        define: {
-          global: "globalThis",
-        },
-        // Enable esbuild polyfill plugins
-        plugins: [
-          NodeGlobalsPolyfillPlugin({
-            process: true,
-            buffer: true,
-          }),
-          NodeModulesPolyfillPlugin(),
-        ],
-      },
-    },
-    build: {
-      rollupOptions: {
-        plugins: [
-          // ↓ Needed for build
-          nodePolyfills(),
-        ],
-      },
-      // ↓ Needed for build if using WalletConnect and other providers
-      commonjsOptions: {
-        transformMixedEsModules: true,
-      },
-    },
   },
   nitro: {
     preset: "vercel",

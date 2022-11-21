@@ -4,7 +4,6 @@
 
 @layer base {
   :root {
-    --color-fontbase: 255 255 255;
     --color-primary: 0, 170, 85;
     --color-secondary: 255, 136, 0;
     --color-success: 155 192 75;
@@ -12,40 +11,7 @@
   }
 
   body {
-    @apply bg-black font-sans text-fontbase;
-  }
-
-  h1,
-  h2,
-  h3 {
-    @apply font-black;
-  }
-
-  h4,
-  h5,
-  h6 {
-    @apply font-semibold;
-  }
-
-  h1 {
-    @apply text-5xl mb-16;
-  }
-
-  h2 {
-    @apply text-4xl mb-8;
-  }
-
-  h3,
-  h4 {
-    @apply text-3xl mb-6;
-  }
-
-  h5 {
-    @apply text-2xl mb-4;
-  }
-
-  h6 {
-    @apply text-xl mb-3;
+    @apply font-sans;
   }
 
   p {
@@ -65,105 +31,9 @@
     @apply font-semibold;
     @apply text-sm;
   }
-
-  a {
-    @apply text-fontbase/80 hover:text-fontbase;
-
-    > svg {
-      @apply inline-block fill-current;
-    }
-  }
-
-  a::before {
-    @apply before-content;
-  }
-
-  /**
-  * Loading ([aria-busy=true])
-  */
-  [aria-busy="true"] {
-    cursor: progress;
-  }
-
-  [aria-busy="true"]:not(input):not(select):not(textarea) {
-    &::before {
-      @apply inline-block w-4 h-4 align-text-bottom;
-      @apply animate-spin rounded-2xl opacity-80;
-      @apply border-[0.1875em] border-solid border-current border-r-transparent;
-      content: "";
-      vertical-align: -0.125em;
-    }
-
-    &:not(:empty) {
-      &::before {
-        @apply mr-2 ml-0;
-        margin-inline-start: 0;
-        margin-inline-end: 0.5em;
-      }
-    }
-
-    &:empty {
-      @apply text-center;
-    }
-  }
 }
 
 @layer components {
-  select {
-    @apply border rounded-full border-fontbase bg-transparent;
-    @apply px-2 text-sm text-fontbase;
-  }
-
-  .btn,
-  button,
-  [role="button"] {
-    @apply rounded-full flex-center gap-1 text-lg leading-6 px-5 py-1;
-    @apply text-fontbase bg-primary;
-    @apply hover:text-opacity-80 hover:bg-opacity-80;
-    @apply disabled:opacity-90 disabled:cursor-not-allowed;
-
-    svg {
-      @apply fill-current h-5 w-5;
-    }
-
-    &.btn-circle {
-      @apply py-2 px-2;
-
-      > svg {
-        @apply h-4 w-4;
-      }
-    }
-
-    &.btn-reverse {
-      @apply text-primary bg-fontbase;
-      @apply hover:text-fontbase hover:bg-primary;
-    }
-
-    &.btn-ghost {
-      @apply bg-transparent;
-    }
-
-    &.huge {
-      @apply font-semibold px-8 py-3;
-    }
-
-    &.disabled {
-      @apply bg-neutral-700 text-neutral-500;
-    }
-
-    &.enabled {
-      @apply bg-success hover:bg-opacity-80;
-    }
-
-    &.enable-locked {
-      @apply bg-transparent border border-success text-success;
-    }
-
-    &.danger {
-      @apply bg-failure hover:bg-opacity-80;
-    }
-  }
-
   .hero {
     @apply grid place-items-center w-full;
     @apply bg-cover bg-center;
