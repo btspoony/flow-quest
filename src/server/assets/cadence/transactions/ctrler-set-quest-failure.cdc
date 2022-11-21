@@ -1,6 +1,6 @@
-import Interfaces from "../../../../cadence/dev-challenge/Interfaces.cdc"
-import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
-import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
+import Interfaces from "../../../../../cadence/dev-challenge/Interfaces.cdc"
+import UserProfile from "../../../../../cadence/dev-challenge/UserProfile.cdc"
+import CompetitionService from "../../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
     target: Address,
@@ -20,7 +20,7 @@ transaction(
     execute {
         let seasonId = self.season.getId()
 
-        self.ctrler.questCompletedAndDistributePoints(
+        self.ctrler.questFailure(
             acct: target,
             seasonId: seasonId,
             questKey: questKey

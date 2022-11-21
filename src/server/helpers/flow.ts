@@ -1,6 +1,5 @@
 import * as fcl from "@onflow/fcl";
 import Signer from "./signer";
-import cadence from "~/assets/cadence";
 
 export const APP_IDENTIFIER = "Flow Dev Challenge V1.0";
 
@@ -28,22 +27,14 @@ export function switchToEmulator() {
     .put("accessNode.api", "http://localhost:8080");
 }
 
-export async function txProfileRegister(
-  signer: Signer,
-  opts: OptionProfileRegister
-) {
-  return signer.sendTransaction(
-    cadence.transactions.profileRegister,
-    (arg, t) => [arg(opts.referredFrom, t.Optional(t.String))]
-  );
-}
-
 export async function txAdminAddQuestConfig(
   signer: Signer,
   opts: OptionAdminAddQuestConfig
 ) {
   return signer.sendTransaction(
-    cadence.transactions.adminAddQuestConfig,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/admin-add-quest-cfg.cdc"
+    ),
     (arg, t) => [
       arg(String(opts.seasonId), t.UInt64),
       arg(opts.questCfg.questKey, t.String),
@@ -68,7 +59,9 @@ export async function txAdminStartNewSeason(
   opts: OptionAdminStartNewSeason
 ) {
   return signer.sendTransaction(
-    cadence.transactions.adminStartNewSeason,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/admin-start-new-season.cdc"
+    ),
     (arg, t) => [
       arg(opts.endDate, t.UFix64),
       arg(
@@ -102,7 +95,9 @@ export async function txAdminUpdateEndDate(
   opts: OptionAdminUpdateEndDate
 ) {
   return signer.sendTransaction(
-    cadence.transactions.adminUpdateEndDate,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/admin-update-end-date.cdc"
+    ),
     (arg, t) => [
       arg(String(opts.seasonId), t.UInt64),
       arg(String(opts.endDate), t.UFix64),
@@ -119,7 +114,9 @@ export async function txCtrlerAppendQuestParams(
     params.push({ key, value: opts.params[key] });
   }
   return signer.sendTransaction(
-    cadence.transactions.ctrlerAppendQuestParams,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/ctrler-append-quest-params.cdc"
+    ),
     (arg, t) => [
       arg(opts.target, t.String),
       arg(opts.questKey, t.String),
@@ -133,7 +130,9 @@ export async function txCtrlerSetQuestCompleted(
   opts: OptionCtrlerSetQuestCompleted
 ) {
   return signer.sendTransaction(
-    cadence.transactions.ctrlerSetQuestCompleted,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/ctrler-set-quest-completed.cdc"
+    ),
     (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
   );
 }
@@ -143,7 +142,9 @@ export async function txCtrlerSetQuestFailure(
   opts: OptionCtrlerSetQuestFailure
 ) {
   return signer.sendTransaction(
-    cadence.transactions.ctrlerSetQuestFailure,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/ctrler-set-quest-failure.cdc"
+    ),
     (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
   );
 }
@@ -153,7 +154,9 @@ export async function txCtrlerSetupReferralCode(
   opts: OptionCtrlerSetupReferralCode
 ) {
   return signer.sendTransaction(
-    cadence.transactions.ctrlerSetupReferralCode,
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/ctrler-setup-referral-code.cdc"
+    ),
     (arg, t) => [arg(opts.target, t.String)]
   );
 }
@@ -163,8 +166,11 @@ export async function scVerifyQuest(
   questKey: string,
   argsFunc: fcl.ArgumentFunction
 ): Promise<boolean> {
-  if (typeof cadence.quests[questKey] !== "string") {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/quests/${questKey}/verify-script.cdc`
+  );
+  if (typeof code !== "string") {
     throw new Error("Unknown quests key.");
   }
-  return signer.executeScript(cadence.quests[questKey], argsFunc, false);
+  return signer.executeScript(code, argsFunc, false);
 }
