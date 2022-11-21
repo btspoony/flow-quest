@@ -17,13 +17,11 @@ export default defineEventHandler(async (event) => {
 
   const isProduction = config.public.network === "mainnet";
 
-  // const signer = new Signer(
-  // );
-  // const ADDRESS_MAP = {
-  //   Interfaces: "0x",
-  //   UserProfile: "0x",
-  //   CompetitionService: "0x",
-  // };
+  const signer = new Signer(config.flowAdminAddress, config.flowPrivateKey, 0, {
+    Interfaces: config.flowServiceAddress,
+    UserProfile: config.flowServiceAddress,
+    CompetitionService: config.flowServiceAddress,
+  });
 
   // Step.1 Verify account proof on mainnet
   if (isProduction) {
@@ -33,7 +31,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const isValid = await fcl.AppUtils.verifyAccountProof(
-    flow.appIdentifier,
+    flow.APP_IDENTIFIER,
     {
       address: mainnetAddress,
       nonce: mainnetProofNonce,
