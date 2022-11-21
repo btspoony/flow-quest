@@ -15,6 +15,9 @@ import ctrlerSetupReferralCode from "./transactions/ctrler-setup-referral-code.c
  */
 import verifyQuestS1Q1 from "./quests/S1Q1/verify-script.cdc?raw";
 
+const quests: { [key: string]: string } = {};
+quests["S1Q1"] = verifyQuestS1Q1;
+
 export default {
   transactions: {
     profileRegister,
@@ -27,7 +30,5 @@ export default {
     ctrlerSetupReferralCode,
   },
   scripts: {},
-  quests: {
-    S1Q1: verifyQuestS1Q1,
-  },
+  quests,
 };

@@ -70,7 +70,7 @@ class FlowSigner {
    * @param code
    * @param args
    */
-  async sendTransaction(code: string, args: fcl.ArugmentFunction) {
+  async sendTransaction(code: string, args: fcl.ArgumentFunction) {
     let transactionId: string;
     const authz = this._buildAuthorization();
 
@@ -118,7 +118,7 @@ class FlowSigner {
 
   async executeScript(
     code: string,
-    args: fcl.ArugmentFunction,
+    args: fcl.ArgumentFunction,
     defaultValue: any
   ): Promise<any> {
     try {

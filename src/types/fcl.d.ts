@@ -288,14 +288,14 @@ declare module "@onflow/fcl" {
     signatures: TransactionSignature[];
   }
 
-  type ArugmentFunction = (
+  type ArgumentFunction = (
     argFunc: typeof arg,
     t: typeof ftypes
   ) => Array<Argument>;
 
   export function query(opts: {
     cadence: string;
-    args?: ArugmentFunction;
+    args?: ArgumentFunction;
     limit?: number;
   }): Promise<Response>;
 
@@ -303,7 +303,7 @@ declare module "@onflow/fcl" {
 
   export function mutate(opts: {
     cadence: string;
-    args?: ArugmentFunction;
+    args?: ArgumentFunction;
     limit?: number;
     proposer?: AuthorizationFunction;
     payer?: AuthorizationFunction;

@@ -157,3 +157,14 @@ export async function txCtrlerSetupReferralCode(
     (arg, t) => [arg(opts.target, t.String)]
   );
 }
+
+export async function scVerifyQuest(
+  signer: Signer,
+  questKey: string,
+  argsFunc: fcl.ArgumentFunction
+): Promise<boolean> {
+  if (typeof cadence.quests[questKey] !== "string") {
+    throw new Error("Unknown quests key.");
+  }
+  return signer.executeScript(cadence.quests[questKey], argsFunc, false);
+}

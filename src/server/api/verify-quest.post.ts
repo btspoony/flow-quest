@@ -1,7 +1,7 @@
 import * as fcl from "@onflow/fcl";
 import { flow, assert, Signer } from "../helpers";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async function (event) {
   const config = useRuntimeConfig();
 
   const body = await readBody(event);
@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
   const mainnetAddress = body.address; // required, mainnet address
   const mainnetProofNonce = body.proofNonce; // required, mainnet account proof nonce
   const mainnetProofSigs = body.proofSigs; // required, mainnet account proof sigs
-  const questId = body.questId; // required, quest id
+  const questKey = body.questKey; // required, quest id
   const questAddress = body.questAddr; // required, quest related
-  const questTransaction = body.questTrx; // optional, quest related transaction
+  // const questTransaction = body.questTrx; // optional, quest related transaction
 
   const isProduction = config.public.network === "mainnet";
 
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
         : "0x5b250a8a85b44a67",
     }
   );
-  assert(isValid, "mainnet account proof invalid");
+  assert(isValid, "account proof invalid");
 
   // Step.2 Verify the quest result on testnet
   if (isProduction) {
@@ -53,7 +53,10 @@ export default defineEventHandler(async (event) => {
   } else {
     flow.switchToEmulator();
   }
-  // TODO: run a script to ensure transactions
+  // run a script to ensure transactions
+  const isQuestValid = await flow.scVerifyQuest(signer, questKey, (arg, t) => [
+    arg(questAddress, t.Address),
+  ]);
 
   // Step.3 Run a transaction on mainnet
   if (isProduction) {
@@ -61,8 +64,20 @@ export default defineEventHandler(async (event) => {
   } else {
     flow.switchToTestnet();
   }
-  // TODO: run the reward transaction
+  let transactionId: string | null = null;
+  if (isQuestValid) {
+    // run the reward transaction
+    transactionId = await flow.txCtrlerSetQuestCompleted(signer, {
+      target: mainnetAddress,
+      questKey,
+    });
+  } else {
+    transactionId = await flow.txCtrlerSetQuestFailure(signer, {
+      target: mainnetAddress,
+      questKey,
+    });
+  }
 
   // Step.4 Return the transaction id
-  return { ok: true };
+  return { ok: transactionId !== null, transactionId };
 });
