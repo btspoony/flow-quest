@@ -1,4 +1,4 @@
-import fcl from "@onflow/fcl";
+import * as fcl from "@onflow/fcl";
 import Signer from "./signer";
 import * as cadence from "./cadence";
 

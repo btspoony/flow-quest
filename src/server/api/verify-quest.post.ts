@@ -1,5 +1,5 @@
-import fcl from "@onflow/fcl";
-import { flow, assert } from "../helpers";
+import * as fcl from "@onflow/fcl";
+import { flow, assert, Signer } from "../helpers";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -16,6 +16,14 @@ export default defineEventHandler(async (event) => {
   const questTransaction = body.questTrx; // optional, quest related transaction
 
   const isProduction = config.public.network === "mainnet";
+
+  // const signer = new Signer(
+  // );
+  // const ADDRESS_MAP = {
+  //   Interfaces: "0x",
+  //   UserProfile: "0x",
+  //   CompetitionService: "0x",
+  // };
 
   // Step.1 Verify account proof on mainnet
   if (isProduction) {

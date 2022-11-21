@@ -1,4 +1,4 @@
-import fcl from "@onflow/fcl";
+import * as fcl from "@onflow/fcl";
 import elliptic from "elliptic";
 import { SHA3 } from "sha3";
 

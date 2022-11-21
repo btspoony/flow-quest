@@ -1,4 +1,4 @@
-import uuid from "uuid";
+import * as uuid from "uuid";
 import { flow } from "../helpers";
 
 export default defineEventHandler((event) => {
