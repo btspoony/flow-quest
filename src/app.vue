@@ -14,15 +14,15 @@ const description = ref(
 </script>
 
 <template>
-  <div>
-    <Html :lang="locale" :data-theme="isDark ? 'dark' : 'light'">
+<Html :lang="locale" :data-theme="isDark ? 'dark' : 'light'">
 
-    <HeadMeta :title="String(route.meta.title ?? 'Home')" :description="description" :url="route.fullPath" />
+  <HeadMeta :title="String(route.meta.title ?? 'Home')" :description="description" :url="route.fullPath" />
 
-    </Html>
-
+  <Header />
+  <div class="container-fluid">
     <NuxtLayout>
       <NuxtPage/>
     </NuxtLayout>
   </div>
+</Html>
 </template>
