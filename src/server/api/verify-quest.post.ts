@@ -1,19 +1,28 @@
 import * as fcl from "@onflow/fcl";
+import { z, useValidatedBody } from "h3-zod";
 import { flow, assert, Signer } from "../helpers";
 
 export default defineEventHandler(async function (event) {
   const config = useRuntimeConfig();
 
-  const body = await readBody(event);
-
   // Step.0 verify body parameters
-  // FIXME: params
-  const mainnetAddress = body.address; // required, mainnet address
-  const mainnetProofNonce = body.proofNonce; // required, mainnet account proof nonce
-  const mainnetProofSigs = body.proofSigs; // required, mainnet account proof sigs
-  const questKey = body.questKey; // required, quest id
-  const questAddress = body.questAddr; // required, quest related
-  // const questTransaction = body.questTrx; // optional, quest related transaction
+  const body = await useValidatedBody(
+    event,
+    z.object({
+      address: z.string(), // required, mainnet address
+      proofNonce: z.string(), // required, mainnet account proof nonce
+      proofSigs: z.array(
+        // required, proof signatures
+        z.object({
+          keyId: z.number(),
+          addr: z.string(),
+          signature: z.string(),
+        })
+      ),
+      questKey: z.string(), // required, quest id
+      questAddr: z.string(), // required, quest related
+    })
+  );
 
   const isProduction = config.public.network === "mainnet";
 
@@ -33,9 +42,15 @@ export default defineEventHandler(async function (event) {
   const isValid = await fcl.AppUtils.verifyAccountProof(
     flow.APP_IDENTIFIER,
     {
-      address: mainnetAddress,
-      nonce: mainnetProofNonce,
-      signatures: mainnetProofSigs,
+      address: body.address,
+      nonce: body.proofNonce,
+      signatures: body.proofSigs.map((one) => ({
+        f_type: "CompositeSignature",
+        f_vsn: "1.0.0",
+        keyId: one.keyId,
+        addr: one.addr,
+        signature: one.signature,
+      })),
     },
     {
       // use blocto adddres to avoid self-custodian
@@ -54,8 +69,8 @@ export default defineEventHandler(async function (event) {
     flow.switchToEmulator();
   }
   // run a script to ensure transactions
-  const isQuestValid = await flow.scVerifyQuest(signer, questKey, {
-    acct: questAddress,
+  const isQuestValid = await flow.scVerifyQuest(signer, body.questKey, {
+    acct: body.questKey,
   });
 
   // Step.3 Run a transaction on mainnet
@@ -68,13 +83,13 @@ export default defineEventHandler(async function (event) {
   if (isQuestValid) {
     // run the reward transaction
     transactionId = await flow.txCtrlerSetQuestCompleted(signer, {
-      target: mainnetAddress,
-      questKey,
+      target: body.address,
+      questKey: body.questKey,
     });
   } else {
     transactionId = await flow.txCtrlerSetQuestFailure(signer, {
-      target: mainnetAddress,
-      questKey,
+      target: body.address,
+      questKey: body.questKey,
     });
   }
 
