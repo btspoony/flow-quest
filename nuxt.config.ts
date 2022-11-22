@@ -1,4 +1,6 @@
 import svgLoader from "vite-svg-loader";
+import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
+import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
@@ -67,7 +69,7 @@ export default defineNuxtConfig({
     // https://content.nuxtjs.org/api/configuration
   },
   build: {
-    transpile: ["@heroicons/vue", "@onflow/fcl"],
+    transpile: ["@heroicons/vue"],
   },
   // vite configure
   vite: {
@@ -79,6 +81,22 @@ export default defineNuxtConfig({
         defaultImport: "component",
       }),
     ],
+    optimizeDeps: {
+      esbuildOptions: {
+        // Node.js global to browser globalThis
+        define: {
+          global: "globalThis",
+        },
+        // Enable esbuild polyfill plugins
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            process: true,
+            buffer: true,
+          }),
+          NodeModulesPolyfillPlugin(),
+        ],
+      },
+    },
   },
   nitro: {
     preset: "vercel",
