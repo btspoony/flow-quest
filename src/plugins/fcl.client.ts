@@ -31,7 +31,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("app.detail.icon", config.app.cdnURL + "/apple-touch-icon.png")
     .put("service.OpenID.scopes", "email email_verified name zoneinfo")
     .put("fcl.limit", 9999)
-    .put("fcl.accountProof.resolver", $fetch("/api/app-resolver"));
+    .put("fcl.accountProof.resolver", async () => {
+      const data = await $fetch("/api/app-resolver");
+      console.log("Account Proof:", data);
+      return data;
+    });
   // ------ Build scripts ------
 
   // ------ Build transactions ------
