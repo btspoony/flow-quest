@@ -307,7 +307,7 @@ declare module "@onflow/fcl" {
     limit?: number;
     proposer?: AuthorizationFunction;
     payer?: AuthorizationFunction;
-    authorizations?: [AuthorizationFunction];
+    authorizations?: AuthorizationFunction[];
   }): Promise<string>;
 
   export function send(args: any, opts?: any): Promise<Response>;
@@ -340,8 +340,8 @@ declare module "@onflow/fcl" {
   export function authorization(account: Account): Promise<FclAuthorization>;
   export function verifyUserSignatures(
     msg: string,
-    compSigs: [TransactionSignature]
-  ): Promise<[unknown]>;
+    compSigs: TransactionSignature[]
+  ): Promise<unknown[]>;
 
   type SubscribeCallback = (user: UserSnapshot) => void;
 
@@ -349,7 +349,7 @@ declare module "@onflow/fcl" {
     authenticate: typeof authenticate;
     unauthenticate: typeof unauthenticate;
     authorization: typeof authorization;
-    signUserMessage: (msg: string) => Promise<[TransactionSignature]>;
+    signUserMessage: (msg: string) => Promise<TransactionSignature[]>;
     subscribe: (callback: SubscribeCallback) => void;
     snapshot: Promise<UserSnapshot>;
     resolveArgument: () => Promise<Argument>;
@@ -363,7 +363,7 @@ declare module "@onflow/fcl" {
   export interface AccountProofData {
     address: string;
     nonce: string;
-    signatures: [FTypeSignature];
+    signatures: FTypeSignature[];
   }
   export interface VerifySigOption {
     fclCryptoContract?: string;
@@ -378,7 +378,7 @@ declare module "@onflow/fcl" {
 
     verifyUserSignatures: (
       message: string,
-      signatures: [FTypeSignature],
+      signatures: FTypeSignature[],
       opts?: VerifySigOption
     ) => Promise<boolean>;
   }
