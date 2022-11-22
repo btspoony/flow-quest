@@ -24,6 +24,8 @@ export default defineEventHandler(async function (event) {
     })
   );
 
+  console.log(`Request[${body.address}] - Step.0: Body verified`);
+
   const isProduction = config.public.network === "mainnet";
 
   const signer = new Signer(config.flowAdminAddress, config.flowPrivateKey, 0, {
@@ -61,6 +63,7 @@ export default defineEventHandler(async function (event) {
     }
   );
   assert(isValid, "account proof invalid");
+  console.log(`Request[${body.address}] - Step.1: Signature verified`);
 
   // Step.2 Verify the quest result on testnet
   if (isProduction) {
@@ -70,8 +73,11 @@ export default defineEventHandler(async function (event) {
   }
   // run a script to ensure transactions
   const isQuestValid = await flow.scVerifyQuest(signer, body.questKey, {
-    acct: body.questKey,
+    acct: body.questAddr,
   });
+  console.log(
+    `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
+  );
 
   // Step.3 Run a transaction on mainnet
   if (isProduction) {
@@ -93,6 +99,12 @@ export default defineEventHandler(async function (event) {
     });
   }
 
+  if (transactionId) {
+    console.log(
+      `Request[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+    );
+  }
+
   // Step.4 Return the transaction id
-  return { ok: transactionId !== null, transactionId };
+  return { isQuestValid, ok: transactionId !== null, transactionId };
 });

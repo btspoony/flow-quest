@@ -159,6 +159,7 @@ declare module "@onflow/fcl" {
     scoped?: Record<string, string>;
     type: string;
     uid: string;
+    data?: any;
   }
 
   export interface UserSnapshot {
@@ -351,8 +352,7 @@ declare module "@onflow/fcl" {
     authorization: typeof authorization;
     signUserMessage: (msg: string) => Promise<TransactionSignature[]>;
     subscribe: (callback: SubscribeCallback) => void;
-    snapshot: Promise<UserSnapshot>;
-    resolveArgument: () => Promise<Argument>;
+    snapshot: () => Promise<UserSnapshot>;
   }
 
   export const currentUser: CurrentUser;

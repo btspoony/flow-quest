@@ -24,7 +24,7 @@ export function switchToEmulator() {
     .config()
     .put("fcl.limit", 9999)
     .put("flow.network", "emulator")
-    .put("accessNode.api", "http://localhost:8080");
+    .put("accessNode.api", "http://localhost:8888");
 }
 
 export async function txAdminAddQuestConfig(
@@ -172,11 +172,10 @@ export async function scVerifyQuest(
   const schema = await useStorage().getItem(
     `assets/server/json/quests/${questKey}/schema.json`
   );
-  if (typeof code !== "string" || typeof schema !== "string") {
+  if (typeof code !== "string" || typeof schema !== "object") {
     throw new Error("Unknown quests key.");
   }
-  const paramsSchema = JSON.parse(schema) as QuestSchema[];
-  return signer.executeScript(
+  const result = await signer.executeScript(
     code,
     (arg, t) => {
       // simple type mapping
@@ -218,16 +217,18 @@ export async function scVerifyQuest(
         "Array(Optional(String))": t.Array(t.Optional(t.String)),
         "Array(Optional(Bool))": t.Array(t.Optional(t.Bool)),
       };
-      return paramsSchema.map((one) => {
+      return (schema as QuestSchema[]).map((one) => {
         if (typeof params[one.key] === "undefined") {
           throw new Error(`Missing parameters: ${one.key}`);
         }
         if (typeof typeMapping[one.type] === "undefined") {
           throw new Error(`Missing types: ${one.type}`);
         }
+        console.log(`Params[${params[one.key]}] <- ${one.type}`);
         return arg(params[one.key], typeMapping[one.type] as typeof t);
       });
     },
     false
   );
+  return !!result;
 }
