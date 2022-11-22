@@ -33,7 +33,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("fcl.limit", 9999)
     .put("fcl.accountProof.resolver", async () => {
       const data = await $fetch("/api/app-resolver");
-      console.log("Account Proof:", data);
+      console.log("AccountProof Resolver:", data);
       return data;
     });
   // ------ Build scripts ------
