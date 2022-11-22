@@ -3,5 +3,7 @@
 </script>
 
 <template>
-  <div>Index</div>
+  <main>
+    Index
+  </main>
 </template>
