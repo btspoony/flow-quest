@@ -3625,6 +3625,11 @@ gzip-size@^7.0.0:
   dependencies:
     duplexer "^0.1.2"
 
+h3-zod@^0.3.10:
+  version "0.3.10"
+  resolved "https://registry.yarnpkg.com/h3-zod/-/h3-zod-0.3.10.tgz#c1781492e5c9a1cc79d730a799437d5047fa7e56"
+  integrity sha512-siOFg9RSm6/YpueQJTK8Wts09IoPoljB370u2CAR5BxW33KFNnfD3vztt/T7/HXQzoZ053rZqXVHtbef/oh3uA==
+
 h3@^0.8.5:
   version "0.8.6"
   resolved "https://registry.yarnpkg.com/h3/-/h3-0.8.6.tgz#8095ef998fe14769b87170b7c8b68ba9c54973d5"
@@ -8190,6 +8195,11 @@ zip-stream@^4.1.0:
     archiver-utils "^2.1.0"
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
+
+zod@^3.19.1:
+  version "3.19.1"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.19.1.tgz#112f074a97b50bfc4772d4ad1576814bd8ac4473"
+  integrity sha512-LYjZsEDhCdYET9ikFu6dVPGp2YH9DegXjdJToSzD9rO6fy4qiRYFoyEYwps88OseJlPyl2NOe2iJuhEhL7IpEA==
 
 zwitch@^2.0.0:
   version "2.0.2"
