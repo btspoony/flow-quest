@@ -6,11 +6,14 @@
   <header class="container-fluid">
     <nav>
       <ul>
-        <li><strong>Brand</strong></li>
+        <li><strong>Flow Developer Challenge</strong></li>
       </ul>
       <ul>
         <li>
           <WidgetThemeToggle />
+        </li>
+        <li>
+          <FlowConnect />
         </li>
       </ul>
     </nav>

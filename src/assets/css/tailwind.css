@@ -1,14 +1,10 @@
-@tailwind base;
+/* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
 
+/* Avoid pico.css */
+/*
 @layer base {
-  :root {
-    --color-primary: 67, 160, 71;
-    --color-secondary: 255, 136, 0;
-    --color-success: 155 192 75;
-    --color-failure: 243 47 117;
-  }
 
   body {
     @apply font-sans;
@@ -20,8 +16,16 @@
     @apply text-base;
   }
 }
+*/
 
 @layer components {
+  :root {
+    --color-primary: 67, 160, 71;
+    --color-secondary: 255, 136, 0;
+    --color-success: 155 192 75;
+    --color-failure: 243 47 117;
+  }
+
   .hero {
     @apply grid place-items-center w-full;
     @apply bg-cover bg-center;

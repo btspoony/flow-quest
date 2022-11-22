@@ -18,7 +18,7 @@ const toggleDark = useToggle(isDark);
 </script>
 
 <template>
-  <label class="cursor-pointer hover:text-primary dark:hover:text-white focus:outline-none" @click="toggleDark()">
+  <label class="cursor-pointer focus:outline-none" @click="toggleDark()">
     <span class="sr-only">View ThemeToggle: {{ isDark ? "dark" : "light" }}</span>
     <SunIcon v-if="!isDark" class="fill-current h-6 w-6" />
     <MoonIcon v-else class="fill-current h-6 w-6" />

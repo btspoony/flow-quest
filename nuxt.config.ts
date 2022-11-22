@@ -49,15 +49,9 @@ export default defineNuxtConfig({
           rel: "manifest",
           href: "site.webmanifest",
         },
-        // CSS
-        {
-          rel: "stylesheet",
-          href: "https://unpkg.com/@picocss/pico@latest/css/pico.min.css",
-        },
       ],
     },
   },
-  css: ["@/assets/css/pico-customize.css"],
   // installed modules
   modules: [
     // Doc: https://github.com/nuxt-community/tailwindcss-module
