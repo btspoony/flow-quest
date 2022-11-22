@@ -3,9 +3,7 @@ import { useDark, useToggle } from "@vueuse/core";
 import { SunIcon, MoonIcon } from "@heroicons/vue/24/outline";
 
 const isDark = useDark({
-  attribute: "data-theme",
-  valueDark: "forest",
-  valueLight: "floid",
+  attribute: "data-theme"
 });
 
 const isSharedDark = useSharedDark();
@@ -17,25 +15,12 @@ watchEffect(
 );
 
 const toggleDark = useToggle(isDark);
-
-const isLight = computed({
-  get(): boolean {
-    return isDark.value;
-  },
-  set(value: boolean) {
-    toggleDark(value);
-  },
-});
 </script>
 
 <template>
-  <label class="swap swap-rotate hover:text-primary dark:hover:text-white focus:outline-none">
-    <!-- this hidden checkbox controls the state -->
-    <input v-model="isLight" type="checkbox" />
+  <label class="cursor-pointer hover:text-primary dark:hover:text-white focus:outline-none" @click="toggleDark()">
     <span class="sr-only">View ThemeToggle: {{ isDark ? "dark" : "light" }}</span>
-    <!-- volume on icon -->
-    <SunIcon class="swap-off fill-current h-6 w-6" />
-    <!-- volume off icon -->
-    <MoonIcon class="swap-on fill-current h-6 w-6" />
+    <SunIcon v-if="!isDark" class="fill-current h-6 w-6" />
+    <MoonIcon v-else class="fill-current h-6 w-6" />
   </label>
 </template>
