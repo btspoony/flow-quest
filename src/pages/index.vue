@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const questAddr = ref<string | null>(null)
+const questAddr = ref<string | null>(null);
+const loading = ref<boolean>(false);
 
 async function onclick() {
   const { $fcl } = useNuxtApp();
@@ -9,6 +10,7 @@ async function onclick() {
     console.log("accountProof not found")
     return
   }
+  loading.value = true
   try {
     const data = await $fetch("/api/verify-quest", {
       method: 'post',
@@ -24,6 +26,7 @@ async function onclick() {
   } catch (err) {
     console.error(err)
   }
+  loading.value = false
 }
 </script>
 
@@ -33,7 +36,7 @@ async function onclick() {
       <label for="quest">Verification Test</label>
       <input type="text" id="quest" name="quest" placeholder="Flow Address" v-model="questAddr" required>
 
-      <button type="submit" @click="onclick()">Submit</button>
+      <button type="submit" :aria-busy="loading" @click="onclick()">Submit</button>
     </section>
   </main>
 </template>

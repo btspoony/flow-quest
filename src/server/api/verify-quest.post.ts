@@ -41,7 +41,7 @@ export default defineEventHandler(async function (event) {
     flow.switchToTestnet();
   }
 
-  const isValid = await fcl.AppUtils.verifyAccountProof(
+  const isAccountValid = await fcl.AppUtils.verifyAccountProof(
     flow.APP_IDENTIFIER,
     {
       address: body.address,
@@ -62,49 +62,59 @@ export default defineEventHandler(async function (event) {
         : "0x5b250a8a85b44a67",
     }
   );
-  assert(isValid, "account proof invalid");
-  console.log(`Request[${body.address}] - Step.1: Signature verified`);
 
-  // Step.2 Verify the quest result on testnet
-  if (isProduction) {
-    flow.switchToTestnet();
-  } else {
-    flow.switchToEmulator();
-  }
-  // run a script to ensure transactions
-  const isQuestValid = await flow.scVerifyQuest(signer, body.questKey, {
-    acct: body.questAddr,
-  });
-  console.log(
-    `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
-  );
-
-  // Step.3 Run a transaction on mainnet
-  if (isProduction) {
-    flow.switchToMainnet();
-  } else {
-    flow.switchToTestnet();
-  }
+  let isQuestValid = false;
   let transactionId: string | null = null;
-  if (isQuestValid) {
-    // run the reward transaction
-    transactionId = await flow.txCtrlerSetQuestCompleted(signer, {
-      target: body.address,
-      questKey: body.questKey,
-    });
-  } else {
-    transactionId = await flow.txCtrlerSetQuestFailure(signer, {
-      target: body.address,
-      questKey: body.questKey,
-    });
-  }
 
-  if (transactionId) {
+  if (isAccountValid) {
+    console.log(`Request[${body.address}] - Step.1: Signature verified`);
+
+    // Step.2 Verify the quest result on testnet
+    if (isProduction) {
+      flow.switchToTestnet();
+    } else {
+      flow.switchToEmulator();
+    }
+    // run a script to ensure transactions
+    isQuestValid = await flow.scVerifyQuest(signer, body.questKey, {
+      acct: body.questAddr,
+    });
     console.log(
-      `Request[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+      `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
     );
+
+    // Step.3 Run a transaction on mainnet
+    if (isProduction) {
+      flow.switchToMainnet();
+    } else {
+      flow.switchToTestnet();
+    }
+
+    if (isQuestValid) {
+      // run the reward transaction
+      transactionId = await flow.txCtrlerSetQuestCompleted(signer, {
+        target: body.address,
+        questKey: body.questKey,
+      });
+    } else {
+      transactionId = await flow.txCtrlerSetQuestFailure(signer, {
+        target: body.address,
+        questKey: body.questKey,
+      });
+    }
+
+    if (transactionId) {
+      console.log(
+        `Request[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+      );
+    }
   }
 
   // Step.4 Return the transaction id
-  return { isQuestValid, ok: transactionId !== null, transactionId };
+  return {
+    ok: isAccountValid && isQuestValid && transactionId !== null,
+    isAccountValid,
+    isQuestValid,
+    transactionId,
+  };
 });
