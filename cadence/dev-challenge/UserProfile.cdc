@@ -36,6 +36,7 @@ pub contract UserProfile {
          ************************/
 
     pub var totalProfiles: UInt64
+    access(contract) let platformMapping: {String: Address}
 
     /**    ____ _  _ _  _ ____ ___ _ ____ _  _ ____ _    _ ___ _   _
        *   |___ |  | |\ | |     |  | |  | |\ | |__| |    |  |   \_/
@@ -150,6 +151,10 @@ pub contract UserProfile {
 
         // ---- readonly methods ----
 
+        pub fun getId(): UInt64 {
+            return self.uuid
+        }
+
         pub fun getIdentities(): [Interfaces.LinkedIdentity] {
             return self.linkedIdentities.values
         }
@@ -204,8 +209,8 @@ pub contract UserProfile {
             assert(competitionCap.isActive(), message: "Competition is not active.")
 
             // add to competition
-            let profileAddress = self.owner!.address
-            competitionCap.registerProfile(acct: profileAddress)
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+            competitionCap.registerProfile(acct: profileAddr)
 
             let seasonId = competitionCap.getId()
             self.seasonScores[seasonId] = SeasonRecord(
@@ -214,17 +219,22 @@ pub contract UserProfile {
             )
 
             emit ProfileSeasonNewSeason(
-                profile: profileAddress,
+                profile: profileAddr,
                 seasonId: seasonId,
                 referredFrom: referredFrom,
             )
         }
 
         pub fun upsertIdentity(platform: String, identity: Interfaces.LinkedIdentity) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+            let uid = platform.concat("#").concat(identity.uid)
+            assert(UserProfile.platformMapping[uid] == nil, message: "The UID registered.")
+
+            UserProfile.platformMapping[uid] = profileAddr
             self.linkedIdentities[platform] = identity
 
             emit ProfileUpsertIdentity(
-                profile: self.owner!.address,
+                profile: profileAddr,
                 platform: platform,
                 uid: identity.uid,
                 name: identity.display.name,
@@ -233,23 +243,27 @@ pub contract UserProfile {
         }
 
         access(account) fun addPoints(seasonId: UInt64, points: UInt64) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
             let seasonRef = self.getSeasonRecordRef(seasonId)
             seasonRef.addPoints(points: points)
 
             emit ProfileSeasonAddPoints(
-                profile: self.owner!.address,
+                profile: profileAddr,
                 seasonId: seasonId,
                 points: points,
             )
         }
 
         access(account) fun appendNewParams(seasonId: UInt64, questKey: String, params: {String: AnyStruct}) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             questScoreRef.appendNewParams(params: params)
 
             emit QuestRecordAppendNewParams(
-                profile: self.owner!.address,
+                profile: profileAddr,
                 seasonId: seasonId,
                 questKey: questKey,
                 keys: params.keys,
@@ -258,12 +272,14 @@ pub contract UserProfile {
 
         // latest result and times completed
         access(account) fun updateVerificationResult(seasonId: UInt64, questKey: String, idx: Int, result: Bool) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             questScoreRef.updateVerificationResult(idx: idx, result: result)
 
             emit QuestRecordUpdateVerificationResult(
-                profile: self.owner!.address,
+                profile: profileAddr,
                 seasonId: seasonId,
                 questKey: questKey,
                 index: idx,
@@ -272,10 +288,11 @@ pub contract UserProfile {
         }
 
         access(account) fun setupReferralCode(seasonId: UInt64) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
             let code = "" // TODO
 
             emit QuestRecordSetupReferralCode(
-                profile: self.owner!.address,
+                profile: profileAddr,
                 seasonId: seasonId,
                 code: code,
             )
@@ -303,6 +320,7 @@ pub contract UserProfile {
 
     init() {
         self.totalProfiles = 0
+        self.platformMapping = {}
 
         self.ProfileStoragePath = /storage/DevCompetitionProfilePathV1
         self.ProfilePublicPath = /public/DevCompetitionProfilePathV1

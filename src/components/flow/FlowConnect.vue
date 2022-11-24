@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRightOnRectangleIcon } from "@heroicons/vue/24/solid";
+import { ArrowRightOnRectangleIcon, UserIcon } from "@heroicons/vue/24/solid";
 
 const current = useFlowAccount();
 
@@ -26,18 +26,19 @@ function logout() {
 
 <template>
   <div>
-    <div v-if="current?.loggedIn" class="flex gap-1 items-center justify-between">
+    <div v-if="current?.loggedIn" class="inline-flex-between">
       <span class="flex-auto h-4 leading-4 pl-4 pr-1 font-medium">
         {{ current?.addr ?? "No Address" }}
       </span>
-      <button class="inline-flex rounded-full" @click="logout">
+      <button class="rounded-full inline-flex-between" @click="logout">
         <small>
           Logout
         </small>
         <ArrowRightOnRectangleIcon class="fill-current h-5 w-5" />
       </button>
     </div>
-    <button v-else class="rounded-full" @click="login">
+    <button v-else class="rounded-full inline-flex-between" @click="login">
+      <UserIcon class="fill-current h-5 w-5" />
       <small>Connect Wallet</small>
     </button>
   </div>

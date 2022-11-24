@@ -49,7 +49,7 @@ export default defineNuxtConfig({
         },
         {
           rel: "manifest",
-          href: "site.webmanifest",
+          href: "/site.webmanifest",
         },
       ],
     },

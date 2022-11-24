@@ -16,6 +16,8 @@ pub contract Interfaces {
 
     // Profile readable
     pub resource interface ProfilePublic {
+        pub fun getId(): UInt64
+
         pub fun getIdentities(): [LinkedIdentity]
         pub fun getIdentity(platform: String): LinkedIdentity
 

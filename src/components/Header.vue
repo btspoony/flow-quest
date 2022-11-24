@@ -13,6 +13,9 @@
           <WidgetThemeToggle />
         </li>
         <li>
+          <AuthGithub />
+        </li>
+        <li>
           <FlowConnect />
         </li>
       </ul>

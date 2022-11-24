@@ -28,7 +28,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("accessNode.api", config.public.accessApi)
     .put("discovery.wallet", config.public.walletDiscovery)
     .put("app.detail.title", appName)
-    .put("app.detail.icon", config.app.cdnURL + "/apple-touch-icon.png")
+    .put(
+      "app.detail.icon",
+      window.location.origin + config.app.baseURL + "apple-touch-icon.png"
+    )
     .put("service.OpenID.scopes", "email email_verified name zoneinfo")
     .put("fcl.limit", 9999)
     .put("fcl.accountProof.resolver", async () => {
