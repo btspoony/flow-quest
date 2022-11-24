@@ -34,11 +34,18 @@ export default defineEventHandler(async function (event) {
 
   const isProduction = config.public.network === "mainnet";
 
-  const signer = new Signer(config.flowAdminAddress, config.flowPrivateKey, 0, {
-    Interfaces: config.flowServiceAddress,
-    UserProfile: config.flowServiceAddress,
-    CompetitionService: config.flowServiceAddress,
-  });
+  // FIXME: using index pool
+  const keyIndex = 0;
+  const signer = new Signer(
+    config.flowAdminAddress,
+    config.flowPrivateKey,
+    keyIndex,
+    {
+      Interfaces: config.flowServiceAddress,
+      UserProfile: config.flowServiceAddress,
+      CompetitionService: config.flowServiceAddress,
+    }
+  );
 
   // Step.1 Verify account proof on mainnet
   if (isProduction) {
