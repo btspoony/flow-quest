@@ -13,6 +13,8 @@ export default defineNuxtConfig({
     flowAdminAddress: "",
     flowPrivateKey: "",
     flowPublicKey: "",
+    oauthGithubClientId: "",
+    oauthGithubClientSecret: "",
     // Keys within public, will be also exposed to the client-side
     public: {
       network: "",
