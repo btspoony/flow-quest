@@ -19,7 +19,12 @@ async function onclick() {
         proofNonce: accountProof.data.nonce,
         proofSigs: accountProof.data.signatures,
         questKey: "S1Q1",
-        questAddr: questAddr.value,
+        questParams: [
+          {
+            key: "acct",
+            value: questAddr.value,
+          }
+        ]
       },
     })
     console.log(data)

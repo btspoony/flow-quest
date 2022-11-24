@@ -20,7 +20,13 @@ export default defineEventHandler(async function (event) {
         })
       ),
       questKey: z.string(), // required, quest id
-      questAddr: z.string(), // required, quest related
+      questParams: z.array(
+        // required, quest related
+        z.object({
+          key: z.string(),
+          value: z.string(),
+        })
+      ),
     })
   );
 
@@ -76,9 +82,11 @@ export default defineEventHandler(async function (event) {
       flow.switchToEmulator();
     }
     // run a script to ensure transactions
-    isQuestValid = await flow.scVerifyQuest(signer, body.questKey, {
-      acct: body.questAddr,
-    });
+    const params: { [key: string]: string } = {};
+    for (const one of body.questParams) {
+      params[one.key] = one.value;
+    }
+    isQuestValid = await flow.scVerifyQuest(signer, body.questKey, params);
     console.log(
       `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
     );
