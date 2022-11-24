@@ -1,24 +1,3 @@
-<template>
-  <div class="flex flex-col gap-4">
-    <template v-if="!txid">
-      <button :class="[
-        {
-          'no-animation': isLoading,
-          loading: isLoading,
-        },
-      ]" role="button" aria-disabled="true" @click="startTransaction">
-        <slot>
-          {{ content }}
-        </slot>
-      </button>
-      <p v-if="errorMessage" class="px-4 text-sm text-error max-w-[240px]">
-        {{ errorMessage }}
-      </p>
-    </template>
-    <FlowWaitTransaction v-else :txid="txid" @sealed="onSealed" />
-    <slot v-if="isSealed" name="next"></slot>
-  </div>
-</template>
 
 <script setup lang="ts">
 import type { TransactionReceipt } from "@onflow/fcl";
@@ -74,3 +53,25 @@ function onSealed(tx: TransactionReceipt) {
   emit("sealed", tx);
 }
 </script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <template v-if="!txid">
+      <button :class="[
+        {
+          'no-animation': isLoading,
+          loading: isLoading,
+        },
+      ]" role="button" aria-disabled="true" @click="startTransaction">
+        <slot>
+          {{ content }}
+        </slot>
+      </button>
+      <p v-if="errorMessage" class="px-4 text-sm text-error max-w-[240px]">
+        {{ errorMessage }}
+      </p>
+    </template>
+    <FlowWaitTransaction v-else :txid="txid" @sealed="onSealed" />
+    <slot v-if="isSealed" name="next"></slot>
+  </div>
+</template>

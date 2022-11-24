@@ -1,14 +1,3 @@
-<template>
-  <article class="min-w-40 w-full text-center border-2 border-primary">
-    <p class="font-semibold pb-2 text-lg">
-      <label>{{ txStatusString }}</label>
-      <a :href="fvsTx(txid)" target="_blank" class="pl-2 link-highlight">{{
-          txidDisplay
-      }}</a>
-    </p>
-    <progress class="w-full" :value="progress" max="100"></progress>
-  </article>
-</template>
 
 <script setup lang="ts">
 import type { TransactionReceipt } from "@onflow/fcl";
@@ -99,3 +88,15 @@ function fvsTx(txId: string) {
 onMounted(startSubscribe);
 onBeforeUnmount(stopSubscribe);
 </script>
+
+<template>
+  <article class="min-w-40 w-full text-center border-2 border-primary">
+    <p class="font-semibold pb-2 text-lg">
+      <label>{{ txStatusString }}</label>
+      <a :href="fvsTx(txid)" target="_blank" class="pl-2 link-highlight">{{
+          txidDisplay
+      }}</a>
+    </p>
+    <progress class="w-full" :value="progress" max="100"></progress>
+  </article>
+</template>

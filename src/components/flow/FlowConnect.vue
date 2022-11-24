@@ -1,22 +1,3 @@
-<template>
-  <div>
-    <div v-if="current?.loggedIn" class="flex gap-1 items-center justify-between">
-      <span class="flex-auto h-4 leading-4 pl-4 pr-1 font-medium">
-        {{ current?.addr ?? "No Address" }}
-      </span>
-      <button class="inline-flex rounded-full" @click="logout">
-        <small>
-          Logout
-        </small>
-        <ArrowRightOnRectangleIcon class="fill-current h-5 w-5" />
-      </button>
-    </div>
-    <button v-else class="rounded-full" @click="login">
-      <small>Connect Wallet</small>
-    </button>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ArrowRightOnRectangleIcon } from "@heroicons/vue/24/solid";
 
@@ -42,3 +23,22 @@ function logout() {
   $fcl.unauthenticate();
 }
 </script>
+
+<template>
+  <div>
+    <div v-if="current?.loggedIn" class="flex gap-1 items-center justify-between">
+      <span class="flex-auto h-4 leading-4 pl-4 pr-1 font-medium">
+        {{ current?.addr ?? "No Address" }}
+      </span>
+      <button class="inline-flex rounded-full" @click="logout">
+        <small>
+          Logout
+        </small>
+        <ArrowRightOnRectangleIcon class="fill-current h-5 w-5" />
+      </button>
+    </div>
+    <button v-else class="rounded-full" @click="login">
+      <small>Connect Wallet</small>
+    </button>
+  </div>
+</template>

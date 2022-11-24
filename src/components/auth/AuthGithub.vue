@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>
-    INDEX
-  </main>
+  <div>
+    TODO
+  </div>
 </template>
