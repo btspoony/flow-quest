@@ -4,6 +4,15 @@ export const useUserProfile = () =>
   useState<Profile>("currentProfile", () =>
     ref({
       loggedIn: false,
+      profile: undefined,
+    })
+  );
+
+export const useGithubProfile = () =>
+  useState<GithubProfile>("currentGithubProfile", () =>
+    ref({
+      auth: undefined,
+      data: undefined,
     })
   );
 

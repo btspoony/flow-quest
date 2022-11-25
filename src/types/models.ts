@@ -5,15 +5,15 @@ interface ProfileData {
 interface Profile {
   loggedIn: boolean;
   profile?: ProfileData;
-  github?: GithubProfile;
 }
 
-interface GithubProfile {
-  auth?: {
-    tokenType: string;
-    scope: string;
-    accessToken: string;
-  };
+interface GithubToken {
+  tokenType: string;
+  scope: string;
+  accessToken: string;
+}
+
+interface GithubProfileData {
   id: number;
   userName: string;
   displayName: string;
@@ -27,4 +27,9 @@ interface GithubProfile {
   following: number;
   created_at: Date;
   updated_at: Date;
+}
+
+interface GithubProfile {
+  auth?: GithubToken;
+  data?: GithubProfileData;
 }
