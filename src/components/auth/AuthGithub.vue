@@ -3,6 +3,7 @@ import { StorageSerializers, RemovableRef, useLocalStorage } from '@vueuse/core'
 import GithubIcon from '~/assets/svgs/github.svg'
 
 const profile = useGithubProfile();
+const loading = ref(false);
 let storageToken: RemovableRef<GithubToken>
 
 onMounted(() => {
@@ -13,9 +14,34 @@ onMounted(() => {
   });
 
   watchEffect(
-    () => {
+    async () => {
       if (storageToken.value) {
         profile.value.auth = toRaw(storageToken.value)
+
+        loading.value = true
+        const data: any = await $fetch("https://api.github.com/user", {
+          headers: {
+            Authorization: `Bearer ${storageToken.value.accessToken}`
+          }
+        })
+        if (typeof data === 'object') {
+          profile.value.data = {
+            id: data.id,
+            userName: data.login,
+            displayName: data.name,
+            avatarUrl: data.avatar_url,
+            email: data.email,
+            bio: data.bio,
+            location: data.location,
+            public_repos: data.public_repos,
+            public_gists: data.public_gists,
+            followers: data.followers,
+            following: data.following,
+            created_at: new Date(data.created_at),
+            updated_at: new Date(data.updated_at)
+          }
+        }
+        loading.value = false
       }
     },
     {
@@ -63,9 +89,14 @@ function login() {
 <template>
   <div>
     <div v-if="profile.auth" class="inline-flex-between">
-      Github Authenticated
+      <span v-if="!profile.data || loading" :aria-busy="loading">
+        Loading
+      </span>
+      <div v-else class="w-10 h-10">
+        <img class="rounded-full" :src="profile.data?.avatarUrl" alt="AvatarUrl" />
+      </div>
     </div>
-    <button v-else class="rounded-full inline-flex-between" @click="login">
+    <button v-else :aria-busy="loading" class="rounded-full inline-flex-between" @click="login">
       <GithubIcon class="fill-current w-5 h-5" />
       <span>Authenticate</span>
     </button>
