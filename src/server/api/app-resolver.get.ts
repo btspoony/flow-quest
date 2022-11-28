@@ -1,5 +1,5 @@
 import * as uuid from "uuid";
-import { APP_IDENTIFIER } from "../helpers/flow";
+import { APP_IDENTIFIER } from "../helpers/flow.mjs";
 
 export default defineEventHandler((event) => {
   const bytesA = uuid.parse(uuid.v1()) as Uint8Array;

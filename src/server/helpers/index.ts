@@ -1,5 +1,6 @@
-export * as flow from "./flow";
-export { default as Signer } from "./signer";
+export * as flow from "./flow.mjs";
+export { default as Signer } from "./signer.mjs";
+export * as actions from "./actions";
 
 /**
  * assert

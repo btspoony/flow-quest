@@ -1,6 +1,6 @@
 import * as fcl from "@onflow/fcl";
 import { z, useValidatedBody } from "h3-zod";
-import { flow, assert, Signer } from "../helpers";
+import { flow, actions, Signer } from "../helpers";
 
 export default defineEventHandler(async function (event) {
   const config = useRuntimeConfig();
@@ -93,7 +93,7 @@ export default defineEventHandler(async function (event) {
     for (const one of body.questParams) {
       params[one.key] = one.value;
     }
-    isQuestValid = await flow.scVerifyQuest(signer, body.questKey, params);
+    isQuestValid = await actions.scVerifyQuest(signer, body.questKey, params);
     console.log(
       `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
     );
@@ -107,12 +107,12 @@ export default defineEventHandler(async function (event) {
 
     if (isQuestValid) {
       // run the reward transaction
-      transactionId = await flow.txCtrlerSetQuestCompleted(signer, {
+      transactionId = await actions.txCtrlerSetQuestCompleted(signer, {
         target: body.address,
         questKey: body.questKey,
       });
     } else {
-      transactionId = await flow.txCtrlerSetQuestFailure(signer, {
+      transactionId = await actions.txCtrlerSetQuestFailure(signer, {
         target: body.address,
         questKey: body.questKey,
       });
