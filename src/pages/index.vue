@@ -9,10 +9,10 @@
         <img src="~/assets/images/home-flow.png" alt="home flow" class="max-w-xs" />
         <div>
           <h3 class="text-5xl font-bold">
-            Learn and earn rewards by completing Flow Developer Challenges
+            Learn and earn rewards by completing Developer Challenges <string class="text-primary">#onFlow</string>
           </h3>
           <p class="py-6">
-            We know crypto can be a confusing place. The Dev Competition will be your guide. <br />
+            Plan to start the web3 journey? The Dev Competition will be your guide.<br />
             Ready to begin?
           </p>
           <BtnGoPage next="/seasons" class="max-w-xs">Start the Competition</BtnGoPage>

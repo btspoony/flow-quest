@@ -20,8 +20,8 @@
 
 @layer components {
   :root {
-    --color-primary: 67, 160, 71;
-    --color-secondary: 255, 136, 0;
+    --color-primary: 67 160 71;
+    --color-secondary: 255 136 0;
     --color-success: 155 192 75;
     --color-failure: 243 47 117;
   }
