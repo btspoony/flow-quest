@@ -110,11 +110,13 @@ export default defineEventHandler(async function (event) {
       transactionId = await actions.txCtrlerSetQuestCompleted(signer, {
         target: body.address,
         questKey: body.questKey,
+        params,
       });
     } else {
       transactionId = await actions.txCtrlerSetQuestFailure(signer, {
         target: body.address,
         questKey: body.questKey,
+        params,
       });
     }
 

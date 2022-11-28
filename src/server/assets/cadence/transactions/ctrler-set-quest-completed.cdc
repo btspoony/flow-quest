@@ -5,6 +5,7 @@ import CompetitionService from "../../../../../cadence/dev-challenge/Competition
 transaction(
     target: Address,
     questKey: String,
+    params: {String: AnyStruct}?
 ) {
     let season: &CompetitionService.CompetitionSeason{CompetitionService.CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
     let ctrler: &CompetitionService.SeasonPointsController
@@ -19,6 +20,15 @@ transaction(
 
     execute {
         let seasonId = self.season.getId()
+
+        if let p = params {
+          self.ctrler.appendNewParams(
+              acct: target,
+              seasonId: seasonId,
+              questKey: questKey,
+              params: p
+          )
+        }
 
         self.ctrler.questCompletedAndDistributePoints(
             acct: target,

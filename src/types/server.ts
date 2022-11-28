@@ -34,11 +34,13 @@ interface OptionCtrlerAppendQuestParams {
 interface OptionCtrlerSetQuestCompleted {
   target: string;
   questKey: string;
+  params: { [key: string]: string };
 }
 
 interface OptionCtrlerSetQuestFailure {
   target: string;
   questKey: string;
+  params: { [key: string]: string };
 }
 
 interface OptionCtrlerSetupReferralCode {

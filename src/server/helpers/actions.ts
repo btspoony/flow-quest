@@ -25,11 +25,21 @@ export async function txCtrlerSetQuestCompleted(
   signer: Signer,
   opts: OptionCtrlerSetQuestCompleted
 ) {
+  const kvpair: { key: string; value: string }[] = [];
+  if (opts.params) {
+    for (const key in opts.params) {
+      kvpair.push({ key, value: opts.params[key] });
+    }
+  }
   return signer.sendTransaction(
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-set-quest-completed.cdc"
     ),
-    (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
+    (arg, t) => [
+      arg(opts.target, t.Address),
+      arg(opts.questKey, t.String),
+      arg(kvpair, t.Dictionary({ key: t.String, value: t.String })),
+    ]
   );
 }
 
@@ -37,11 +47,21 @@ export async function txCtrlerSetQuestFailure(
   signer: Signer,
   opts: OptionCtrlerSetQuestFailure
 ) {
+  const kvpair: { key: string; value: string }[] = [];
+  if (opts.params) {
+    for (const key in opts.params) {
+      kvpair.push({ key, value: opts.params[key] });
+    }
+  }
   return signer.sendTransaction(
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-set-quest-failure.cdc"
     ),
-    (arg, t) => [arg(opts.target, t.Address), arg(opts.questKey, t.String)]
+    (arg, t) => [
+      arg(opts.target, t.Address),
+      arg(opts.questKey, t.String),
+      arg(kvpair, t.Dictionary({ key: t.String, value: t.String })),
+    ]
   );
 }
 
