@@ -1,22 +1,29 @@
 <script setup lang="ts">
-// TODO
+import FlowLogo from '~/assets/svgs/flow.svg'
+
+const router = useRouter()
 </script>
 
 <template>
-  <header class="container-fluid">
+  <header class="container">
     <nav>
       <ul>
-        <li><strong>Flow Developer Challenge</strong></li>
+        <li class="inline-flex-between cursor-pointer" @click="() => {
+          router.push('/');
+        }">
+          <FlowLogo class="fill-white w-10 h-10" />
+          <span class="font-semibold text-2xl">Flow Dev Challenges</span>
+        </li>
       </ul>
       <ul>
         <li>
           <WidgetThemeToggle />
         </li>
         <li>
-          <AuthGithub />
+          <FlowConnect />
         </li>
         <li>
-          <FlowConnect />
+          <AuthGithub />
         </li>
       </ul>
     </nav>

@@ -21,7 +21,7 @@ const description = ref(
   </HeadMeta>
 
   <Header />
-  <div class="container-fluid">
+  <div class="container">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
