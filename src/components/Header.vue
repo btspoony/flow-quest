@@ -12,7 +12,7 @@ const router = useRouter()
           router.push('/');
         }">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span class="font-semibold text-2xl">Flow Dev Challenges</span>
+          <span class="font-semibold text-2xl">Flow Dev Explorer</span>
         </li>
       </ul>
       <ul>

@@ -4,6 +4,7 @@
 
 <template>
   <main>
-    Seasons
+    <h1>Leaderboard</h1>
+    <NuxtPage />
   </main>
 </template>

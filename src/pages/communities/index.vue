@@ -4,6 +4,6 @@
 
 <template>
   <main>
-    Season Detail and Quest list
+    Community List
   </main>
 </template>

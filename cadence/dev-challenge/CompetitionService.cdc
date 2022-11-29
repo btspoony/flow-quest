@@ -200,6 +200,12 @@ pub contract CompetitionService {
             endDate: UFix64,
             quests: [QuestConfig]
         ): UInt64 {
+            // ensure one time one season
+            if self.latestActiveSeasonId != 0 {
+                let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason? ?? panic("Failed to found last season")
+                assert(!season.isActive(), message: "Last season is active")
+            }
+
             let season <- create CompetitionSeason(
                 endDate: endDate,
                 quests: quests,

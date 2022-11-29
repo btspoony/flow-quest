@@ -4,6 +4,6 @@
 
 <template>
   <main>
-    Ranking of the season
+    Community detail
   </main>
 </template>
