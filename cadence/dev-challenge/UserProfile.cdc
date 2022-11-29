@@ -213,6 +213,7 @@ pub contract UserProfile {
             competitionCap.registerProfile(acct: profileAddr)
 
             let seasonId = competitionCap.getId()
+            assert(self.seasonScores[seasonId] == nil, message: "Already registered.")
             self.seasonScores[seasonId] = SeasonRecord(
                 cap: serviceCap,
                 referredFrom: referredFrom
