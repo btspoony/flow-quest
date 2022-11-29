@@ -50,7 +50,6 @@ onMounted(() => {
   )
 });
 
-
 onUnmounted(() => {
   window.removeEventListener("message", receiveMessage, false)
 })
@@ -92,9 +91,7 @@ function login() {
       <span v-if="!profile.data || loading" :aria-busy="loading">
         Loading
       </span>
-      <div v-else class="w-10 h-10">
-        <img class="rounded-full" :src="profile.data?.avatarUrl" alt="AvatarUrl" />
-      </div>
+      <WidgetProfileHead v-else />
     </div>
     <button v-else :aria-busy="loading" class="rounded-full inline-flex-between" @click="login">
       <GithubIcon class="fill-current w-5 h-5" />
