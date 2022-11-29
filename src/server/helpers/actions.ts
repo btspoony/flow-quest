@@ -1,4 +1,3 @@
-import * as fcl from "@onflow/fcl";
 import Signer from "./signer.mjs";
 
 export async function txCtrlerAppendQuestParams(
