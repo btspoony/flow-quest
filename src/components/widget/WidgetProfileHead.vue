@@ -2,8 +2,9 @@
 import { StorageSerializers, RemovableRef, useLocalStorage } from '@vueuse/core';
 import { ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/solid'
 
+const details = ref<HTMLDetailsElement | null>(null);
 const profile = useGithubProfile();
-let storageToken: RemovableRef<GithubToken>
+let storageToken: RemovableRef<GithubToken>;
 
 onMounted(() => {
   storageToken = useLocalStorage<GithubToken>('github-token', null, {
@@ -12,7 +13,12 @@ onMounted(() => {
   });
 })
 
+function closeDropdown() {
+  details.value?.removeAttribute("open")
+}
+
 function onLogout() {
+  closeDropdown()
   storageToken.value = null
   profile.value.auth = undefined
   profile.value.data = undefined
@@ -20,7 +26,7 @@ function onLogout() {
 </script>
 
 <template>
-  <details v-if="profile.data" role="list" dir="rtl">
+  <details ref="details" v-if="profile.data" role="list" dir="rtl">
     <summary aria-haspopup="listbox" role="link" class="after:!h-10">
       <div class="w-10 h-10">
         <img class="rounded-full" :src="profile.data?.avatarUrl" alt="AvatarUrl" />
@@ -28,7 +34,7 @@ function onLogout() {
     </summary>
     <ul role="listbox">
       <li>
-        <NuxtLink to="/account/profile">
+        <NuxtLink to="/account/profile" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-between">
             <ChevronRightIcon class="fill-current w-5 h-5" />
             <span>Profile</span>
