@@ -37,6 +37,12 @@ pub contract Interfaces {
         access(account) fun setupReferralCode(seasonId: UInt64)
     }
 
+    pub struct interface QuestInfoPublic {
+        pub let steps: UInt64
+        pub let stackable: Bool
+        pub let stackLimit: UInt64
+    }
+
     // Bounty information
     pub resource interface BountyInfoPublic {
         pub let endDate: UFix64;
@@ -50,7 +56,8 @@ pub contract Interfaces {
         pub fun getId(): UInt64
         pub fun isActive(): Bool
 
-        pub fun getBountyInfo(_ bountyUid: UInt64): &{BountyInfoPublic}
+        pub fun getBountyInfo(_ bountyUid: UInt64): &AnyResource{BountyInfoPublic}
+        pub fun getQuestInfo(_ questKey: String): &AnyStruct{QuestInfoPublic}
 
         access(account) fun onProfileRegistered(acct: Address)
         access(account) fun onBountyCompleted(bountyUid: UInt64, acct: Address)

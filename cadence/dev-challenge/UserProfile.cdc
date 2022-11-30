@@ -45,8 +45,8 @@ pub contract UserProfile {
          ***********************************************************/
 
     pub struct VerificationStep {
-        pub var params: [{String: AnyStruct}]
-        pub var results: {Int: Bool}
+        pub let params: [{String: AnyStruct}]
+        pub let results: {Int: Bool}
 
         init() {
             self.params = []
@@ -77,10 +77,10 @@ pub contract UserProfile {
     Profile quest record
      */
     pub struct QuestRecord {
+        pub let steps: [VerificationStep]
         pub var timesCompleted: UInt64
-        pub var steps: [VerificationStep]
 
-        init(stepAmt: Int) {
+        init(_ stepAmt: Int) {
             self.timesCompleted = 0
             self.steps = []
 
@@ -146,8 +146,18 @@ pub contract UserProfile {
         }
 
         // get reference of the quest record
-        access(contract) fun getQuestRecordRef(questKey: String): &QuestRecord {
-            return &self.questScores[questKey] as &QuestRecord? ?? panic("Missing quest record refs.")
+        access(contract) fun fetchOrCreateQuestRecordRef(questKey: String): &QuestRecord {
+            var record = &self.questScores[questKey] as &QuestRecord?
+            if record == nil {
+                let serviceRef = self.campetitionServiceCap.borrow() ?? panic("Failed to get service capability.")
+                let competitionRef = serviceRef.getSeason(seasonId: self.seasonId)
+                assert(competitionRef.isActive(), message: "Competition is not active.")
+
+                let questInfo = competitionRef.getQuestInfo(questKey)
+                self.questScores[questKey] = QuestRecord(Int(questInfo.steps))
+                record = &self.questScores[questKey] as &QuestRecord?
+            }
+            return record!
         }
 
         // update verification result
@@ -172,7 +182,7 @@ pub contract UserProfile {
             let requiredQuests = bountyInfo.getRequiredQuestKeys()
             var invalid = false
             for key in requiredQuests {
-                let recordRef = self.getQuestRecordRef(questKey: key)
+                let recordRef = self.fetchOrCreateQuestRecordRef(questKey: key)
                 if recordRef.timesCompleted == 0 {
                     invalid = true
                     break
@@ -235,8 +245,7 @@ pub contract UserProfile {
 
         pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64 {
             let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            return questScoreRef.timesCompleted
+            return seasonRef.questScores[questKey]?.timesCompleted ?? 0
         }
 
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64} {
@@ -307,7 +316,7 @@ pub contract UserProfile {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
             let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
+            let questScoreRef = seasonRef.fetchOrCreateQuestRecordRef(questKey: questKey)
             questScoreRef.updateVerifactionParams(step: step, params: params)
 
             emit QuestRecordUpdateParams(
@@ -325,7 +334,7 @@ pub contract UserProfile {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
             let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
+            let questScoreRef = seasonRef.fetchOrCreateQuestRecordRef(questKey: questKey)
             questScoreRef.updateVerificationResult(step: step, result: result)
 
             emit QuestRecordUpdateResult(
@@ -368,7 +377,6 @@ pub contract UserProfile {
             return &self.seasonScores[seasonId] as &SeasonRecord? ?? panic("Missing season score")
         }
     }
-
 
     // ---- public methods ----
 

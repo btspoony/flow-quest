@@ -38,7 +38,12 @@ interface ChallengeIndexCondition extends UnlockCondition {
   index: number;
 }
 
+interface TimeLimitedUnlockCondition extends UnlockCondition {
+  endDate: number;
+}
+
 type UnlockConditions =
+  | TimeLimitedUnlockCondition
   | CompletedAmountUnlockCondition
   | MinimumLevelUnlockCondition
   | AchievementRequiredCondition
@@ -69,19 +74,19 @@ interface BountyEntity {
   category: BountyType;
   key: string;
   communityId: string;
-  preconditions: UnlockConditions[];
   display: Display;
   // all seasons
   seasonsIncluded: string[];
 }
 
 interface QuestConfig extends BountyEntity {
+  steps: number;
   stackable?: boolean;
   limitation?: number;
 }
 
 interface ChallengeConfig extends BountyEntity {
-  quests: QuestConfig[];
+  quests: BountyIdentifier[];
   accomplishAchievementId?: string;
 }
 
@@ -90,6 +95,13 @@ type BountyEntities = QuestConfig | ChallengeConfig;
 interface ParticipantRecord {
   address: string;
   datetime: number;
+}
+
+interface CommuntiyBountyBasics {
+  category: BountyType;
+  key: string;
+  createdAt: number;
+  active: boolean;
 }
 
 interface Community {
@@ -102,7 +114,9 @@ interface Community {
     discord?: string;
     website?: string;
   };
-  bounties: { [key: string]: BountyEntities };
+  quests: { [key: string]: QuestConfig };
+  challenges: { [key: string]: ChallengeConfig };
+  bounties: CommuntiyBountyBasics[];
 }
 
 /**
@@ -110,27 +124,48 @@ interface Community {
  */
 interface BountyIdentifier {
   communityId: string;
-  bountyKey: string;
+  key: string;
   category: BountyType;
 }
 
-interface BountyStatus {
-  bountyIdentifier: BountyIdentifier;
-  bountyConfig?: BountyEntities; // load dynamic
-  endDate: number;
+interface BountyInfo {
+  identifier: BountyIdentifier;
+  config?: BountyEntities; // load dynamic
+  preconditions: UnlockConditions[];
   rewardInfo: RewardInfos;
   participants: ParticipantRecord[];
 }
 
 interface CompetitionSeason {
   endDate: number;
-  bounties: {[key: string]: BountyStatus};
+  bounties: { [uid: string]: BountyInfo };
 }
 
 // ---- Profile ----
 
+interface VerificationStep {
+  params: { [key: string]: string }[];
+  results: { [times: number]: boolean };
+}
+
+interface QuestRecord {
+  timesCompleted: number;
+  steps: VerificationStep[];
+}
+
+interface SeasonRecord {
+  seasonId: string;
+  referredFromCode: string;
+  referredFromAddress: string;
+  referralCode: string;
+  points: number;
+  questScores: { [key: string]: QuestRecord };
+  bountiesCompleted: { [uid: string]: number };
+}
+
 interface ProfileData {
   id: string;
+  seasonRecords: { [key: string]: SeasonRecord };
 }
 
 interface Profile {
