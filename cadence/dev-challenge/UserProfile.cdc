@@ -26,9 +26,10 @@ pub contract UserProfile {
 
     pub event ProfileSeasonAddPoints(profile: Address, seasonId: UInt64, points: UInt64)
     pub event ProfileSeasonNewSeason(profile: Address, seasonId: UInt64, referredFrom: String?)
-    pub event QuestRecordAppendNewParams(profile: Address, seasonId: UInt64, questKey: String, keys: [String])
-    pub event QuestRecordUpdateVerificationResult(profile: Address, seasonId: UInt64, questKey: String, index: Int, result: Bool)
-    pub event QuestRecordSetupReferralCode(profile: Address, seasonId: UInt64, code: String)
+    pub event ProfileSeasonBountyCompleted(profile: Address, seasonId: UInt64, bountyUid: UInt64)
+    pub event QuestRecordUpdateParams(profile: Address, seasonId: UInt64, questKey: String, step: Int, keys: [String], round: UInt64)
+    pub event QuestRecordUpdateResult(profile: Address, seasonId: UInt64, questKey: String, step: Int, result: Bool, round: UInt64)
+    pub event ProfileSetupReferralCode(profile: Address, seasonId: UInt64, code: String)
 
     /**    ____ ___ ____ ___ ____
        *   [__   |  |__|  |  |___
@@ -43,51 +44,73 @@ pub contract UserProfile {
         *  |    |__| | \| |___  |  | |__| | \| |  | |___ |  |    |
          ***********************************************************/
 
-    pub struct QuestRecord {
-        pub var timesCompleted: UInt64
-        pub var verificationParams: [{String: AnyStruct}]
-        pub var verificationResults: {Int: Bool}
+    pub struct VerificationStep {
+        pub var params: [{String: AnyStruct}]
+        pub var results: {Int: Bool}
 
         init() {
+            self.params = []
+            self.results = {}
+        }
+
+        access(contract) fun updateParams(idx: Int, params: {String: AnyStruct}) {
+            pre {
+                idx <= self.params.length: "Out of bound"
+            }
+            if idx == self.params.length {
+                self.params.append(params)
+            } else {
+                self.params[idx] = params
+            }
+        }
+
+        access(contract) fun updateResult(idx: Int, result: Bool) {
+            pre {
+                idx <= self.params.length: "Out of bound"
+                self.results[idx] == nil: "Verification result exists"
+            }
+            self.results[idx] = result
+        }
+    }
+
+    /**
+    Profile quest record
+     */
+    pub struct QuestRecord {
+        pub var timesCompleted: UInt64
+        pub var steps: [VerificationStep]
+
+        init(stepAmt: Int) {
             self.timesCompleted = 0
-            self.verificationParams = []
-            self.verificationResults = {}
+            self.steps = []
+
+            var i = 0
+            while i < stepAmt {
+                self.steps.append(VerificationStep())
+                i = i + 1
+            }
         }
 
         pub fun getLatestIndex(): Int {
-            pre {
-                self.verificationParams.length > 0: "no params"
-            }
-            return self.verificationParams.length - 1
+            return Int(self.timesCompleted)
         }
 
-        pub fun getLatestParams(): {String: AnyStruct} {
-            return self.verificationParams[self.getLatestIndex()]
-        }
-
-        pub fun getLatestResult(): Bool? {
-            return self.verificationResults[self.getLatestIndex()]
-        }
-
-        access(contract) fun appendNewParams(params: {String: AnyStruct}) {
-            self.verificationParams.append(params)
+        access(contract) fun updateVerifactionParams(step: Int, params: {String: AnyStruct}) {
+            self.steps[step].updateParams(idx: self.getLatestIndex(), params: params)
         }
 
         // latest result and times completed
-        access(contract) fun updateVerificationResult(idx: Int, result: Bool) {
-            pre {
-                idx < self.verificationParams.length: "Update verification"
-                self.verificationResults[idx] == nil: "Verification result exists"
-            }
-            self.verificationResults[idx] = result
+        access(contract) fun updateVerificationResult(step: Int, result: Bool) {
+            self.steps[step].updateResult(idx: self.getLatestIndex(), result: result)
             // update completed one time
-            if result {
+            if step == self.steps.length - 1 && result {
                 self.timesCompleted = self.timesCompleted + 1
             }
         }
     }
 
     pub struct SeasonRecord {
+        pub let seasonId: UInt64
         pub let referredFromCode: String?
         pub let referredFromAddress: Address?
         pub var referralCode: String?
@@ -95,17 +118,31 @@ pub contract UserProfile {
 
         access(self) let campetitionServiceCap: Capability<&{Interfaces.CompetitionServicePublic}>
         access(contract) var questScores: {String: QuestRecord}
+        access(contract) var bountiesCompleted: {UInt64: UFix64}
 
         init(
+            seasonId: UInt64,
             cap: Capability<&{Interfaces.CompetitionServicePublic}>,
             referredFrom: String?
         ) {
+            self.seasonId = seasonId
             self.campetitionServiceCap = cap
             self.referredFromCode = referredFrom
             self.referredFromAddress = nil // TODO: parse address from code?
             self.referralCode = nil
             self.points = 0
             self.questScores = {}
+            self.bountiesCompleted = {}
+        }
+
+        // get a copy of bountiesCompleted
+        pub fun getBountiesCompleted(): {UInt64: UFix64} {
+            return self.bountiesCompleted
+        }
+
+        // get a copy of quest score
+        pub fun getQuestScore(questKey: String): QuestRecord {
+            return self.questScores[questKey] ?? panic("Missing quest record")
         }
 
         // get reference of the quest record
@@ -124,6 +161,29 @@ pub contract UserProfile {
                 self.referralCode == nil: "referral code should be nil"
             }
             self.referralCode = code
+        }
+
+        access(contract) fun completeBounty(bountyUid: UInt64, owner: Address) {
+            let serviceRef = self.campetitionServiceCap.borrow() ?? panic("Failed to get service capability.")
+            let competitionRef = serviceRef.getSeason(seasonId: self.seasonId)
+            assert(competitionRef.isActive(), message: "Competition is not active.")
+
+            let bountyInfo = competitionRef.getBountyInfo(bountyUid)
+            let requiredQuests = bountyInfo.getRequiredQuestKeys()
+            var invalid = false
+            for key in requiredQuests {
+                let recordRef = self.getQuestRecordRef(questKey: key)
+                if recordRef.timesCompleted == 0 {
+                    invalid = true
+                    break
+                }
+            }
+            assert(!invalid, message: "required quests are not completed.")
+            // set bounties as completed
+            self.bountiesCompleted[bountyUid] = getCurrentBlock().timestamp
+
+            // callback to service
+            competitionRef.onBountyCompleted(bountyUid: bountyUid, acct: owner)
         }
     }
 
@@ -173,30 +233,16 @@ pub contract UserProfile {
             return seasonRef.referredFromAddress
         }
 
-        pub fun getTimesCompleted(seasonId: UInt64, questKey: String): UInt64 {
+        pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64 {
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
             return questScoreRef.timesCompleted
         }
 
-        pub fun getLatestSeasonQuestParameters(seasonId: UInt64, questKey: String): {String: AnyStruct} {
+        pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64} {
             let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            return questScoreRef.getLatestParams()
+            return seasonRef.getBountiesCompleted()
         }
-
-        pub fun getLatestSeasonQuestIndex(seasonId: UInt64, questKey: String): Int {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            return questScoreRef.getLatestIndex()
-        }
-
-        pub fun getLatestSeasonQuestResult(seasonId: UInt64, questKey: String): Bool? {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
-            let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            return questScoreRef.getLatestResult()
-        }
-
 
         // ---- writable methods ----
 
@@ -205,16 +251,17 @@ pub contract UserProfile {
             referredFrom: String?
         ) {
             let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
-            let competitionCap = serviceRef.getLatestActiveSeason()
-            assert(competitionCap.isActive(), message: "Competition is not active.")
+            let competitionRef = serviceRef.getLatestActiveSeason()
+            assert(competitionRef.isActive(), message: "Competition is not active.")
 
             // add to competition
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
-            competitionCap.registerProfile(acct: profileAddr)
+            competitionRef.onProfileRegistered(acct: profileAddr)
 
-            let seasonId = competitionCap.getId()
+            let seasonId = competitionRef.getId()
             assert(self.seasonScores[seasonId] == nil, message: "Already registered.")
             self.seasonScores[seasonId] = SeasonRecord(
+                seasonId: seasonId,
                 cap: serviceCap,
                 referredFrom: referredFrom
             )
@@ -256,35 +303,51 @@ pub contract UserProfile {
             )
         }
 
-        access(account) fun appendNewParams(seasonId: UInt64, questKey: String, params: {String: AnyStruct}) {
+        access(account) fun updateQuestNewParams(seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct}) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            questScoreRef.appendNewParams(params: params)
+            questScoreRef.updateVerifactionParams(step: step, params: params)
 
-            emit QuestRecordAppendNewParams(
+            emit QuestRecordUpdateParams(
                 profile: profileAddr,
                 seasonId: seasonId,
                 questKey: questKey,
+                step: step,
                 keys: params.keys,
+                round: questScoreRef.timesCompleted
             )
         }
 
         // latest result and times completed
-        access(account) fun updateVerificationResult(seasonId: UInt64, questKey: String, idx: Int, result: Bool) {
+        access(account) fun updateQuestVerificationResult(seasonId: UInt64, questKey: String, step: Int, result: Bool) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
             let seasonRef = self.getSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.getQuestRecordRef(questKey: questKey)
-            questScoreRef.updateVerificationResult(idx: idx, result: result)
+            questScoreRef.updateVerificationResult(step: step, result: result)
 
-            emit QuestRecordUpdateVerificationResult(
+            emit QuestRecordUpdateResult(
                 profile: profileAddr,
                 seasonId: seasonId,
                 questKey: questKey,
-                index: idx,
+                step: step,
                 result: result,
+                round: questScoreRef.timesCompleted
+            )
+        }
+
+        access(account) fun completeBounty(seasonId: UInt64, bountyUid: UInt64) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
+            let seasonRef = self.getSeasonRecordRef(seasonId)
+            seasonRef.completeBounty(bountyUid: bountyUid, owner: profileAddr)
+
+            emit ProfileSeasonBountyCompleted(
+                profile: profileAddr,
+                seasonId: seasonId,
+                bountyUid: bountyUid,
             )
         }
 
@@ -292,7 +355,7 @@ pub contract UserProfile {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
             let code = "" // TODO
 
-            emit QuestRecordSetupReferralCode(
+            emit ProfileSetupReferralCode(
                 profile: profileAddr,
                 seasonId: seasonId,
                 code: code,

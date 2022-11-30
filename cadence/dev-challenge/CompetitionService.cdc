@@ -123,7 +123,7 @@ pub contract CompetitionService {
 
         // ---- writable methods ----
 
-        access(account) fun registerProfile(acct: Address) {
+        access(account) fun onProfileRegistered(acct: Address) {
             pre {
                 self.profiles[acct] == nil: "Profile registered."
             }
