@@ -28,20 +28,21 @@ interface MinimumLevelUnlockCondition extends UnlockCondition {
   points: number;
 }
 
-interface TimeLimitedUnlockCondition extends UnlockCondition {
-  endDate: number;
-}
-
 interface AchievementRequiredCondition extends UnlockCondition {
   achievementId: number;
   achievementUrl: string;
 }
 
+interface ChallengeIndexCondition extends UnlockCondition {
+  challengeKey: string;
+  index: number;
+}
+
 type UnlockConditions =
   | CompletedAmountUnlockCondition
   | MinimumLevelUnlockCondition
-  | TimeLimitedUnlockCondition
-  | AchievementRequiredCondition;
+  | AchievementRequiredCondition
+  | ChallengeIndexCondition;
 
 type QuestType = "Points" | "NFT";
 
@@ -61,12 +62,17 @@ interface NFTRewardInfo extends RewardInfo {
 type BountyType = "quest" | "challenge";
 type RewardInfos = PointRewardInfo | NFTRewardInfo;
 
+/**
+ * Bounty basis data
+ */
 interface BountyEntity {
-  key: string;
   category: BountyType;
+  key: string;
   communityId: string;
   preconditions: UnlockConditions[];
-  rewardInfo: RewardInfos;
+  display: Display;
+  // all seasons
+  seasonsIncluded: string[];
 }
 
 interface QuestConfig extends BountyEntity {
@@ -76,29 +82,49 @@ interface QuestConfig extends BountyEntity {
 
 interface ChallengeConfig extends BountyEntity {
   quests: QuestConfig[];
-  deliverAchievementId: string;
+  accomplishAchievementId?: string;
 }
+
+type BountyEntities = QuestConfig | ChallengeConfig;
 
 interface ParticipantRecord {
   address: string;
   datetime: number;
 }
 
-interface QuestStatus {
-  questKey: string;
-  participants: ParticipantRecord[];
-}
-
 interface Community {
   owner: string;
   communityId: string;
   display: Display;
-  banner: string;
+  banner?: string;
   socials: {
-    twitter: string;
-    discord: string;
-    website: string;
+    twitter?: string;
+    discord?: string;
+    website?: string;
   };
+  bounties: { [key: string]: BountyEntities };
+}
+
+/**
+ * Season related data
+ */
+interface BountyIdentifier {
+  communityId: string;
+  bountyKey: string;
+  category: BountyType;
+}
+
+interface BountyStatus {
+  bountyIdentifier: BountyIdentifier;
+  bountyConfig?: BountyEntities; // load dynamic
+  endDate: number;
+  rewardInfo: RewardInfos;
+  participants: ParticipantRecord[];
+}
+
+interface CompetitionSeason {
+  endDate: number;
+  bounties: {[key: string]: BountyStatus};
 }
 
 // ---- Profile ----
