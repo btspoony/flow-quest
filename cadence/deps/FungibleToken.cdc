@@ -185,7 +185,7 @@ pub contract interface FungibleToken {
             // Assert that the concrete type of the deposited vault is the same
             // as the vault that is accepting the deposit
             pre {
-                from.isInstance(self.getType()): 
+                from.isInstance(self.getType()):
                     "Cannot deposit an incompatible token type"
             }
             post {

@@ -9,7 +9,9 @@
     "testnet": {
       "testnet-admin": [
         "Interfaces",
+        "Helper",
         "UserProfile",
+        "Community",
         "CompetitionService"
       ]
     }

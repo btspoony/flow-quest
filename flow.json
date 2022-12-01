@@ -34,6 +34,34 @@
         "mainnet": "0xf233dcee88fe0abe"
       }
     },
+    "FlowToken": {
+      "source": "./cadence/deps/FlowToken.cdc",
+      "aliases": {
+        "testnet": "0x7e60df042a9c0868",
+        "mainnet": "0x1654653399040a61"
+      }
+    },
+    "FindViews": {
+      "source": "./cadence/deps/FindViews.cdc",
+      "aliases": {
+        "testnet": "0x35717efbbce11c74",
+        "mainnet": "0x097bafa4e0b48eef"
+      }
+    },
+    "FLOAT": {
+      "source": "./cadence/deps/FLOAT.cdc",
+      "aliases": {
+        "testnet": "0x0afe396ebc8eee65",
+        "mainnet": "0x2d4c3caffbeab845"
+      }
+    },
+    "GrantedAccountAccess": {
+      "source": "./cadence/deps/GrantedAccountAccess.cdc",
+      "aliases": {
+        "testnet": "0x0afe396ebc8eee65",
+        "mainnet": "0x2d4c3caffbeab845"
+      }
+    },
     "ArrayUtils": {
       "source": "./cadence/deps/ArrayUtils.cdc",
       "aliases": {
@@ -49,18 +77,12 @@
       }
     },
     "Interfaces": "./cadence/dev-challenge/Interfaces.cdc",
+    "Helper": "./cadence/dev-challenge/Helper.cdc",
     "UserProfile": "./cadence/dev-challenge/UserProfile.cdc",
+    "Community": "./cadence/dev-challenge/Community.cdc",
     "CompetitionService": "./cadence/dev-challenge/CompetitionService.cdc"
   },
   "deployments": {
-    "emulator": {
-      "emulator-account": [
-        "NonFungibleToken",
-        "MetadataViews",
-        "Interfaces",
-        "UserProfile",
-        "CompetitionService"
-      ]
-    }
+    "emulator": {}
   }
 }
