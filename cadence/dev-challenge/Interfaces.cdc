@@ -1,6 +1,9 @@
 import MetadataViews from "../deps/MetadataViews.cdc"
+import Helper from "./Helper.cdc"
 
 pub contract Interfaces {
+
+    // =================== Profile ====================
 
     pub struct LinkedIdentity {
         pub let platform: String
@@ -37,22 +40,75 @@ pub contract Interfaces {
         access(account) fun setupReferralCode(seasonId: UInt64)
     }
 
+    // =================== Community ====================
+
+    pub enum BountyType: UInt8 {
+        pub case quest
+        pub case challenge
+    }
+
+    pub struct interface BountyEntityIdentifier {
+        pub let category: BountyType
+        pub let key: String
+
+        pub fun getBountyEntity(): &AnyStruct{BountyEntityPublic};
+    }
+
+    pub struct interface BountyEntityPublic {
+        pub let category: BountyType
+        // The offchain key of the quest
+        pub let key: String
+        // The community belongs to
+        pub let communityId: UInt64
+
+        // display
+        pub fun getStandardDisplay(): MetadataViews.Display
+    }
+
     pub struct interface QuestInfoPublic {
+        // How many steps in the quest
         pub let steps: UInt64
-        pub let stackable: Bool
-        pub let stackLimit: UInt64
+    }
+
+    pub struct interface ChallengeInfoPublic {
+        pub let quests: [AnyStruct{BountyEntityIdentifier}]
+        pub var achievement: Helper.EventIdentifier?;
+    }
+
+    // =================== Competition ====================
+
+    pub enum UnlockConditionTypes: UInt8 {
+        pub case CompletedAmount
+        pub case MinimumLevel
+        pub case TimeLimited
+        pub case AchievementRequired
+        pub case ChallengeIndex
+    }
+
+    pub struct interface UnlockCondition {
+        pub let type: UnlockConditionTypes
+        pub let display: MetadataViews.Display?
+
+        pub fun isUnlocked(): Bool;
     }
 
     // Bounty information
     pub resource interface BountyInfoPublic {
-        pub let endDate: UFix64;
-        // TODO: more info required
+        pub let identifier: AnyStruct{BountyEntityIdentifier};
+        pub let preconditions: [AnyStruct{UnlockCondition}];
+        pub let participants: {Address: {String: AnyStruct}}
+        access(contract) let rewardInfo: {Helper.QuestRewardType: AnyStruct{Helper.RewardInfo}}
 
         pub fun getRequiredQuestKeys(): [String]
+        pub fun getPointReward(): Helper.PointReward?
+        pub fun getFLOATReward(): Helper.FLOATReward?
     }
 
     // Competition public interface
     pub resource interface CompetitionPublic {
+        pub var endDate: UFix64
+        access(contract) let bounties: @{ UInt64: AnyResource{BountyInfoPublic} };
+
         pub fun getId(): UInt64
         pub fun isActive(): Bool
 
