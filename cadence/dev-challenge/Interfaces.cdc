@@ -49,7 +49,10 @@ pub contract Interfaces {
 
     pub struct interface BountyEntityIdentifier {
         pub let category: BountyType
+        // The offchain key of the quest
         pub let key: String
+        // The community belongs to
+        pub let communityId: UInt64
 
         pub fun getBountyEntity(): &AnyStruct{BountyEntityPublic};
     }
@@ -94,12 +97,13 @@ pub contract Interfaces {
 
     // Bounty information
     pub resource interface BountyInfoPublic {
-        pub let identifier: AnyStruct{BountyEntityIdentifier};
-        pub let preconditions: [AnyStruct{UnlockCondition}];
-        pub let participants: {Address: {String: AnyStruct}}
-        access(contract) let rewardInfo: {Helper.QuestRewardType: AnyStruct{Helper.RewardInfo}}
+        pub fun getPreconditions(): [AnyStruct{UnlockCondition}]
+        pub fun getParticipants(): {Address: {String: AnyStruct}}
+        pub fun getIdentifier(): AnyStruct{BountyEntityIdentifier}
 
         pub fun getRequiredQuestKeys(): [String]
+
+        pub fun getRewardType(): Helper.QuestRewardType
         pub fun getPointReward(): Helper.PointReward?
         pub fun getFLOATReward(): Helper.FLOATReward?
     }

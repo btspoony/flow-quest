@@ -12,7 +12,8 @@ type UnlockConditionTypes =
   | "CompletedAmount"
   | "MinimumLevel"
   | "TimeLimited"
-  | "AchievementRequired";
+  | "AchievementRequired"
+  | "ChallengeIndex";
 
 interface UnlockCondition {
   type: UnlockConditionTypes;
@@ -49,10 +50,10 @@ type UnlockConditions =
   | AchievementRequiredCondition
   | ChallengeIndexCondition;
 
-type QuestType = "Points" | "NFT";
+type QuestRewardType = "Points" | "NFT";
 
 interface RewardInfo {
-  rewardType: QuestType;
+  rewardType: QuestRewardType;
 }
 
 interface PointRewardInfo extends RewardInfo {
@@ -61,7 +62,8 @@ interface PointRewardInfo extends RewardInfo {
 }
 
 interface NFTRewardInfo extends RewardInfo {
-  floatEventId: string;
+  eventHost: string;
+  eventId: string;
 }
 
 type BountyType = "quest" | "challenge";
@@ -75,14 +77,10 @@ interface BountyEntity {
   key: string;
   communityId: string;
   display: Display;
-  // all seasons
-  seasonsIncluded: string[];
 }
 
 interface QuestConfig extends BountyEntity {
   steps: number;
-  stackable?: boolean;
-  limitation?: number;
 }
 
 interface ChallengeConfig extends BountyEntity {
@@ -92,16 +90,10 @@ interface ChallengeConfig extends BountyEntity {
 
 type BountyEntities = QuestConfig | ChallengeConfig;
 
-interface ParticipantRecord {
-  address: string;
-  datetime: number;
-}
-
 interface CommuntiyBountyBasics {
   category: BountyType;
   key: string;
   createdAt: number;
-  active: boolean;
 }
 
 interface Community {
@@ -123,9 +115,14 @@ interface Community {
  * Season related data
  */
 interface BountyIdentifier {
+  category: BountyType;
   communityId: string;
   key: string;
-  category: BountyType;
+}
+
+interface ParticipantRecord {
+  datetime: number;
+  [key: string]: any;
 }
 
 interface BountyInfo {
@@ -133,7 +130,7 @@ interface BountyInfo {
   config?: BountyEntities; // load dynamic
   preconditions: UnlockConditions[];
   rewardInfo: RewardInfos;
-  participants: ParticipantRecord[];
+  participants: { [key: string]: ParticipantRecord };
 }
 
 interface CompetitionSeason {
@@ -164,7 +161,7 @@ interface SeasonRecord {
 }
 
 interface ProfileData {
-  id: string;
+  address: string;
   seasonRecords: { [key: string]: SeasonRecord };
 }
 

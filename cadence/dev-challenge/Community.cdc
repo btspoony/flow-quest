@@ -511,5 +511,7 @@ pub contract Community {
 
         self.entityMapping = {}
         self.communityMapping = {}
+
+        emit ContractInitialized()
     }
 }

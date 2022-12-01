@@ -6,7 +6,9 @@
 Join a flow development competition.
 */
 import Interfaces from "./Interfaces.cdc"
+import Helper from "./Helper.cdc"
 import UserProfile from "./UserProfile.cdc"
+import Community from "./Community.cdc"
 
 pub contract CompetitionService {
 
@@ -28,6 +30,8 @@ pub contract CompetitionService {
 
     pub event ContractInitialized()
 
+    pub event BountyCompleted(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
+
     pub event SeasonCreated(seasonId: UInt64)
 
     /**    ____ ___ ____ ___ ____
@@ -42,51 +46,101 @@ pub contract CompetitionService {
         *  |    |__| | \| |___  |  | |__| | \| |  | |___ |  |    |
          ***********************************************************/
 
-    pub struct QuestIdentifier {
+    pub resource BountyInfo: Interfaces.BountyInfoPublic {
         pub let seasonId: UInt64
-        pub let questKey: String
-
-        init(season: UInt64, questKey: String) {
-            self.seasonId = season
-            self.questKey = questKey
-        }
-
-        pub fun getConfig(): QuestConfig {
-            let season = CompetitionService.borrowServiceRef().borrowSeasonRef(self.seasonId)
-            return season.getQuestConfig(key: self.questKey)
-        }
-    }
-
-    pub struct QuestConfig {
-        // The offchain key of the quest
-        pub let questKey: String
-        // how many points user can obtain when quest completed
-        pub let rewardPoints: UInt64
-        // how many points inviter can obtain when quest completed
-        pub let referalPoints: UInt64
-        // Whether it can be completed repeatedly
-        pub let stackable: Bool
-        // how many times can be completed
-        pub let limitation: UInt64
+        access(contract) let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
+        access(contract) let participants: {Address: {String: AnyStruct}}
+        access(contract) let identifier: Community.BountyEntityIdentifier
+        access(self) let rewardInfo: AnyStruct{Helper.RewardInfo}
+        access(self) let rewardType: Helper.QuestRewardType
 
         init(
-            questKey: String,
-            rewardPoints: UInt64,
-            referalPoints: UInt64?,
-            stackable: Bool?,
-            limitation: UInt64?,
+            seasonId: UInt64,
+            identifier: Community.BountyEntityIdentifier,
+            preconditions: [AnyStruct{Interfaces.UnlockCondition}],
+            reward: AnyStruct{Helper.RewardInfo}
         ) {
-            self.questKey = questKey
-            self.rewardPoints = rewardPoints
-            self.referalPoints = referalPoints ?? 0
-            self.stackable = stackable ?? false
-            self.limitation = limitation ?? 1
+            self.seasonId = seasonId
+            self.identifier = identifier
+            self.preconditions = preconditions
+            self.rewardType = reward.type
+            self.rewardInfo = reward
+            self.participants = {}
+        }
+
+        // ---- readonly methods ----
+
+        pub fun getPreconditions(): [AnyStruct{Interfaces.UnlockCondition}] {
+            return self.preconditions
+        }
+
+        pub fun getParticipants(): {Address: {String: AnyStruct}} {
+            return self.participants
+        }
+
+        pub fun getIdentifier(): AnyStruct{Interfaces.BountyEntityIdentifier} {
+            return self.identifier
+        }
+
+        pub fun getRequiredQuestKeys(): [String] {
+            let ret: [String] = []
+            if self.identifier.category == Interfaces.BountyType.quest {
+                ret.append(self.identifier.communityId.toString().concat(":").concat(self.identifier.key))
+            } else {
+                let challenge = self.identifier.getChallengeConfig()
+                for one in challenge.quests {
+                    ret.append(one.communityId.toString().concat(":").concat(one.key))
+                }
+            }
+            return ret
+        }
+
+        pub fun getRewardType(): Helper.QuestRewardType {
+            return self.rewardType
+        }
+
+        pub fun getPointReward(): Helper.PointReward? {
+            if self.rewardType == Helper.QuestRewardType.Points {
+                return self.rewardInfo as! Helper.PointReward
+            }
+            return nil
+        }
+
+        pub fun getFLOATReward(): Helper.FLOATReward? {
+            if self.rewardType == Helper.QuestRewardType.FLOAT {
+                return self.rewardInfo as! Helper.FLOATReward
+            }
+            return nil
+        }
+
+        // ---- writable methods ----
+
+        pub fun onParticipantComplete(acct: Address) {
+            let now = getCurrentBlock().timestamp
+            if self.participants[acct] == nil {
+                self.participants[acct] = {
+                    "datetime": now,
+                    "updatedAt": now,
+                    "times": UInt64(1)
+                }
+            } else {
+                let record = (&self.participants[acct] as &{String: AnyStruct}?)!
+                record["updatedAt"] = now
+                record["times"] = (record["times"] as! UInt64?)! + 1
+            }
+
+            emit BountyCompleted(
+                seasonId: self.seasonId,
+                communityId: self.identifier.communityId,
+                key: self.identifier.key,
+                category: self.identifier.category.rawValue,
+                participant: acct
+            )
         }
     }
 
     pub resource interface CompetitionSeasonQuestsPublic {
-        pub fun getQuestKeys(): [String]
-        pub fun getQuestConfig(key: String): QuestConfig
+        // TODO
     }
 
     pub resource CompetitionSeason: CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic {
