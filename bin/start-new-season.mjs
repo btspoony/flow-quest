@@ -36,7 +36,10 @@ async function main() {
   );
 
   const code = fs.readFileSync(
-    path.join(process.cwd(), "cadence/transactions/admin-start-new-season.cdc"),
+    path.join(
+      process.cwd(),
+      "cadence/dev-challenge/transactions/admin-start-new-season.cdc"
+    ),
     "utf8"
   );
 
