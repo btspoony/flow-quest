@@ -1,6 +1,6 @@
-//import Interfaces from "../../../../../cadence/dev-challenge/Interfaces.cdc"
-//import UserProfile from "../../../../../cadence/dev-challenge/UserProfile.cdc"
-import CompetitionService from "../../../../../cadence/dev-challenge/CompetitionService.cdc"
+// import Interfaces from "../Interfaces.cdc"
+// import UserProfile from "../UserProfile.cdc"
+import CompetitionService from "../CompetitionService.cdc"
 
 transaction {
     prepare(service: AuthAccount, acct: AuthAccount) {

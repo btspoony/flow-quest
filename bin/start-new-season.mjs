@@ -36,34 +36,11 @@ async function main() {
   );
 
   const code = fs.readFileSync(
-    path.join(
-      process.cwd(),
-      "src/server/assets/cadence/transactions/admin-start-new-season.cdc"
-    ),
+    path.join(process.cwd(), "cadence/transactions/admin-start-new-season.cdc"),
     "utf8"
   );
 
   const txid = await signer.sendTransaction(code, (arg, t) => [
-    arg(
-      seasonData.quests.map((o) => o.questKey),
-      t.Array(t.String)
-    ),
-    arg(
-      seasonData.quests.map((o) => String(o.rewardPoint)),
-      t.Array(t.UInt64)
-    ),
-    arg(
-      seasonData.quests.map((o) => String(o.referalPoint)),
-      t.Array(t.UInt64)
-    ),
-    arg(
-      seasonData.quests.map((o) => o.stackable),
-      t.Array(t.Bool)
-    ),
-    arg(
-      seasonData.quests.map((o) => String(o.limitation)),
-      t.Array(t.UInt64)
-    ),
     arg(seasonData.endDate.toFixed(1), t.UFix64),
   ]);
 
