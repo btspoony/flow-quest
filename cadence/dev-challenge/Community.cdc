@@ -28,7 +28,7 @@ pub contract Community {
     pub event ChallengeCreated(key: String, communityId: UInt64, owner: Address, questKeys: [String], achievementHost: Address?, achievementId: UInt64?)
     pub event ChallengeAchievementUpdated(key: String, communityId: UInt64, owner: Address, achievementHost: Address, achievementId: UInt64)
 
-    pub event CommunityCreated(id: UInt64, owner: Address, name: String, description: String, image: String)
+    pub event CommunityCreated(id: UInt64, key: String, owner: Address, name: String, description: String, image: String)
     pub event CommunityUpdateBasics(id: UInt64, owner: Address, name: String, description: String, image: String, banner: String?)
     pub event CommunityUpdateSocial(id: UInt64, owner: Address, key: String, value: String)
 
@@ -37,7 +37,8 @@ pub contract Community {
         *  ___]  |  |  |  |  |___
          ************************/
 
-    access(contract) let communityMapping: {UInt64: Address}
+    access(contract) let communityIdMapping: {UInt64: Address}
+    access(contract) let communityKeyMapping: {String: UInt64}
     access(contract) let entityMapping: {String: Address}
 
     /**    ____ _  _ _  _ ____ ___ _ ____ _  _ ____ _    _ ___ _   _
@@ -230,8 +231,10 @@ pub contract Community {
     }
 
     pub resource interface CommunityPublic {
+        pub let key: String
         pub let bounties: [CommuntiyBountyBasics]
 
+        pub fun getID(): UInt64
         pub fun getStandardDisplay(): MetadataViews.Display
         pub fun getDetailedDisplay(): CommunityDisplay
 
@@ -240,6 +243,7 @@ pub contract Community {
     }
 
     pub resource CommunityIns: CommunityPublic, MetadataViews.Resolver {
+        pub let key: String
         pub let name: String
         pub var description: String
         pub var imageIpfs: String
@@ -250,12 +254,14 @@ pub contract Community {
         access(contract) let challenges: {String: ChallengeConfig}
 
         init(
+            key: String,
             name: String,
             description: String,
             image: String,
             banner: String?,
             socials: {String: String}?
         ) {
+            self.key = key
             self.name = name
             self.description = description
             self.imageIpfs = image
@@ -296,7 +302,7 @@ pub contract Community {
             pre {
                 self.owner != nil: "Owner exists."
                 Community.entityMapping[key] == nil: "Mapping bounty entity exists."
-                Community.communityMapping[quest.communityId] != nil: "Community mapping doesn't exist."
+                Community.communityIdMapping[quest.communityId] != nil: "Community mapping doesn't exist."
             }
             let owner = self.owner!.address
             Community.entityMapping[key] = owner
@@ -319,7 +325,7 @@ pub contract Community {
             pre {
                 self.owner != nil: "Owner exists."
                 Community.entityMapping[key] == nil: "Mapping bounty entity exists."
-                Community.communityMapping[challenge.communityId] != nil: "Community mapping doesn't exist."
+                Community.communityIdMapping[challenge.communityId] != nil: "Community mapping doesn't exist."
             }
             let owner = self.owner!.address
             Community.entityMapping[key] = owner
@@ -370,6 +376,10 @@ pub contract Community {
         }
 
         /************* Getters (for anyone) *************/
+
+        pub fun getID(): UInt64 {
+            return self.uuid
+        }
 
         pub fun borrowQuestRef(key: String): &QuestConfig? {
             return &self.quests[key] as &QuestConfig?
@@ -429,6 +439,7 @@ pub contract Community {
         }
 
         pub fun createCommunity(
+            key: String,
             name: String,
             description: String,
             image: String,
@@ -437,9 +448,11 @@ pub contract Community {
         ): UInt64 {
             pre {
                 self.owner?.address != nil: "no owner"
+                Community.communityKeyMapping[key] == nil: "Unique key is occupied"
             }
 
             let community <- create CommunityIns(
+                key: key,
                 name: name,
                 description: description,
                 image: image,
@@ -451,10 +464,12 @@ pub contract Community {
 
             let owner = self.owner!.address
             // set to mapping
-            Community.communityMapping[id] = owner
+            Community.communityIdMapping[id] = owner
+            Community.communityKeyMapping[key] = id
 
             emit CommunityCreated(
                 id: id,
+                key: key,
                 owner: owner,
                 name: name,
                 description: description,
@@ -489,8 +504,16 @@ pub contract Community {
     }
 
     // Global borrow community
+
+    pub fun borrowCommunityByKey(key: String): &CommunityIns{CommunityPublic}? {
+        if let id = Community.communityKeyMapping[key] {
+            return Community.borrowCommunityById(id: id)
+        }
+        return nil
+    }
+
     pub fun borrowCommunityById(id: UInt64): &CommunityIns{CommunityPublic}? {
-        if let host = Community.communityMapping[id] {
+        if let host = Community.communityIdMapping[id] {
             return Community.borrowCommunity(host: host, id: id)
         }
         return nil
@@ -510,7 +533,8 @@ pub contract Community {
         self.CommunityPublicPath = /public/DevCompetitionCommunityPathV1
 
         self.entityMapping = {}
-        self.communityMapping = {}
+        self.communityIdMapping = {}
+        self.communityKeyMapping = {}
 
         emit ContractInitialized()
     }

@@ -79,7 +79,9 @@
     "Interfaces": "./cadence/dev-challenge/Interfaces.cdc",
     "Helper": "./cadence/dev-challenge/Helper.cdc",
     "UserProfile": "./cadence/dev-challenge/UserProfile.cdc",
+    "FLOATVerifiers": "./cadence/dev-challenge/FLOATVerifiers.cdc",
     "Community": "./cadence/dev-challenge/Community.cdc",
+    "BountyUnlockConditions": "./cadence/dev-challenge/BountyUnlockConditions.cdc",
     "CompetitionService": "./cadence/dev-challenge/CompetitionService.cdc"
   },
   "deployments": {

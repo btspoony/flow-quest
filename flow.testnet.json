@@ -11,7 +11,9 @@
         "Interfaces",
         "Helper",
         "UserProfile",
+        "FLOATVerifiers",
         "Community",
+        "BountyUnlockConditions",
         "CompetitionService"
       ]
     }

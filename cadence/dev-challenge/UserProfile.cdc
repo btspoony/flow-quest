@@ -140,6 +140,10 @@ pub contract UserProfile {
             return self.bountiesCompleted
         }
 
+        pub fun isBountyCompleted(bountyId: UInt64): Bool {
+            return self.bountiesCompleted[bountyId] != nil
+        }
+
         // get quest score keys
         pub fun getQuestKeys(): [String] {
             return self.questScores.keys
@@ -256,6 +260,11 @@ pub contract UserProfile {
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64} {
             let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.getBountiesCompleted()
+        }
+
+        pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool {
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            return seasonRef.isBountyCompleted(bountyId: bountyId)
         }
 
         pub fun getQuestsParticipanted(seasonId: UInt64): [String] {

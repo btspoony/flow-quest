@@ -30,6 +30,8 @@ pub contract Interfaces {
         // readable
         pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64}
+        pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool
+        pub fun getQuestsParticipanted(seasonId: UInt64): [String]
 
         // writable
         access(account) fun addPoints(seasonId: UInt64, points: UInt64)
@@ -100,7 +102,7 @@ pub contract Interfaces {
         pub let type: UnlockConditionTypes
         pub let display: MetadataViews.Display?
 
-        pub fun isUnlocked(): Bool;
+        pub fun isUnlocked(_ params: {String: AnyStruct}): Bool;
     }
 
     // Bounty information

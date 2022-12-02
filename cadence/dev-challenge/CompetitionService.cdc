@@ -124,7 +124,7 @@ pub contract CompetitionService {
                 self.participants[acct] = {
                     "datetime": now,
                     "updatedAt": now,
-                    "times": UInt64(1)
+                    "times": 1 as UInt64
                 }
             } else {
                 let record = (&self.participants[acct] as &{String: AnyStruct}?)!
@@ -144,10 +144,13 @@ pub contract CompetitionService {
         // ---- internal methods ----
 
         // check if the bounty unlocked
-        access(contract) fun isUnlocked(): Bool {
+        access(contract) fun isUnlocked(_ profile: Address): Bool {
+            let params: {String: AnyStruct} = {
+                "profile": profile
+            }
             var unlocked = true
             for cond in self.preconditions {
-                unlocked = unlocked && cond.isUnlocked()
+                unlocked = unlocked && cond.isUnlocked(params)
             }
             return unlocked
         }
@@ -262,12 +265,6 @@ pub contract CompetitionService {
 
         access(contract) fun borrowBountyPrivateRef(_ bountyId: UInt64): &BountyInfo {
             return &self.bounties[bountyId] as &BountyInfo? ?? panic("Failed to borrow bounty")
-        }
-
-        // check if the bounty unlocked
-        access(contract) fun isBountyUnlocked(_ bountyId: UInt64): Bool {
-            let bounty = self.borrowBountyPrivateRef(bountyId)
-            return bounty.isUnlocked()
         }
     }
 
@@ -403,7 +400,7 @@ pub contract CompetitionService {
             let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
             let bounty = seasonRef.borrowBountyPrivateRef(bountyId)
             // ensure bounty unlocked
-            assert(bounty.isUnlocked(), message: "Bounty is locked")
+            assert(bounty.isUnlocked(acct), message: "Bounty is locked")
 
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
