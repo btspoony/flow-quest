@@ -4,10 +4,12 @@ import CompetitionService from "../../../../../cadence/dev-challenge/Competition
 
 transaction(
     target: Address,
+    bountyId: UInt64,
     questKey: String,
+    step: Int,
     params: {String: AnyStruct}?
 ) {
-    let season: &CompetitionService.CompetitionSeason{CompetitionService.CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
+    let season: &{Interfaces.CompetitionPublic}
     let ctrler: &CompetitionService.SeasonPointsController
 
     prepare(acct: AuthAccount) {
@@ -15,25 +17,16 @@ transaction(
             ?? panic("Without controller resource")
 
         let service = CompetitionService.borrowServicePublic()
-        self.season = service.borrowLatestActiveSeasonFull()
+        self.season = service.borrowLatestActiveSeason()
     }
 
     execute {
-        let seasonId = self.season.getId()
+        let seasonId = self.season.getSeasonId()
 
         if let p = params {
-          self.ctrler.appendNewParams(
-              acct: target,
-              seasonId: seasonId,
-              questKey: questKey,
-              params: p
-          )
+          self.ctrler.updateNewParams(acct: target, seasonId: seasonId, questKey: questKey, step: step, params: p)
         }
 
-        self.ctrler.questCompletedAndDistributePoints(
-            acct: target,
-            seasonId: seasonId,
-            questKey: questKey
-        )
+        self.ctrler.questStepCompleted(acct: target, seasonId: seasonId, bountyId: bountyId, questKey: questKey, step: step)
     }
 }

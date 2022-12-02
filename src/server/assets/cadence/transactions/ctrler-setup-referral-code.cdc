@@ -5,7 +5,7 @@ import CompetitionService from "../../../../../cadence/dev-challenge/Competition
 transaction(
     target: Address,
 ) {
-    let season: &CompetitionService.CompetitionSeason{CompetitionService.CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
+    let season: &{Interfaces.CompetitionPublic}
     let ctrler: &CompetitionService.SeasonPointsController
 
     prepare(acct: AuthAccount) {
@@ -13,11 +13,11 @@ transaction(
             ?? panic("Without controller resource")
 
         let service = CompetitionService.borrowServicePublic()
-        self.season = service.borrowLatestActiveSeasonFull()
+        self.season = service.borrowLatestActiveSeason()
     }
 
     execute {
-        let seasonId = self.season.getId()
+        let seasonId = self.season.getSeasonId()
 
         self.ctrler.setupReferralCode(acct: target, seasonId: seasonId)
     }

@@ -395,7 +395,7 @@ pub contract CompetitionService {
             profileRef.updateQuestVerificationResult(seasonId: seasonId, questKey: questKey, step: step, result: false)
         }
 
-        pub fun completeBounty(acct: Address, seasonId: UInt64, bountyId: UInt64, step: Int) {
+        pub fun completeBounty(acct: Address, seasonId: UInt64, bountyId: UInt64) {
             let serviceIns = CompetitionService.borrowServiceRef()
             let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
             let bounty = seasonRef.borrowBountyPrivateRef(bountyId)
