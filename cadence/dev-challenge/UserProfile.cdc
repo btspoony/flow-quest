@@ -26,7 +26,7 @@ pub contract UserProfile {
 
     pub event ProfileSeasonAddPoints(profile: Address, seasonId: UInt64, points: UInt64)
     pub event ProfileSeasonNewSeason(profile: Address, seasonId: UInt64, referredFrom: String?)
-    pub event ProfileSeasonBountyCompleted(profile: Address, seasonId: UInt64, bountyUid: UInt64)
+    pub event ProfileSeasonBountyCompleted(profile: Address, seasonId: UInt64, bountyId: UInt64)
     pub event QuestRecordUpdateParams(profile: Address, seasonId: UInt64, questKey: String, step: Int, keys: [String], round: UInt64)
     pub event QuestRecordUpdateResult(profile: Address, seasonId: UInt64, questKey: String, step: Int, result: Bool, round: UInt64)
     pub event ProfileSetupReferralCode(profile: Address, seasonId: UInt64, code: String)
@@ -140,6 +140,11 @@ pub contract UserProfile {
             return self.bountiesCompleted
         }
 
+        // get quest score keys
+        pub fun getQuestKeys(): [String] {
+            return self.questScores.keys
+        }
+
         // get a copy of quest score
         pub fun getQuestScore(questKey: String): QuestRecord {
             return self.questScores[questKey] ?? panic("Missing quest record")
@@ -150,10 +155,10 @@ pub contract UserProfile {
             var record = &self.questScores[questKey] as &QuestRecord?
             if record == nil {
                 let serviceRef = self.campetitionServiceCap.borrow() ?? panic("Failed to get service capability.")
-                let competitionRef = serviceRef.getSeason(seasonId: self.seasonId)
+                let competitionRef = serviceRef.borrowSeason(seasonId: self.seasonId)
                 assert(competitionRef.isActive(), message: "Competition is not active.")
 
-                let questInfo = competitionRef.getQuestInfo(questKey)
+                let questInfo = competitionRef.borrowQuestRef(questKey)
                 self.questScores[questKey] = QuestRecord(Int(questInfo.steps))
                 record = &self.questScores[questKey] as &QuestRecord?
             }
@@ -173,12 +178,12 @@ pub contract UserProfile {
             self.referralCode = code
         }
 
-        access(contract) fun completeBounty(bountyUid: UInt64, owner: Address) {
+        access(contract) fun completeBounty(bountyId: UInt64, owner: Address) {
             let serviceRef = self.campetitionServiceCap.borrow() ?? panic("Failed to get service capability.")
-            let competitionRef = serviceRef.getSeason(seasonId: self.seasonId)
+            let competitionRef = serviceRef.borrowSeason(seasonId: self.seasonId)
             assert(competitionRef.isActive(), message: "Competition is not active.")
 
-            let bountyInfo = competitionRef.getBountyInfo(bountyUid)
+            let bountyInfo = competitionRef.borrowBountyInfo(bountyId)
             let requiredQuests = bountyInfo.getRequiredQuestKeys()
             var invalid = false
             for key in requiredQuests {
@@ -190,10 +195,10 @@ pub contract UserProfile {
             }
             assert(!invalid, message: "required quests are not completed.")
             // set bounties as completed
-            self.bountiesCompleted[bountyUid] = getCurrentBlock().timestamp
+            self.bountiesCompleted[bountyId] = getCurrentBlock().timestamp
 
             // callback to service
-            competitionRef.onBountyCompleted(bountyUid: bountyUid, acct: owner)
+            competitionRef.onBountyCompleted(bountyId: bountyId, acct: owner)
         }
     }
 
@@ -234,23 +239,28 @@ pub contract UserProfile {
         }
 
         pub fun getSeasonPoints(seasonId: UInt64): UInt64 {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.points
         }
 
         pub fun getReferredFrom(seasonId: UInt64): Address? {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.referredFromAddress
         }
 
         pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64 {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.questScores[questKey]?.timesCompleted ?? 0
         }
 
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64} {
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.getBountiesCompleted()
+        }
+
+        pub fun getQuestsParticipanted(seasonId: UInt64): [String] {
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            return seasonRef.getQuestKeys()
         }
 
         // ---- writable methods ----
@@ -260,14 +270,14 @@ pub contract UserProfile {
             referredFrom: String?
         ) {
             let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
-            let competitionRef = serviceRef.getLatestActiveSeason()
+            let competitionRef = serviceRef.borrowLatestActiveSeason()
             assert(competitionRef.isActive(), message: "Competition is not active.")
 
             // add to competition
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
             competitionRef.onProfileRegistered(acct: profileAddr)
 
-            let seasonId = competitionRef.getId()
+            let seasonId = competitionRef.getSeasonId()
             assert(self.seasonScores[seasonId] == nil, message: "Already registered.")
             self.seasonScores[seasonId] = SeasonRecord(
                 seasonId: seasonId,
@@ -302,7 +312,7 @@ pub contract UserProfile {
         access(account) fun addPoints(seasonId: UInt64, points: UInt64) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             seasonRef.addPoints(points: points)
 
             emit ProfileSeasonAddPoints(
@@ -315,7 +325,7 @@ pub contract UserProfile {
         access(account) fun updateQuestNewParams(seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct}) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.fetchOrCreateQuestRecordRef(questKey: questKey)
             questScoreRef.updateVerifactionParams(step: step, params: params)
 
@@ -333,7 +343,7 @@ pub contract UserProfile {
         access(account) fun updateQuestVerificationResult(seasonId: UInt64, questKey: String, step: Int, result: Bool) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
-            let seasonRef = self.getSeasonRecordRef(seasonId)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
             let questScoreRef = seasonRef.fetchOrCreateQuestRecordRef(questKey: questKey)
             questScoreRef.updateVerificationResult(step: step, result: result)
 
@@ -347,16 +357,16 @@ pub contract UserProfile {
             )
         }
 
-        access(account) fun completeBounty(seasonId: UInt64, bountyUid: UInt64) {
+        access(account) fun completeBounty(seasonId: UInt64, bountyId: UInt64) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
-            let seasonRef = self.getSeasonRecordRef(seasonId)
-            seasonRef.completeBounty(bountyUid: bountyUid, owner: profileAddr)
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            seasonRef.completeBounty(bountyId: bountyId, owner: profileAddr)
 
             emit ProfileSeasonBountyCompleted(
                 profile: profileAddr,
                 seasonId: seasonId,
-                bountyUid: bountyUid,
+                bountyId: bountyId,
             )
         }
 
@@ -373,7 +383,7 @@ pub contract UserProfile {
 
         // ---- internal methods ----
 
-        access(self) fun getSeasonRecordRef(_ seasonId: UInt64): &SeasonRecord {
+        access(self) fun borrowSeasonRecordRef(_ seasonId: UInt64): &SeasonRecord {
             return &self.seasonScores[seasonId] as &SeasonRecord? ?? panic("Missing season score")
         }
     }

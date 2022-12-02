@@ -13,7 +13,7 @@ transaction(
             ?? panic("Without controller resource")
 
         let service = CompetitionService.borrowServicePublic()
-        self.season = service.getLatestActiveSeasonFull()
+        self.season = service.borrowLatestActiveSeasonFull()
     }
 
     execute {

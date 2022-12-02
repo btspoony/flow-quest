@@ -30,7 +30,10 @@ pub contract CompetitionService {
 
     pub event ContractInitialized()
 
+    pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8)
     pub event BountyCompleted(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
+    pub event ProfileRegistered(seasonId: UInt64, participant: Address)
+    pub event SeasonEndDateUpdated(seasonId: UInt64, datetime: UFix64)
 
     pub event SeasonCreated(seasonId: UInt64)
 
@@ -51,8 +54,8 @@ pub contract CompetitionService {
         access(contract) let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
         access(contract) let participants: {Address: {String: AnyStruct}}
         access(contract) let identifier: Community.BountyEntityIdentifier
-        access(self) let rewardInfo: AnyStruct{Helper.RewardInfo}
-        access(self) let rewardType: Helper.QuestRewardType
+        access(contract) let rewardInfo: AnyStruct{Helper.RewardInfo}
+        access(contract) let rewardType: Helper.QuestRewardType
 
         init(
             seasonId: UInt64,
@@ -85,11 +88,11 @@ pub contract CompetitionService {
         pub fun getRequiredQuestKeys(): [String] {
             let ret: [String] = []
             if self.identifier.category == Interfaces.BountyType.quest {
-                ret.append(self.identifier.communityId.toString().concat(":").concat(self.identifier.key))
+                ret.append(self.identifier.toString())
             } else {
                 let challenge = self.identifier.getChallengeConfig()
                 for one in challenge.quests {
-                    ret.append(one.communityId.toString().concat(":").concat(one.key))
+                    ret.append(one.toString())
                 }
             }
             return ret
@@ -99,23 +102,23 @@ pub contract CompetitionService {
             return self.rewardType
         }
 
-        pub fun getPointReward(): Helper.PointReward? {
+        pub fun getPointReward(): Helper.PointReward {
             if self.rewardType == Helper.QuestRewardType.Points {
                 return self.rewardInfo as! Helper.PointReward
             }
-            return nil
+            panic("Reward type is not Points")
         }
 
-        pub fun getFLOATReward(): Helper.FLOATReward? {
+        pub fun getFLOATReward(): Helper.FLOATReward {
             if self.rewardType == Helper.QuestRewardType.FLOAT {
                 return self.rewardInfo as! Helper.FLOATReward
             }
-            return nil
+            panic("Reward type is not FLOAT")
         }
 
         // ---- writable methods ----
 
-        pub fun onParticipantComplete(acct: Address) {
+        pub fun onParticipantCompleted(acct: Address) {
             let now = getCurrentBlock().timestamp
             if self.participants[acct] == nil {
                 self.participants[acct] = {
@@ -137,29 +140,42 @@ pub contract CompetitionService {
                 participant: acct
             )
         }
+
+        // ---- internal methods ----
+
+        // check if the bounty unlocked
+        access(contract) fun isUnlocked(): Bool {
+            var unlocked = true
+            for cond in self.preconditions {
+                unlocked = unlocked && cond.isUnlocked()
+            }
+            return unlocked
+        }
     }
 
-    pub resource interface CompetitionSeasonQuestsPublic {
-        // TODO
-    }
-
-    pub resource CompetitionSeason: CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic {
+    pub resource CompetitionSeason: Interfaces.CompetitionPublic {
         pub var endDate: UFix64
-        access(contract) var quests: {String: QuestConfig}
         access(contract) var profiles: {Address: Bool}
+        access(contract) var bounties: @{UInt64: BountyInfo}
+        // QuestKey -> CommunityID
+        access(self) var questCommunityMapping: {String: UInt64}
 
         init(
             endDate: UFix64,
-            quests: [QuestConfig]
         ) {
             self.endDate = endDate
-            self.quests = {}
             self.profiles = {}
+            self.bounties <- {}
+            self.questCommunityMapping = {}
+        }
+
+        destroy() {
+            destroy self.bounties
         }
 
         // ---- readonly methods ----
 
-        pub fun getId(): UInt64 {
+        pub fun getSeasonId(): UInt64 {
             return self.uuid
         }
 
@@ -167,12 +183,22 @@ pub contract CompetitionService {
             return self.endDate > getCurrentBlock().timestamp
         }
 
-        pub fun getQuestKeys(): [String] {
-            return self.quests.keys
+        pub fun getBountyIDs(): [UInt64] {
+            return self.bounties.keys
         }
 
-        pub fun getQuestConfig(key: String): QuestConfig {
-            return self.quests[key] ?? panic("Missing quest of key: ".concat(key))
+        pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{Interfaces.BountyInfoPublic} {
+            return self.borrowBountyPrivateRef(bountyId)
+        }
+
+        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
+            let communityId = self.questCommunityMapping[questKey] ?? panic("Missing questKey.")
+            let questIdentifier = Community.BountyEntityIdentifier(
+                category: Interfaces.BountyType.quest,
+                communityId: communityId,
+                key: questKey
+            )
+            return questIdentifier.getQuestConfig()
         }
 
         // ---- writable methods ----
@@ -182,13 +208,16 @@ pub contract CompetitionService {
                 self.profiles[acct] == nil: "Profile registered."
             }
             self.profiles[acct] = true
+
+            emit ProfileRegistered(
+                seasonId: self.getSeasonId(),
+                participant: acct,
+            )
         }
 
-        access(contract) fun addQuestConfig(quest: QuestConfig) {
-            pre {
-                self.quests[quest.questKey] == nil: "Quest exists"
-            }
-            self.quests[quest.questKey] = quest
+        access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address) {
+            let bounty = &self.bounties[bountyId] as &BountyInfo? ?? panic("Failed to borrow bounty")
+            bounty.onParticipantCompleted(acct: acct)
         }
 
         access(contract) fun updateEndDate(datetime: UFix64) {
@@ -196,17 +225,54 @@ pub contract CompetitionService {
                 datetime > getCurrentBlock().timestamp: "Cannot update end date before now."
             }
             self.endDate = datetime
+
+            emit SeasonEndDateUpdated(
+                seasonId: self.getSeasonId(),
+                datetime: datetime,
+            )
+        }
+
+        access(contract) fun addBounty(
+            identifier: Community.BountyEntityIdentifier,
+            preconditions: [AnyStruct{Interfaces.UnlockCondition}],
+            reward: AnyStruct{Helper.RewardInfo}
+        ) {
+            pre {
+                self.questCommunityMapping[identifier.key] == nil: "Quest is registered."
+            }
+            self.questCommunityMapping[identifier.key] = identifier.communityId
+            let bounty <- create BountyInfo(
+                seasonId: self.uuid,
+                identifier: identifier,
+                preconditions: preconditions,
+                reward: reward
+            )
+            let uid = bounty.uuid
+            self.bounties[bounty.uuid] <-! bounty
+
+            emit SeasonBountyAdded(
+                seasonId: self.uuid,
+                communityId: identifier.communityId,
+                key: identifier.key,
+                category: identifier.category.rawValue,
+            )
         }
 
         // ---- internal methods ----
-    }
 
-    pub resource interface CompetitionServicePublic {
-        pub fun getLatestActiveSeasonFull(): &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}
+        access(contract) fun borrowBountyPrivateRef(_ bountyId: UInt64): &BountyInfo {
+            return &self.bounties[bountyId] as &BountyInfo? ?? panic("Failed to borrow bounty")
+        }
+
+        // check if the bounty unlocked
+        access(contract) fun isBountyUnlocked(_ bountyId: UInt64): Bool {
+            let bounty = self.borrowBountyPrivateRef(bountyId)
+            return bounty.isUnlocked()
+        }
     }
 
     // The singleton instance of competition service
-    pub resource CompetitionServiceStore: CompetitionServicePublic, Interfaces.CompetitionServicePublic {
+    pub resource CompetitionServiceStore: Interfaces.CompetitionServicePublic {
         // all seasons in the
         access(self) var latestActiveSeasonId: UInt64
         access(self) var seasons: @{UInt64: CompetitionSeason}
@@ -232,18 +298,18 @@ pub contract CompetitionService {
 
         // ---- readonly methods ----
 
-        pub fun getLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
-            return self.getLatestActiveSeasonFull()
+        pub fun borrowSeason(seasonId: UInt64): &{Interfaces.CompetitionPublic} {
+            return self.borrowSeasonPrivateRef(seasonId)
         }
 
-        pub fun getLatestActiveSeasonFull(): &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic} {
-            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{CompetitionSeasonQuestsPublic, Interfaces.CompetitionPublic}?
+        pub fun borrowLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
+            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{Interfaces.CompetitionPublic}?
                 ?? panic("Failed to get current active season.")
             assert(season.isActive(), message: "The current season is not active.")
             return season
         }
 
-        access(contract) fun borrowSeasonRef(_ seasonId: UInt64): &CompetitionSeason {
+        access(contract) fun borrowSeasonPrivateRef(_ seasonId: UInt64): &CompetitionSeason {
             return &self.seasons[seasonId] as &CompetitionSeason?
                 ?? panic("Failed to get the season: ".concat(seasonId.toString()))
         }
@@ -251,8 +317,7 @@ pub contract CompetitionService {
         // ---- writable methods ----
 
         access(contract) fun startNewSeason(
-            endDate: UFix64,
-            quests: [QuestConfig]
+            endDate: UFix64
         ): UInt64 {
             // ensure one time one season
             if self.latestActiveSeasonId != 0 {
@@ -262,7 +327,6 @@ pub contract CompetitionService {
 
             let season <- create CompetitionSeason(
                 endDate: endDate,
-                quests: quests,
             )
             let seasonId = season.uuid
             self.seasons[seasonId] <-! season
@@ -278,20 +342,28 @@ pub contract CompetitionService {
     /// Mainly used to manage competition
     pub resource CompetitionAdmin {
 
-        pub fun startNewSeason(endDate: UFix64, quests: [QuestConfig]): UInt64 {
+        pub fun startNewSeason(endDate: UFix64): UInt64 {
             let serviceIns = CompetitionService.borrowServiceRef()
-            return serviceIns.startNewSeason(endDate: endDate, quests: quests)
+            return serviceIns.startNewSeason(endDate: endDate)
         }
 
-        pub fun addQuestConfig(seasonId: UInt64, quest: QuestConfig) {
+        pub fun addBounty(
+            seasonId: UInt64,
+            identifier: Community.BountyEntityIdentifier,
+            preconditions: [AnyStruct{Interfaces.UnlockCondition}],
+            reward: AnyStruct{Helper.RewardInfo}
+        ) {
             let serviceIns = CompetitionService.borrowServiceRef()
-            let season = serviceIns.borrowSeasonRef(seasonId)
-            season.addQuestConfig(quest: quest)
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.addBounty(identifier: identifier, preconditions: preconditions, reward: reward)
         }
 
-        pub fun updateEndDate(seasonId: UInt64, datetime: UFix64) {
+        pub fun updateEndDate(
+            seasonId: UInt64,
+            datetime: UFix64
+        ) {
             let serviceIns = CompetitionService.borrowServiceRef()
-            let season = serviceIns.borrowSeasonRef(seasonId)
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateEndDate(datetime: datetime)
         }
     }
@@ -299,40 +371,72 @@ pub contract CompetitionService {
     /// Mainly used to update user profile
     pub resource SeasonPointsController {
 
-        pub fun questCompletedAndDistributePoints(acct: Address, seasonId: UInt64, questKey: String) {
+        pub fun updateNewParams(acct: Address, seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct}) {
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.updateQuestNewParams(seasonId: seasonId, questKey: questKey, step: step, params: params)
+        }
+
+        pub fun questStepCompleted(acct: Address, seasonId: UInt64, bountyId: UInt64, questKey: String, step: Int) {
             // get quest config
             let serviceIns = CompetitionService.borrowServiceRef()
-            let seasonRef = serviceIns.borrowSeasonRef(seasonId)
-            let questCfg = seasonRef.getQuestConfig(key: questKey)
+            let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
+            let quest = seasonRef.borrowQuestRef(questKey)
 
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            let paramsIndex = profileRef.getLatestSeasonQuestIndex(seasonId: seasonId, questKey: questKey)
-            let timesCompleted = profileRef.getTimesCompleted(seasonId: seasonId, questKey: questKey)
+            profileRef.updateQuestVerificationResult(seasonId: seasonId, questKey: questKey, step: step, result: true)
+        }
 
-            assert(timesCompleted == 0 || (questCfg.stackable && timesCompleted < questCfg.limitation), message: "Cannot complete more times.")
+        pub fun questStepFailure(acct: Address, seasonId: UInt64, bountyId: UInt64, questKey: String, step: Int) {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
+            let quest = seasonRef.borrowQuestRef(questKey)
 
-            self.updateQuestVerificationResult(acct: acct, seasonId: seasonId, questKey: questKey, idx: paramsIndex, result: true)
-            self.addPoints(acct: acct, seasonId: seasonId, points: questCfg.rewardPoints)
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            profileRef.updateQuestVerificationResult(seasonId: seasonId, questKey: questKey, step: step, result: false)
+        }
 
-            // get inviter profile and update referral points
-            let referralFrom = profileRef.getReferredFrom(seasonId: seasonId)
-            if referralFrom != nil && questCfg.referalPoints > 0 {
-                self.addPoints(acct: referralFrom!, seasonId: seasonId, points: questCfg.referalPoints)
+        pub fun completeBounty(acct: Address, seasonId: UInt64, bountyId: UInt64, step: Int) {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
+            let bounty = seasonRef.borrowBountyPrivateRef(bountyId)
+            // ensure bounty unlocked
+            assert(bounty.isUnlocked(), message: "Bounty is locked")
+
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+
+            // ensure quest completed
+            if bounty.identifier.category == Interfaces.BountyType.quest {
+                let completedTimes = profileRef.getQuestCompletedTimes(seasonId: seasonId, questKey: bounty.identifier.key)
+                assert(completedTimes > 0, message: "Quset not completed")
+            } else {
+                let challengeRef = bounty.identifier.getChallengeConfig()
+                var allCompleted = true
+                for identifier in challengeRef.quests {
+                    let completedTimes = profileRef.getQuestCompletedTimes(seasonId: seasonId, questKey: identifier.key)
+                    allCompleted = allCompleted && completedTimes > 0
+                }
+                assert(allCompleted, message: "Challenge not completed")
             }
-        }
 
-        pub fun questFailure(acct: Address, seasonId: UInt64, questKey: String) {
-            // get profile and update points
-            let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            let paramsIndex = profileRef.getLatestSeasonQuestIndex(seasonId: seasonId, questKey: questKey)
-            self.updateQuestVerificationResult(acct: acct, seasonId: seasonId, questKey: questKey, idx: paramsIndex, result: false)
-        }
+            // distribute rewards
+            if bounty.rewardType == Helper.QuestRewardType.Points {
+                let reward = bounty.getPointReward()
+                self.addPoints(acct: acct, seasonId: seasonId, points: reward.rewardPoints)
 
-        pub fun appendNewParams(acct: Address, seasonId: UInt64, questKey: String, params: {String: AnyStruct}) {
-            // get profile and update points
-            let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.appendNewParams(seasonId: seasonId, questKey: questKey, params: params)
+                // get inviter profile and update referral points
+                let referralFrom = profileRef.getReferredFrom(seasonId: seasonId)
+                if referralFrom != nil && reward.referralPoints > 0 {
+                    self.addPoints(acct: referralFrom!, seasonId: seasonId, points: reward.referralPoints)
+                }
+            } else {
+                // NOTHING for now
+            }
+
+            profileRef.completeBounty(seasonId: seasonId, bountyId: bountyId)
         }
 
         pub fun setupReferralCode(acct: Address, seasonId: UInt64) {
@@ -341,24 +445,18 @@ pub contract CompetitionService {
             profileRef.setupReferralCode(seasonId: seasonId)
         }
 
-        access(contract) fun addPoints(acct: Address, seasonId: UInt64, points: UInt64) {
+        access(self) fun addPoints(acct: Address, seasonId: UInt64, points: UInt64) {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
             profileRef.addPoints(seasonId: seasonId, points: points)
-        }
-
-        access(contract) fun updateQuestVerificationResult(acct: Address, seasonId: UInt64, questKey: String, idx: Int, result: Bool) {
-            // get profile and update points
-            let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.updateVerificationResult(seasonId: seasonId, questKey: questKey, idx: idx, result: result)
         }
     }
 
     // ---- public methods ----
 
-    pub fun borrowServicePublic(): &CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic} {
+    pub fun borrowServicePublic(): &CompetitionServiceStore{Interfaces.CompetitionServicePublic} {
         return self.account
-            .getCapability<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
+            .getCapability<&CompetitionServiceStore{Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
             .borrow()
             ?? panic("Missing the capability of service store resource")
     }
@@ -385,7 +483,7 @@ pub contract CompetitionService {
         self.account.save(<- store.createSeasonPointsController(), to: self.ControllerStoragePath)
         // Store the resource of Challenge Seasons in the account
         self.account.save(<- store, to: self.ServiceStoragePath)
-        self.account.link<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
+        self.account.link<&CompetitionServiceStore{Interfaces.CompetitionServicePublic}>(
             self.ServicePublicPath,
             target: self.ServiceStoragePath
         )

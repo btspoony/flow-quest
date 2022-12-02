@@ -35,7 +35,7 @@ pub contract Interfaces {
         access(account) fun addPoints(seasonId: UInt64, points: UInt64)
         access(account) fun updateQuestNewParams(seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct})
         access(account) fun updateQuestVerificationResult(seasonId: UInt64, questKey: String, step: Int, result: Bool)
-        access(account) fun completeBounty(seasonId: UInt64, bountyUid: UInt64)
+        access(account) fun completeBounty(seasonId: UInt64, bountyId: UInt64)
 
         access(account) fun setupReferralCode(seasonId: UInt64)
     }
@@ -53,8 +53,12 @@ pub contract Interfaces {
         pub let key: String
         // The community belongs to
         pub let communityId: UInt64
-
+        // get Bounty Entity
         pub fun getBountyEntity(): &AnyStruct{BountyEntityPublic};
+        // To simple string uid
+        pub fun toString(): String {
+            return self.communityId.toString().concat(":").concat(self.key)
+        }
     }
 
     pub struct interface BountyEntityPublic {
@@ -66,6 +70,10 @@ pub contract Interfaces {
 
         // display
         pub fun getStandardDisplay(): MetadataViews.Display
+        // To simple string uid
+        pub fun toString(): String {
+            return self.communityId.toString().concat(":").concat(self.key)
+        }
     }
 
     pub struct interface QuestInfoPublic {
@@ -104,27 +112,26 @@ pub contract Interfaces {
         pub fun getRequiredQuestKeys(): [String]
 
         pub fun getRewardType(): Helper.QuestRewardType
-        pub fun getPointReward(): Helper.PointReward?
-        pub fun getFLOATReward(): Helper.FLOATReward?
+        pub fun getPointReward(): Helper.PointReward
+        pub fun getFLOATReward(): Helper.FLOATReward
     }
 
     // Competition public interface
     pub resource interface CompetitionPublic {
         pub var endDate: UFix64
-        access(contract) let bounties: @{ UInt64: AnyResource{BountyInfoPublic} };
 
-        pub fun getId(): UInt64
+        pub fun getSeasonId(): UInt64
         pub fun isActive(): Bool
 
-        pub fun getBountyInfo(_ bountyUid: UInt64): &AnyResource{BountyInfoPublic}
-        pub fun getQuestInfo(_ questKey: String): &AnyStruct{QuestInfoPublic}
+        pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
+        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{BountyEntityPublic, QuestInfoPublic}
 
         access(account) fun onProfileRegistered(acct: Address)
-        access(account) fun onBountyCompleted(bountyUid: UInt64, acct: Address)
+        access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address)
     }
 
     pub resource interface CompetitionServicePublic {
-        pub fun getSeason(seasonId: UInt64): &{CompetitionPublic}
-        pub fun getLatestActiveSeason(): &{CompetitionPublic}
+        pub fun borrowSeason(seasonId: UInt64): &{CompetitionPublic}
+        pub fun borrowLatestActiveSeason(): &{CompetitionPublic}
     }
 }
