@@ -1,25 +1,11 @@
 import * as fcl from "@onflow/fcl";
+import cadence from "../assets/cadence";
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
 
   const isMainnet = config.public.network === "mainnet";
   const appName = "Flow Challenge Tour";
-
-  // method of replace imports
-  const replaceImports = (code: string) =>
-    replaceImportAddresses(
-      code,
-      // Address mapping
-      {
-        MetadataViews: isMainnet ? "0x1d7e57aa55817448" : "0x631e88ae7f1d7c20",
-        NonFungibleToken: isMainnet
-          ? "0x1d7e57aa55817448"
-          : "0x631e88ae7f1d7c20",
-        FungibleToken: isMainnet ? "0xf233dcee88fe0abe" : "0x9a0766d93b6608b7",
-        FlowToken: isMainnet ? "0x1654653399040a61" : "0x7e60df042a9c0868",
-      }
-    );
 
   // initialize fcl
   fcl
@@ -39,16 +25,111 @@ export default defineNuxtPlugin((nuxtApp) => {
       console.log("AccountProof Resolver:", data);
       return data;
     });
+
+  // Address mapping
+  const addressMapping = {
+    MetadataViews: isMainnet ? "0x1d7e57aa55817448" : "0x631e88ae7f1d7c20",
+    NonFungibleToken: isMainnet ? "0x1d7e57aa55817448" : "0x631e88ae7f1d7c20",
+    FungibleToken: isMainnet ? "0xf233dcee88fe0abe" : "0x9a0766d93b6608b7",
+    FlowToken: isMainnet ? "0x1654653399040a61" : "0x7e60df042a9c0868",
+    // dApp address
+    Interfaces: config.flowServiceAddress,
+    Helper: config.flowServiceAddress,
+    UserProfile: config.flowServiceAddress,
+    FLOATVerifiers: config.flowServiceAddress,
+    Community: config.flowServiceAddress,
+    BountyUnlockConditions: config.flowServiceAddress,
+    CompetitionService: config.flowServiceAddress,
+  };
   // ------ Build scripts ------
 
   // ------ Build transactions ------
+  const sendTransaction = async (
+    code: string,
+    args: fcl.ArgumentFunction
+  ): Promise<string | null> => {
+    let transactionId: string;
+
+    try {
+      transactionId = await fcl.mutate({
+        cadence: replaceImportAddresses(code, addressMapping),
+        args: args,
+      });
+      console.log("Tx Sent:", transactionId);
+      return transactionId;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  };
+
+  /**
+   * @param transactionId
+   * @param onSealed
+   * @param onStatusUpdated
+   * @param onErrorOccured
+   */
+  const watchTransaction = (
+    transactionId: string,
+    onSealed: (txId: string, errorMsg?: string) => void | undefined,
+    onStatusUpdated: (code: fcl.TransactionStatus) => void | undefined,
+    onErrorOccured: (errorMsg: string) => void | undefined
+  ) => {
+    fcl.tx(transactionId).subscribe((res) => {
+      if (onStatusUpdated) {
+        onStatusUpdated(res.status);
+      }
+
+      if (res.status === 4) {
+        if (res.statusCode !== 0 && onErrorOccured) {
+          onErrorOccured(res.errorMessage);
+        }
+        // on sealed callback
+        if (typeof onSealed === "function") {
+          onSealed(
+            transactionId,
+            res.statusCode === 0 ? undefined : res.errorMessage
+          );
+        }
+      }
+    });
+  };
+
+  /**
+   * @param code
+   * @param args
+   * @param defaultValue
+   */
+  const executeScript = async (
+    code: string,
+    args: fcl.ArgumentFunction,
+    defaultValue: any
+  ): Promise<any> => {
+    try {
+      const queryResult = await fcl.query({
+        cadence: replaceImportAddresses(code, addressMapping),
+        args,
+      });
+      return queryResult ?? defaultValue;
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return {
     provide: {
       appName: () => appName,
       fcl: fcl,
       scripts: {},
-      transactions: {},
+      transactions: {
+        async registerForNewSeason(referredFrom?: string) {
+          return sendTransaction(
+            cadence.transactions.profileRegister,
+            (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
+          );
+        },
+      },
+      watchTransaction,
     },
   };
 });

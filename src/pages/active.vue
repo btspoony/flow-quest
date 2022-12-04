@@ -12,7 +12,10 @@ const profile = useGithubProfile();
           <AuthGithubButton />
         </template>
         <template v-else>
-          List of Bounties
+          <h4>Start with these Challenges:</h4>
+          <div class="flex-center">
+            List of Bounties
+          </div>
         </template>
       </div>
     </div>
