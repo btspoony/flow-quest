@@ -61,13 +61,13 @@ interface PointRewardInfo extends RewardInfo {
   referalPoints: number;
 }
 
-interface NFTRewardInfo extends RewardInfo {
+interface FLOATRewardInfo extends RewardInfo {
   eventHost: string;
   eventId: string;
 }
 
 type BountyType = "quest" | "challenge";
-type RewardInfos = PointRewardInfo | NFTRewardInfo;
+type RewardInfos = PointRewardInfo | FLOATRewardInfo;
 
 /**
  * Bounty basis data
@@ -85,7 +85,21 @@ interface QuestConfig extends BountyEntity {
 
 interface ChallengeConfig extends BountyEntity {
   quests: BountyIdentifier[];
-  accomplishAchievementId?: string;
+  achievement?: {
+    host: string;
+    eventId: string;
+  };
+}
+
+interface FLOATEvent {
+  claimable: boolean;
+  description: string;
+  eventId: string;
+  host: string;
+  image: string;
+  name: string;
+  totalSupply: number;
+  url: string;
 }
 
 type BountyEntities = QuestConfig | ChallengeConfig;
@@ -126,11 +140,12 @@ interface ParticipantRecord {
 }
 
 interface BountyInfo {
-  identifier: BountyIdentifier;
-  config?: BountyEntities; // load dynamic
+  config: BountyEntities; // load dynamic by identifier
   preconditions: UnlockConditions[];
-  rewardInfo: RewardInfos;
   participants: { [key: string]: ParticipantRecord };
+  rewardType: "Points" | "FLOAT";
+  pointReward?: PointRewardInfo;
+  floatReward?: FLOATRewardInfo;
 }
 
 interface CompetitionSeason {

@@ -119,8 +119,69 @@ export default defineNuxtPlugin((nuxtApp) => {
   return {
     provide: {
       appName: () => appName,
-      fcl: fcl,
-      scripts: {},
+      fcl,
+      scripts: {
+        async getActiveSeasonBounties(): Promise<CompetitionSeason> {
+          // FIXME: load from blockchain
+          return Promise.resolve({
+            endDate: 1672416000,
+            bounties: {
+              ["001"]: {
+                config: {
+                  category: "challenge",
+                  key: "create-account",
+                  communityId: "flow",
+                  display: {
+                    name: "Create Accont",
+                    description: "Challenge description",
+                    thumbnail:
+                      "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+                  },
+                  quests: [
+                    {
+                      category: "quest",
+                      key: "S1Q1",
+                      communityId: "flow",
+                    },
+                    {
+                      category: "quest",
+                      key: "S1Q2",
+                      communityId: "flow",
+                    },
+                    {
+                      category: "quest",
+                      key: "S1Q3",
+                      communityId: "flow",
+                    },
+                  ],
+                  achievement: {
+                    host: "0xa51d7fe9e0080662",
+                    eventId: "97505692",
+                  },
+                },
+                preconditions: [],
+                participants: {},
+                rewardType: "Points",
+                pointReward: {
+                  rewardType: "Points",
+                  rewardPoints: 20,
+                  referalPoints: 2,
+                },
+              },
+            },
+          });
+        },
+        async getFLOATDetail(
+          host: string,
+          eventId: string
+        ): Promise<FLOATEvent> {
+          return executeScript(
+            cadence.scripts.getFLOATEvent,
+            (arg, t) => [arg(host, t.Address), arg(eventId, t.String)],
+            undefined
+          );
+        },
+      },
       transactions: {
         async registerForNewSeason(referredFrom?: string) {
           return sendTransaction(
