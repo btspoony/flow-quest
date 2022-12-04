@@ -122,9 +122,9 @@ pub contract Interfaces {
     pub resource interface CompetitionPublic {
         pub var endDate: UFix64
 
-        pub fun getSeasonId(): UInt64
         pub fun isActive(): Bool
-
+        pub fun getSeasonId(): UInt64
+        pub fun getBountyIDs(): [UInt64]
         pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{BountyEntityPublic, QuestInfoPublic}
 
