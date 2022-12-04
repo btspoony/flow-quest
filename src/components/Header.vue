@@ -44,9 +44,6 @@ function isCurrentInActivePage(pageKey: string): boolean {
           <WidgetThemeToggle />
         </li>
         <li>
-          <FlowConnect />
-        </li>
-        <li>
           <AuthGithub />
         </li>
       </ul>

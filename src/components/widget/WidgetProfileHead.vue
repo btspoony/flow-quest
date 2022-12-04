@@ -4,14 +4,6 @@ import { ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@he
 
 const details = ref<HTMLDetailsElement | null>(null);
 const profile = useGithubProfile();
-let storageToken: RemovableRef<GithubToken>;
-
-onMounted(() => {
-  storageToken = useLocalStorage<GithubToken>('github-token', null, {
-    mergeDefaults: true,
-    serializer: StorageSerializers.object
-  });
-})
 
 function closeDropdown() {
   details.value?.removeAttribute("open")
@@ -19,6 +11,10 @@ function closeDropdown() {
 
 function onLogout() {
   closeDropdown()
+  const storageToken = useLocalStorage<GithubToken>('github-token', null, {
+    mergeDefaults: true,
+    serializer: StorageSerializers.object
+  });
   storageToken.value = null
   profile.value.auth = undefined
   profile.value.data = undefined
