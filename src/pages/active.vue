@@ -1,9 +1,20 @@
 <script setup lang="ts">
-// TODO
+const profile = useGithubProfile();
 </script>
 
 <template>
   <main>
-    Quests of current active Season
+    <div class="hero min-h-[calc(100vh-100px)]">
+      <div class="hero-content narrow flex-col">
+        <template v-if="!profile.auth">
+          <h4>Start Challenges</h4>
+          <p>Login with Github to start the challenge tour</p>
+          <AuthGithubButton />
+        </template>
+        <template v-else>
+          List of Bounties
+        </template>
+      </div>
+    </div>
   </main>
 </template>

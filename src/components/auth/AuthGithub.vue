@@ -36,12 +36,12 @@ watchEffect(async () => {
 
 <template>
   <div>
+    <AuthGithubButton v-show="!profile.auth" />
     <div v-if="profile.auth" class="inline-flex-between">
       <span v-if="!profile.data || loading" :aria-busy="loading">
         Loading
       </span>
       <WidgetProfileHead v-else />
     </div>
-    <AuthGithubButton v-else />
   </div>
 </template>

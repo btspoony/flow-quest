@@ -18,18 +18,13 @@ onMounted(() => {
     serializer: StorageSerializers.object
   });
 
-  watchEffect(
-    async () => {
-      if (storageToken.value) {
-        profile.value.auth = toRaw(storageToken.value)
-      } else {
-        profile.value.auth = undefined
-      }
-    },
-    {
-      flush: 'sync'
+  watchEffect(() => {
+    if (storageToken.value) {
+      profile.value.auth = toRaw(storageToken.value)
+    } else {
+      profile.value.auth = undefined
     }
-  )
+  })
 })
 
 onUnmounted(() => {
@@ -71,7 +66,7 @@ function login() {
 </script>
 
 <template>
-  <button :aria-busy="loading" class="rounded-full inline-flex-between" @click="login">
+  <button :aria-busy="loading" class="rounded-full inline-flex-between max-w-[10rem]" @click="login">
     <GithubIcon class="fill-current w-5 h-5" />
     <span>Authenticate</span>
   </button>

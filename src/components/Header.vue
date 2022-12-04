@@ -28,12 +28,14 @@ function isCurrentInActivePage(pageKey: string): boolean {
             Competition
           </NuxtLink>
         </li>
+      <!--
         <li class="flex-center">
           <NuxtLink to="/communities" :class="['inline-flex-between', { secondary: isCurrentInActivePage('communities') }]">
             <Squares2X2Icon class="fill-current w-6 h-6" />
             Communities
           </NuxtLink>
         </li>
+      -->
         <li class="flex-center">
           <NuxtLink to="/leaderboard" :class="['inline-flex-between', { secondary: isCurrentInActivePage('leaderboard') }]">
             <ChartBarSquareIcon class="fill-current w-6 h-6" />
