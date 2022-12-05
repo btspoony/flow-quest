@@ -107,6 +107,8 @@ pub contract Interfaces {
 
     // Bounty information
     pub resource interface BountyInfoPublic {
+        pub fun getID(): UInt64
+
         pub fun getPreconditions(): [AnyStruct{UnlockCondition}]
         pub fun getParticipants(): {Address: {String: AnyStruct}}
         pub fun getIdentifier(): AnyStruct{BountyEntityIdentifier}

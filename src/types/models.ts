@@ -50,7 +50,7 @@ type UnlockConditions =
   | AchievementRequiredCondition
   | ChallengeIndexCondition;
 
-type QuestRewardType = "Points" | "NFT";
+type QuestRewardType = "Points" | "FLOAT" | "None";
 
 interface RewardInfo {
   rewardType: QuestRewardType;
@@ -140,10 +140,11 @@ interface ParticipantRecord {
 }
 
 interface BountyInfo {
+  id: string;
   config: BountyEntities; // load dynamic by identifier
   preconditions: UnlockConditions[];
   participants: { [key: string]: ParticipantRecord };
-  rewardType: "Points" | "FLOAT";
+  rewardType: QuestRewardType;
   pointReward?: PointRewardInfo;
   floatReward?: FLOATRewardInfo;
 }

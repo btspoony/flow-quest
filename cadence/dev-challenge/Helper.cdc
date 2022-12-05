@@ -37,6 +37,7 @@ pub contract Helper {
     pub enum QuestRewardType: UInt8 {
         pub case Points
         pub case FLOAT
+        pub case None
     }
 
     pub struct interface RewardInfo {
@@ -67,6 +68,14 @@ pub contract Helper {
         ) {
             self.type = QuestRewardType.FLOAT
             self.eventIdentifier = identifier
+        }
+    }
+
+    pub struct NoneReward: RewardInfo {
+        pub let type: QuestRewardType
+
+        init() {
+            self.type = QuestRewardType.None
         }
     }
 }

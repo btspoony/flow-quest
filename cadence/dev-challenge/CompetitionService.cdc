@@ -72,6 +72,9 @@ pub contract CompetitionService {
         }
 
         // ---- readonly methods ----
+        pub fun getID(): UInt64 {
+            return self.uuid
+        }
 
         pub fun getPreconditions(): [AnyStruct{Interfaces.UnlockCondition}] {
             return self.preconditions

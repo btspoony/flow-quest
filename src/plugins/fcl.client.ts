@@ -121,12 +121,17 @@ export default defineNuxtPlugin((nuxtApp) => {
       appName: () => appName,
       fcl,
       scripts: {
+        /**
+         * Get Bounties in the active season
+         * @returns
+         */
         async getActiveSeasonBounties(): Promise<CompetitionSeason> {
           // FIXME: load from blockchain
           return Promise.resolve({
             endDate: 1672416000,
             bounties: {
               ["001"]: {
+                id: "001",
                 config: {
                   category: "challenge",
                   key: "create-account",
@@ -161,16 +166,16 @@ export default defineNuxtPlugin((nuxtApp) => {
                 },
                 preconditions: [],
                 participants: {},
-                rewardType: "Points",
-                pointReward: {
-                  rewardType: "Points",
-                  rewardPoints: 20,
-                  referalPoints: 2,
-                },
+                rewardType: "None",
               },
             },
           });
         },
+        /**
+         * Get float information
+         * @param host
+         * @param eventId
+         */
         async getFLOATDetail(
           host: string,
           eventId: string
@@ -180,6 +185,86 @@ export default defineNuxtPlugin((nuxtApp) => {
             (arg, t) => [arg(host, t.Address), arg(eventId, t.String)],
             undefined
           );
+        },
+        /**
+         * Get quests
+         * @param quests
+         */
+        async getQuestsDetail(
+          quests: BountyIdentifier[]
+        ): Promise<BountyInfo[]> {
+          // FIXME: load from blockchain
+          return Promise.resolve([
+            {
+              id: "101",
+              config: {
+                category: "quest",
+                key: "s1q1",
+                communityId: "flow",
+                display: {
+                  name: "Quest 1",
+                  description: "quest description",
+                  thumbnail:
+                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+                },
+                steps: 1,
+              },
+              preconditions: [],
+              participants: {},
+              rewardType: "Points",
+              pointReward: {
+                rewardType: "Points",
+                rewardPoints: 20,
+                referalPoints: 2,
+              },
+            },
+            {
+              id: "102",
+              config: {
+                category: "quest",
+                key: "s1q2",
+                communityId: "flow",
+                display: {
+                  name: "Quest 2",
+                  description: "quest description",
+                  thumbnail:
+                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+                },
+                steps: 1,
+              },
+              preconditions: [],
+              participants: {},
+              rewardType: "Points",
+              pointReward: {
+                rewardType: "Points",
+                rewardPoints: 50,
+                referalPoints: 5,
+              },
+            },
+            {
+              id: "103",
+              config: {
+                category: "quest",
+                key: "s1q3",
+                communityId: "flow",
+                display: {
+                  name: "Quest 3",
+                  description: "quest description",
+                  thumbnail:
+                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+                },
+                steps: 1,
+              },
+              preconditions: [],
+              participants: {},
+              rewardType: "Points",
+              pointReward: {
+                rewardType: "Points",
+                rewardPoints: 50,
+                referalPoints: 5,
+              },
+            },
+          ]);
         },
       },
       transactions: {
