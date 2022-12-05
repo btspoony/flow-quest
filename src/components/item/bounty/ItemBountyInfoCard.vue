@@ -7,11 +7,14 @@ const props = withDefaults(defineProps<{
   full: true
 })
 
+const current = useCurrentBounty()
+
 function onClickCard() {
+  current.value = props.bounty
   if (props.bounty.config.category === 'challenge') {
-    router.push(`/challenges/${props.bounty.config.key}`)
+    router.push(`/challenges/${props.bounty.id}`)
   } else {
-    router.push(`/quests/${props.bounty.config.key}`)
+    router.push(`/quests/${props.bounty.id}`)
   }
 }
 </script>

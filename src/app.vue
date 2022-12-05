@@ -21,11 +21,9 @@ const description = ref(
   </HeadMeta>
 
   <Header />
-  <div class="container">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </Html>
 </template>
 

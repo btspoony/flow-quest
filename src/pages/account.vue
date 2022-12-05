@@ -4,7 +4,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <main>
+  <main class="container">
     <NuxtPage />
   </main>
 </template>

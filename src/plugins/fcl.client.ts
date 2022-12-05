@@ -266,6 +266,51 @@ export default defineNuxtPlugin((nuxtApp) => {
             },
           ]);
         },
+        /**
+         * get simple bounty info
+         * @param id
+         */
+        async getBountyById(id: string): Promise<BountyInfo> {
+          // FIXME: load from blockchain
+          return Promise.resolve({
+            id: "001",
+            config: {
+              category: "challenge",
+              key: "create-account",
+              communityId: "flow",
+              display: {
+                name: "Challenge: Create Account",
+                description: "Challenge description",
+                thumbnail:
+                  "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+              },
+              quests: [
+                {
+                  category: "quest",
+                  key: "S1Q1",
+                  communityId: "flow",
+                },
+                {
+                  category: "quest",
+                  key: "S1Q2",
+                  communityId: "flow",
+                },
+                {
+                  category: "quest",
+                  key: "S1Q3",
+                  communityId: "flow",
+                },
+              ],
+              achievement: {
+                host: "0xa51d7fe9e0080662",
+                eventId: "97505692",
+              },
+            },
+            preconditions: [],
+            participants: {},
+            rewardType: "None",
+          });
+        },
       },
       transactions: {
         async registerForNewSeason(referredFrom?: string) {

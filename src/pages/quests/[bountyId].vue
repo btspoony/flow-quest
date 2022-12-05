@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>
+  <main class="container-fluid">
     Quest detail
   </main>
 </template>
