@@ -1,5 +1,12 @@
 <script setup lang="ts">
 const profile = useGithubProfile();
+
+const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', async () => {
+  const { $scripts } = useNuxtApp();
+  return await $scripts.getActiveSeason()
+}, {
+  server: false
+});
 </script>
 
 <template>
@@ -13,8 +20,8 @@ const profile = useGithubProfile();
         </template>
         <template v-else>
           <h4>Start with these Challenges:</h4>
-          <div class="flex-center">
-            List of Bounties
+          <div :aria-busy="pending" class="flex-center">
+            <ItemBountyInfoCard v-for="(bounty, index) in seasonData?.bounties" :key="'idx_'+index" :bounty="bounty" />
           </div>
         </template>
       </div>

@@ -125,7 +125,7 @@ export default defineNuxtPlugin((nuxtApp) => {
          * Get Bounties in the active season
          * @returns
          */
-        async getActiveSeasonBounties(): Promise<CompetitionSeason> {
+        async getActiveSeason(): Promise<CompetitionSeason> {
           // FIXME: load from blockchain
           return Promise.resolve({
             endDate: 1672416000,
