@@ -137,7 +137,7 @@ export default defineNuxtPlugin((nuxtApp) => {
                   key: "create-account",
                   communityId: "flow",
                   display: {
-                    name: "Create Accont",
+                    name: "Challenge: Create Account",
                     description: "Challenge description",
                     thumbnail:
                       "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",

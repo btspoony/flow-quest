@@ -10,20 +10,18 @@ const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', 
 </script>
 
 <template>
-  <main>
-    <div class="hero min-h-[calc(100vh-100px)]">
-      <div class="hero-content narrow flex-col">
-        <template v-if="!profile.auth">
-          <h4>Start Challenges</h4>
-          <p>Login with Github to start the challenge tour</p>
-          <AuthGithubButton />
-        </template>
-        <template v-else>
-          <h4>Start with these Challenges:</h4>
-          <div :aria-busy="pending" class="flex-center">
-            <ItemBountyInfoCard v-for="(bounty, index) in seasonData?.bounties" :key="'idx_'+index" :bounty="bounty" />
-          </div>
-        </template>
+  <main class="min-h-[calc(100vh-100px)]">
+    <div class="hero" v-if="!profile.auth">
+      <div class="page-container hero-content flex-col">
+        <h4>Start Challenges</h4>
+        <p>Login with Github to start the challenge tour</p>
+        <AuthGithubButton />
+      </div>
+    </div>
+    <div v-else class="page-container w-full py-8">
+      <h4 class="text-center">Start with these Challenges:</h4>
+      <div :aria-busy="pending" class="max-w-full grid grid-cols-1 lg:grid-cols-2">
+        <ItemBountyInfoCard v-for="(bounty, index) in seasonData?.bounties" :key="'idx_' + index" :bounty="bounty" />
       </div>
     </div>
   </main>

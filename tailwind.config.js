@@ -25,6 +25,7 @@ const defaultSans = [
 ];
 
 module.exports = {
+  darkMode: ["class", '[data-theme="dark"]'],
   theme: {
     container: {
       center: true,

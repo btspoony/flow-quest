@@ -36,11 +36,7 @@
 
     .hero-content {
       @apply flex justify-center items-center;
-      @apply z-0 max-w-7xl gap-4 py-20 px-2 sm:px-4;
-
-      &.narrow {
-        @apply max-w-5xl;
-      }
+      @apply z-0 gap-4 py-20;
 
       &.align-end {
         @apply justify-end items-end;
@@ -49,6 +45,51 @@
       &.align-start {
         @apply justify-start items-start;
       }
+    }
+  }
+
+  .page-container {
+    @apply mx-auto max-w-5xl px-2 sm:px-4;
+
+    &.wide {
+      @apply max-w-7xl;
+    }
+  }
+
+  .card {
+    @apply bg-[var(--card-background-color)];
+    @apply p-4 m-4;
+
+    &.double-border {
+        @apply m-0;
+    }
+  }
+
+  .card-border {
+    @apply relative rounded-xl;
+    @apply border border-solid border-opacity-40;
+    @apply border-gray-300 dark:border-gray-700;
+
+    &.double-border {
+      @apply absolute -top-1 -left-1;
+      @apply bg-[var(--card-background-color)] w-full h-full;
+    }
+  }
+
+  .tag {
+    @apply rounded-full px-3 py-1;
+    @apply bg-opacity-70 bg-gray-300 dark:bg-gray-700;
+
+    &.primary {
+      @apply text-white bg-primary dark:bg-primary;
+    }
+
+    &.success {
+      @apply text-white bg-success dark:bg-success;
+    }
+
+    &.failure {
+      @apply text-white bg-failure dark:bg-failure;
     }
   }
 }
