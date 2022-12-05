@@ -1,8 +1,11 @@
 <script setup lang="ts">
 const router = useRouter()
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   bounty: BountyInfo
-}>()
+  full?: boolean
+}>(), {
+  full: true
+})
 
 function onClickCard() {
   if (props.bounty.config.category === 'challenge') {
@@ -14,7 +17,7 @@ function onClickCard() {
 </script>
 
 <template>
-  <article class="card card-border cursor-pointer w-full h-36" @click="onClickCard()">
+  <article :class="['card card-border cursor-pointer h-36', { 'w-full': full }]" @click="onClickCard()">
     <ItemChallengeInfoCard v-if="bounty.config.category === 'challenge'" :bounty="bounty" />
     <ItemQuestInfoCard v-else :bounty="bounty" />
   </article>

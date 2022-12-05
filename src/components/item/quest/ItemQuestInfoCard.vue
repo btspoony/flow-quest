@@ -5,7 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div>
+  <div class="card card-border h-36 w-full flex items-center justify-between gap-4">
     Quest
   </div>
 </template>

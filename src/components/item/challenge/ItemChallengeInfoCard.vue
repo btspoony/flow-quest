@@ -8,7 +8,7 @@ const progress = ref(0);
 </script>
 
 <template>
-  <div class="card card-border double-border h-full w-full flex items-center justify-between gap-4">
+  <div class="card card-border double-border h-36 w-full flex items-center justify-between gap-4">
     <div class="flex-1 flex flex-col justify-between gap-2 h-full">
       <div>
         <span class="tag">

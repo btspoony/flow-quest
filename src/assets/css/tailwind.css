@@ -72,7 +72,7 @@
 
     &.double-border {
       @apply absolute -top-1 -left-1;
-      @apply bg-[var(--card-background-color)] w-full h-full;
+      @apply w-full h-full;
     }
   }
 
