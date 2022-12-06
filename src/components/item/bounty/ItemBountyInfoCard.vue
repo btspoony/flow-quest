@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { LockClosedIcon } from '@heroicons/vue/24/solid'
+
 const router = useRouter()
 const props = withDefaults(defineProps<{
   bounty: BountyInfo;
@@ -30,6 +32,8 @@ function onClickCard() {
     @click="onClickCard()">
     <ItemChallengeInfoCard v-if="bounty.config.category === 'challenge'" :bounty="bounty" />
     <ItemQuestInfoCard v-else :bounty="bounty" />
-    <div v-if="locked" class="overlay rounded-xl" />
+    <div v-if="locked" class="overlay rounded-xl">
+      <LockClosedIcon class="fill-current w-6 h-6" />
+    </div>
   </article>
 </template>
