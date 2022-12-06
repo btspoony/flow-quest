@@ -58,11 +58,7 @@
 
   .card {
     @apply bg-[var(--card-background-color)];
-    @apply p-4 m-4;
-
-    &.double-border {
-        @apply m-0;
-    }
+    @apply p-4 m-0;
   }
 
   .card-border {

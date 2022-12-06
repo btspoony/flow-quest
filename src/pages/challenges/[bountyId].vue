@@ -81,7 +81,9 @@ const progress = ref(0); // FIXME
       </div>
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
-        TODO
+        <div class="max-w-lg" v-for="(bounty, index) in info?.quests" :key="'idx_' + index">
+          <ItemQuestInfoCard :bounty="bounty" />
+        </div>
       </div>
     </section>
   </main>
