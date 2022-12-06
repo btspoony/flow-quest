@@ -25,6 +25,7 @@ const description = ref(
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <Footer />
 </Html>
 </template>
 

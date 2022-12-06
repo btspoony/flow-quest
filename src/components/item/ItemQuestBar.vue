@@ -3,9 +3,10 @@ const props = defineProps<{
   current: number,
   index: number,
   bounty: BountyInfo
+  isLast: boolean,
 }>()
 
-const questCfg = computed(() => (props.bounty.config as QuestConfig));
+// const questCfg = computed(() => (props.bounty.config as QuestConfig));
 const isCurrentProcess = computed(() => props.current === props.index)
 const isOdd = computed(() => props.index % 2 === 0)
 </script>
@@ -17,7 +18,8 @@ const isOdd = computed(() => props.index % 2 === 0)
         <span class="tag absolute -top-8 left-1/2" style="transform: translateX(-50%);">Next Quest:</span>
       </div>
       <ItemBountyInfoCard :bounty="bounty" :highlight="isCurrentProcess" :locked="(index > current)" />
-      <div :class="['card-link absolute right-12 opacity-40 dark:opacity-100', isOdd ? 'left-12' : 'left-auto']" :style="{
+      <div v-if="!isLast"
+        :class="['card-link absolute right-12 opacity-40 dark:opacity-100', isOdd ? 'left-12' : 'left-auto']" :style="{
         transform: !isOdd ? 'scaleX(-1)' : 'none'
       }" />
     </div>

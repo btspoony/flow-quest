@@ -45,7 +45,7 @@ const totalPoints = computed(() => {
   return points
 })
 
-const currentIndex = ref(0);
+const currentIndex = ref(0); // FIXME
 const progress = ref(0); // FIXME
 </script>
 
@@ -83,9 +83,26 @@ const progress = ref(0); // FIXME
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
         <ItemQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
+          :isLast="((info?.quests.length! - 1 === index) && !challengeCfg?.achievement)"
           :current="currentIndex" />
-        <div class="h-40"></div>
+        <div v-if="challengeCfg?.achievement" class="flex-center flex-col gap-2">
+          <span class="tag">Achievement FLOAT</span>
+          <div class="relative">
+            <div class="shiny" />
+            <ItemFLOATEvent :host="challengeCfg?.achievement.host" :event-id="challengeCfg?.achievement.eventId" />
+          </div>
+        </div>
       </div>
     </section>
   </main>
 </template>
+
+<style scoped>
+.shiny {
+  @apply absolute pointer-events-none w-64 h-64 -top-14 -left-20;
+  @apply bg-center bg-[url(/assets/images/shiny.png)] bg-contain;
+
+  animation: spin 20s linear infinite;
+  transform-origin: center;
+}
+</style>
