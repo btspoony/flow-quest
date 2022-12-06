@@ -77,7 +77,7 @@
   }
 
   .tag {
-    @apply rounded-full px-3 py-1;
+    @apply rounded-full px-3 py-1 text-xs;
     @apply bg-opacity-70 bg-gray-300 dark:bg-gray-700;
 
     &.primary {
@@ -91,6 +91,10 @@
     &.failure {
       @apply text-white bg-failure dark:bg-failure;
     }
+  }
+
+  .section-header-text {
+    @apply text-[var(--color)] sm:text-white;
   }
 }
 

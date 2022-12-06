@@ -11,8 +11,8 @@ function isCurrentInActivePage(pageKey: string): boolean {
 </script>
 
 <template>
-  <header class="container">
-    <nav>
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)]">
+    <nav class="container">
       <ul>
         <li class="inline-flex-between cursor-pointer" @click="() => {
           router.push('/');

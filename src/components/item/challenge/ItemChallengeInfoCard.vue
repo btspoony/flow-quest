@@ -4,7 +4,7 @@ const props = defineProps<{
 }>();
 
 const challengeCfg = computed(() => (props.bounty.config as ChallengeConfig));
-const progress = ref(0);
+const progress = ref(0); // FIXME
 </script>
 
 <template>

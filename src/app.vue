@@ -21,6 +21,7 @@ const description = ref(
   </HeadMeta>
 
   <Header />
+  <div class="h-[90px]"></div>
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
