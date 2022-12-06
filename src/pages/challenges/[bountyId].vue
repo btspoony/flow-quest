@@ -45,6 +45,7 @@ const totalPoints = computed(() => {
   return points
 })
 
+const currentIndex = ref(0);
 const progress = ref(0); // FIXME
 </script>
 
@@ -70,7 +71,7 @@ const progress = ref(0); // FIXME
           <div class="flex gap-2 items-center justify-start">
             <span class="tag">{{ challengeCfg?.quests.length ?? 0 }} Quests</span>
             <span class="tag">{{ totalPoints }} Points</span>
-            <progress :value="progress" max="100" class="w-40 mb-[4px]" />
+            <progress :value="progress" max="100" class="w-40 mb-[2px]" />
           </div>
         </div>
       </div>
@@ -81,9 +82,9 @@ const progress = ref(0); // FIXME
       </div>
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
-        <div class="max-w-lg" v-for="(bounty, index) in info?.quests" :key="'idx_' + index">
-          <ItemQuestInfoCard :bounty="bounty" />
-        </div>
+        <ItemQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
+          :current="currentIndex" />
+        <div class="h-40"></div>
       </div>
     </section>
   </main>

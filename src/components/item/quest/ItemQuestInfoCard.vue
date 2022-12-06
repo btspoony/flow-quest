@@ -7,7 +7,7 @@ const questCfg = computed(() => (props.bounty.config as QuestConfig));
 </script>
 
 <template>
-  <div class="card card-border h-36 w-full flex flex-col justify-between gap-4">
+  <div class="card p-0 w-full h-full flex flex-col justify-between gap-4">
     <div class="flex gap-4 items-center justify-between">
       <span class="tag">{{ questCfg?.communityId }}</span>
     </div>

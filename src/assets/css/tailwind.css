@@ -57,12 +57,19 @@
   }
 
   .card {
+    @apply relative rounded-xl p-[3px] m-0;
     @apply bg-[var(--card-background-color)];
-    @apply p-4 m-0;
+
+    .card {
+      @apply rounded-lg p-3;
+    }
+
+    &.highlight {
+      @apply bg-gradient-to-r from-primary to-secondary;
+    }
   }
 
   .card-border {
-    @apply relative rounded-xl;
     @apply border border-solid border-opacity-40;
     @apply border-gray-300 dark:border-gray-700;
 
@@ -116,6 +123,6 @@
   }
 
   .overlay {
-    @apply absolute top-0 left-0 w-full h-full flex-center bg-gray-800/80;
+    @apply absolute top-0 left-0 w-full h-full flex-center bg-gray-700/60;
   }
 }
