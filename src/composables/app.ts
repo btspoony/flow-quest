@@ -1,2 +1,5 @@
-export const useCurrentBounty = () =>
-  useState<BountyInfo | null>("currentBounty", () => ref(null));
+export const useCurrentChallenge = () =>
+  useState<BountyInfo | null>("currentChallenge", () => ref(null));
+
+export const useCurrentQuest = () =>
+  useState<BountyInfo | null>("currentQuest", () => ref(null));

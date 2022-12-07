@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
   locked: false,
 })
 
-const current = useCurrentBounty()
+const current = useCurrentChallenge()
 
 function onClickCard() {
   if (props.locked) return

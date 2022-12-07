@@ -16,7 +16,7 @@ const { data: floatEvent, pending } = useAsyncData<FLOATEvent>('floatEvent', asy
 </script>
 
 <template>
-  <article class="card w-20 h-28 flex flex-col items-center justify-center">
+  <article class="card card-border w-20 h-28 flex flex-col items-center justify-center">
     <div v-if="pending" class="justify-items-center" aria-busy="true" />
     <a v-else-if="floatEvent" class="flex flex-col items-center justify-center"
       :href="`https://${isTestnet ? 'testnet.' : ''}floats.city/${host}/event/${eventId}`" target="_blank">

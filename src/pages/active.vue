@@ -10,7 +10,7 @@ const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', 
 </script>
 
 <template>
-  <main class="container min-h-[calc(100vh-100px)]">
+  <main class="container min-h-[calc(100vh-240px)]">
     <div class="hero" v-if="!profile.auth">
       <div class="page-container hero-content flex-col">
         <h4>Start Challenges</h4>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const current = useCurrentBounty()
+const current = useCurrentChallenge()
 
 watch(route, (newVal) => {
   refresh();

@@ -77,6 +77,10 @@
       @apply absolute -top-1 -left-1;
       @apply w-full h-full;
     }
+
+    &:hover {
+      @apply border-gray-400 dark:border-gray-600;
+    }
   }
 
   .tag {
