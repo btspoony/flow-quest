@@ -30,7 +30,7 @@ pub contract CompetitionService {
 
     pub event ContractInitialized()
 
-    pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8)
+    pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, bountyId: UInt64)
     pub event BountyCompleted(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
     pub event ProfileRegistered(seasonId: UInt64, participant: Address)
     pub event SeasonEndDateUpdated(seasonId: UInt64, datetime: UFix64)
@@ -164,8 +164,8 @@ pub contract CompetitionService {
         access(contract) var profiles: {Address: Bool}
         access(contract) var bounties: @{UInt64: BountyInfo}
         access(contract) var primaryBounties: [UInt64]
-        // QuestKey -> CommunityID
-        access(self) var questCommunityMapping: {String: UInt64}
+        // QuestKey -> BountyID
+        access(self) var keyIdMapping: {String: UInt64}
 
         init(
             endDate: UFix64,
@@ -174,7 +174,7 @@ pub contract CompetitionService {
             self.profiles = {}
             self.bounties <- {}
             self.primaryBounties = []
-            self.questCommunityMapping = {}
+            self.keyIdMapping = {}
         }
 
         destroy() {
@@ -204,13 +204,10 @@ pub contract CompetitionService {
         }
 
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
-            let communityId = self.questCommunityMapping[questKey] ?? panic("Missing questKey.")
-            let questIdentifier = Community.BountyEntityIdentifier(
-                category: Interfaces.BountyType.quest,
-                communityId: communityId,
-                key: questKey
-            )
-            return questIdentifier.getQuestConfig()
+            let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
+            let bountyRef = self.borrowBountyPrivateRef(bountyId)
+            assert(bountyRef.identifier.category == Interfaces.BountyType.quest, message: "Bounty should be a quest.")
+            return bountyRef.identifier.getQuestConfig()
         }
 
         // ---- writable methods ----
@@ -251,16 +248,15 @@ pub contract CompetitionService {
             primary: Bool
         ) {
             pre {
-                self.questCommunityMapping[identifier.key] == nil: "Quest is registered."
+                self.keyIdMapping[identifier.key] == nil: "Quest is registered."
             }
             // ensure quests added to bounties
             if identifier.category == Interfaces.BountyType.challenge {
                 let challengeCfg = identifier.getChallengeConfig()
                 for questIdentifier in challengeCfg.quests {
-                    assert(self.questCommunityMapping[questIdentifier.key] != nil, message: "Quest not registered.")
+                    assert(self.keyIdMapping[questIdentifier.key] != nil, message: "Quest not registered.")
                 }
             }
-            self.questCommunityMapping[identifier.key] = identifier.communityId
 
             let bounty <- create BountyInfo(
                 seasonId: self.uuid,
@@ -271,6 +267,7 @@ pub contract CompetitionService {
             let uid = bounty.uuid
             self.bounties[bounty.uuid] <-! bounty
 
+            self.keyIdMapping[identifier.key] = uid
             if identifier.category == Interfaces.BountyType.challenge || primary {
                 self.primaryBounties.append(uid)
             }
@@ -280,6 +277,7 @@ pub contract CompetitionService {
                 communityId: identifier.communityId,
                 key: identifier.key,
                 category: identifier.category.rawValue,
+                bountyId: uid,
             )
         }
 
