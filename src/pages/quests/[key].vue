@@ -28,7 +28,14 @@ const questCfg = computed(() => (info.value?.quest.config as QuestConfig));
 </script>
 
 <template>
-  <main class="container-fluid">
-    Quest detail
+  <main class="container">
+    <div class="w-full flex gap-4 justify-between">
+      <div class="flex-none w-5/12 flex flex-col gap-2">
+        Quest detail
+      </div>
+      <div class="flex-auto">
+        Preview
+      </div>
+      </div>
   </main>
 </template>

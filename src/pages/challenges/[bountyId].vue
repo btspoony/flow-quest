@@ -75,10 +75,8 @@ const progress = ref(0); // FIXME
           </div>
         </div>
       </div>
-      <div class="flex flex-col">
-        <p class="mb-4">
-          {{ challengeCfg?.display.description }}
-        </p>
+      <div class="mb-4 prose-sm lg:prose">
+        {{ challengeCfg?.display.description }}
       </div>
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
