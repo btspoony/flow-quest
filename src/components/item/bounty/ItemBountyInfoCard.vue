@@ -22,7 +22,7 @@ function onClickCard() {
   if (props.bounty.config.category === 'challenge') {
     router.push(`/challenges/${props.bounty.id}`)
   } else {
-    router.push(`/quests/${props.bounty.id}`)
+    router.push(`/quests/${props.bounty.config.key}`)
   }
 }
 </script>
