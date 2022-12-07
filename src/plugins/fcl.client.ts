@@ -315,6 +315,36 @@ export default defineNuxtPlugin((nuxtApp) => {
             rewardType: "None",
           });
         },
+        /**
+         * get bounty info
+         * @param key
+         */
+        async getBountyByKey(key: string): Promise<BountyInfo> {
+          // FIXME: load from blockchain
+          return Promise.resolve({
+            id: "101",
+            config: {
+              category: "quest",
+              key: "s1q1",
+              communityId: "flow",
+              display: {
+                name: "Quest 1",
+                description: "quest description",
+                thumbnail:
+                  "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
+              },
+              steps: 1,
+            },
+            preconditions: [],
+            participants: {},
+            rewardType: "Points",
+            pointReward: {
+              rewardType: "Points",
+              rewardPoints: 20,
+              referalPoints: 2,
+            },
+          });
+        },
       },
       transactions: {
         async registerForNewSeason(referredFrom?: string) {
