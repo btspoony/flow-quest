@@ -69,7 +69,7 @@ const progress = ref(0); // FIXME
           </div>
           <h3 class="section-header-text mb-3">{{ challengeCfg?.display.name }}</h3>
           <div class="flex gap-2 items-center justify-start">
-            <span class="tag">{{ challengeCfg?.quests.length ?? 0 }} Quests</span>
+            <span class="tag">{{ challengeCfg?.quests?.length ?? 0 }} Quests</span>
             <span class="tag">{{ totalPoints }} Points</span>
             <progress :value="progress" max="100" class="w-40 mb-[2px]" />
           </div>
@@ -83,7 +83,7 @@ const progress = ref(0); // FIXME
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
         <ItemQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
-          :isLast="((info?.quests.length! - 1 === index) && !challengeCfg?.achievement)"
+          :isLast="(((info?.quests?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"
           :current="currentIndex" />
         <div v-if="challengeCfg?.achievement" class="flex-center flex-col gap-2">
           <span class="tag">Achievement FLOAT</span>

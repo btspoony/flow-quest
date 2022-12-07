@@ -4,7 +4,6 @@ import CompetitionService from "../../../../../cadence/dev-challenge/Competition
 
 transaction(
     target: Address,
-    bountyId: UInt64,
     questKey: String,
     step: Int,
     params: {String: AnyStruct}?
@@ -27,6 +26,6 @@ transaction(
           self.ctrler.updateNewParams(acct: target, seasonId: seasonId, questKey: questKey, step: step, params: p)
         }
 
-        self.ctrler.questStepCompleted(acct: target, seasonId: seasonId, bountyId: bountyId, questKey: questKey, step: step)
+        self.ctrler.questStepCompleted(acct: target, seasonId: seasonId, questKey: questKey, step: step)
     }
 }

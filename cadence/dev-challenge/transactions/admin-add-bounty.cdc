@@ -11,6 +11,7 @@ transaction(
     key: String,
     rewardPoints: UInt64,
     referralPoints: UInt64,
+    primary: Bool,
 ) {
     let admin: &CompetitionService.CompetitionAdmin
 
@@ -32,7 +33,8 @@ transaction(
             seasonId: seasonId,
             identifier: entityIdentifier,
             preconditions: [], // FIXME: no precondition for now
-            reward: Helper.PointReward(rewardPoints, referralPoints)
+            reward: Helper.PointReward(rewardPoints, referralPoints),
+            primary: primary,
         )
     }
 }
