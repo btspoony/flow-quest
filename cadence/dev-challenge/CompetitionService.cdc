@@ -203,6 +203,11 @@ pub contract CompetitionService {
             return self.borrowBountyPrivateRef(bountyId)
         }
 
+        pub fun borrowBountyInfoByKey(_ key: String): &AnyResource{Interfaces.BountyInfoPublic} {
+            let bountyId = self.keyIdMapping[key] ?? panic("Missing questKey.")
+            return self.borrowBountyInfo(bountyId)
+        }
+
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
             let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
             let bountyRef = self.borrowBountyPrivateRef(bountyId)
