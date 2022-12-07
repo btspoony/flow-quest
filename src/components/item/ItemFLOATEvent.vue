@@ -16,12 +16,12 @@ const { data: floatEvent, pending } = useAsyncData<FLOATEvent>('floatEvent', asy
 </script>
 
 <template>
-  <article class="card w-24 h-32 flex flex-col items-center justify-center">
+  <article class="card w-20 h-28 flex flex-col items-center justify-center">
     <div v-if="pending" class="justify-items-center" aria-busy="true" />
-    <a v-else-if="floatEvent" class="no-style"
+    <a v-else-if="floatEvent" class="flex flex-col items-center justify-center"
       :href="`https://${isTestnet ? 'testnet.' : ''}floats.city/${host}/event/${eventId}`" target="_blank">
       <img class="max-w-[80px] max-h-[80px]" :src="getIPFSUrl(floatEvent.image)" :alt="`${floatEvent.name} Image`" />
-      <h3 class="mb-0 flex-grow text-ellipsis overflow-hidden whitespace-nowrap">{{ floatEvent.name }}</h3>
+      <h5 class="mb-0 flex-grow text-ellipsis overflow-hidden whitespace-nowrap">{{ floatEvent.name }}</h5>
     </a>
     <div v-else> NaN </div>
   </article>

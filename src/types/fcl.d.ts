@@ -1,6 +1,8 @@
 declare module "*.cdc";
 declare module "*.cdc?raw";
 
+declare module "@onflow/transport-grpc";
+
 declare module "@onflow/config" {
   // Config
   export interface FlowConfig {

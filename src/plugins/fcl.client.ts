@@ -1,4 +1,5 @@
 import * as fcl from "@onflow/fcl";
+import { send as grpcSend } from "@onflow/transport-grpc";
 import cadence from "../assets/cadence";
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -13,6 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("flow.network", config.public.network)
     .put("accessNode.api", config.public.accessApi)
     .put("discovery.wallet", config.public.walletDiscovery)
+    .put("sdk.transport", grpcSend)
     .put("app.detail.title", appName)
     .put(
       "app.detail.icon",
