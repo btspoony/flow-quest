@@ -20,12 +20,16 @@ const description = ref(
     <Link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
   </HeadMeta>
 
-  <Header />
-  <div class="h-[90px]"></div>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-  <Footer />
+  <Body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <Header />
+    <div class="h-[90px]"></div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <Footer />
+  </Body>
 </Html>
 </template>
 
