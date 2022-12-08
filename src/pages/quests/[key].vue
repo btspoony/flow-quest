@@ -41,6 +41,15 @@ const imageUrl = computed(() => {
 })
 const isInvalid = computed(() => true) // FIXME
 
+function isCompleted(index: number) {
+  return info.value?.status?.steps[index] ?? false
+}
+
+function isLocked(index: number) {
+  // FIXME
+  return false
+}
+
 async function completeBounty() {
   // TODO
 }
@@ -63,7 +72,8 @@ async function completeBounty() {
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="i" />
+          <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)"
+            :is-completed="isCompleted(i)" :is-locked="isLocked(i)" />
         </div>
         <div class="flex flex-col py-2">
           <button class="rounded-xl" @click="completeBounty()" :disabled="isInvalid">

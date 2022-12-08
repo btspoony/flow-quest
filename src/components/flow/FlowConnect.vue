@@ -1,22 +1,7 @@
 <script setup lang="ts">
-import { ArrowRightOnRectangleIcon, UserIcon } from "@heroicons/vue/24/solid";
+import { ArrowRightOnRectangleIcon } from "@heroicons/vue/24/solid";
 
 const current = useFlowAccount();
-
-onMounted(() => {
-  const { $fcl } = useNuxtApp();
-  $fcl.currentUser.subscribe((user) => {
-    current.value = user;
-    if (user) {
-      console.log(`Flow User loggedIn: ${user.addr}`);
-    }
-  });
-});
-
-function login() {
-  const { $fcl } = useNuxtApp();
-  $fcl.authenticate();
-}
 
 function logout() {
   const { $fcl } = useNuxtApp();
@@ -37,9 +22,6 @@ function logout() {
         <ArrowRightOnRectangleIcon class="fill-current h-5 w-5" />
       </button>
     </div>
-    <button v-else class="rounded-full inline-flex-between" @click="login">
-      <UserIcon class="fill-current h-5 w-5" />
-      <small>Connect Wallet</small>
-    </button>
+    <FlowConnectButton v-else />
   </div>
 </template>
