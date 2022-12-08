@@ -17,6 +17,22 @@ pub contract Interfaces {
         }
     }
 
+    pub struct QuestStatus {
+        pub let steps: [Bool]
+        pub let completed: Bool
+
+        init(
+            steps: [Bool]
+        ) {
+            self.steps = steps
+            var completed = true
+            for one in steps {
+                completed = one && completed
+            }
+            self.completed = completed
+        }
+    }
+
     // Profile readable
     pub resource interface ProfilePublic {
         pub fun getId(): UInt64
@@ -28,9 +44,9 @@ pub contract Interfaces {
         pub fun getReferredFrom(seasonId: UInt64): Address?
 
         // readable
-        pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64}
         pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool
+        pub fun getQuestStatus(seasonId: UInt64, questKey: String): QuestStatus
         pub fun getQuestsParticipanted(seasonId: UInt64): [String]
 
         // writable

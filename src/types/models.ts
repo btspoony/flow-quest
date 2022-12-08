@@ -144,6 +144,7 @@ interface BountyInfo {
   config: BountyEntities; // load dynamic by identifier
   preconditions: UnlockConditions[];
   participants: { [key: string]: ParticipantRecord };
+  participantAmt: number;
   rewardType: QuestRewardType;
   pointReward?: PointRewardInfo;
   floatReward?: FLOATRewardInfo;

@@ -103,6 +103,10 @@
   .section-header-text {
     @apply text-[var(--color)] sm:text-white;
   }
+
+  .divider {
+    @apply w-full bg-gray-400 dark:bg-gray-600 h-[1px];
+  }
 }
 
 @layer utilities {

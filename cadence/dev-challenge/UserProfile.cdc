@@ -71,6 +71,17 @@ pub contract UserProfile {
             }
             self.results[idx] = result
         }
+
+        pub fun isValid(): Bool {
+            var valid: Bool = false
+            for key in self.results.keys {
+                valid = valid || self.results[key]!
+                if valid {
+                    break
+                }
+            }
+            return valid
+        }
     }
 
     /**
@@ -138,6 +149,15 @@ pub contract UserProfile {
         // get a copy of bountiesCompleted
         pub fun getBountiesCompleted(): {UInt64: UFix64} {
             return self.bountiesCompleted
+        }
+
+        pub fun getQuestStatus(questKey: String): Interfaces.QuestStatus {
+            let score = self.getQuestScore(questKey: questKey)
+            let steps: [Bool] = []
+            for step in score.steps {
+                steps.append(step.isValid())
+            }
+            return Interfaces.QuestStatus(steps: steps)
         }
 
         pub fun isBountyCompleted(bountyId: UInt64): Bool {
@@ -252,9 +272,9 @@ pub contract UserProfile {
             return seasonRef.referredFromAddress
         }
 
-        pub fun getQuestCompletedTimes(seasonId: UInt64, questKey: String): UInt64 {
+        pub fun getQuestStatus(seasonId: UInt64, questKey: String): Interfaces.QuestStatus {
             let seasonRef = self.borrowSeasonRecordRef(seasonId)
-            return seasonRef.questScores[questKey]?.timesCompleted ?? 0
+            return seasonRef.getQuestStatus(questKey: questKey)
         }
 
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64} {

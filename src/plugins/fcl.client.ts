@@ -169,6 +169,7 @@ export default defineNuxtPlugin((nuxtApp) => {
                   },
                 },
                 preconditions: [],
+                participantAmt: 0,
                 participants: {},
                 rewardType: "None",
               },
@@ -215,6 +216,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               },
               preconditions: [],
               participants: {},
+              participantAmt: 0,
               rewardType: "Points",
               pointReward: {
                 rewardType: "Points",
@@ -238,6 +240,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               },
               preconditions: [],
               participants: {},
+              participantAmt: 0,
               rewardType: "Points",
               pointReward: {
                 rewardType: "Points",
@@ -261,6 +264,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               },
               preconditions: [],
               participants: {},
+              participantAmt: 0,
               rewardType: "Points",
               pointReward: {
                 rewardType: "Points",
@@ -312,6 +316,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             },
             preconditions: [],
             participants: {},
+            participantAmt: 0,
             rewardType: "None",
           });
         },
@@ -333,10 +338,11 @@ export default defineNuxtPlugin((nuxtApp) => {
                 thumbnail:
                   "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
               },
-              steps: 1,
+              steps: 3,
             },
             preconditions: [],
             participants: {},
+            participantAmt: 0,
             rewardType: "Points",
             pointReward: {
               rewardType: "Points",
