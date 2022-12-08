@@ -3,3 +3,6 @@ export const useCurrentChallenge = () =>
 
 export const useCurrentQuest = () =>
   useState<BountyInfo | null>("currentQuest", () => ref(null));
+
+export const useActiveSeason = () =>
+  useState<CompetitionSeason | null>("activeSeason", () => ref(null));

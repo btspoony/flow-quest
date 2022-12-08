@@ -13,15 +13,17 @@ const props = withDefaults(defineProps<{
   locked: false,
 })
 
-const current = useCurrentChallenge()
 
 function onClickCard() {
   if (props.locked) return
 
-  current.value = props.bounty
   if (props.bounty.config.category === 'challenge') {
+    const current = useCurrentChallenge()
+    current.value = props.bounty
     router.push(`/challenges/${props.bounty.id}`)
   } else {
+    const quest = useCurrentQuest()
+    quest.value = props.bounty
     router.push(`/quests/${props.bounty.config.key}`)
   }
 }

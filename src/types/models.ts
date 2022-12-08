@@ -151,20 +151,16 @@ interface BountyInfo {
 }
 
 interface CompetitionSeason {
+  seasonId: string;
   endDate: number;
   bounties: { [uid: string]: BountyInfo };
 }
 
 // ---- Profile ----
 
-interface VerificationStep {
-  params: { [key: string]: string }[];
-  results: { [times: number]: boolean };
-}
-
-interface QuestRecord {
-  timesCompleted: number;
-  steps: VerificationStep[];
+interface QuestStatus {
+  steps: boolean[];
+  completed: boolean;
 }
 
 interface SeasonRecord {
@@ -173,7 +169,7 @@ interface SeasonRecord {
   referredFromAddress: string;
   referralCode: string;
   points: number;
-  questScores: { [key: string]: QuestRecord };
+  questScores: { [key: string]: QuestStatus };
   bountiesCompleted: { [uid: string]: number };
 }
 

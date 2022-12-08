@@ -2,26 +2,31 @@
 import { LockClosedIcon } from '@heroicons/vue/24/solid';
 
 const route = useRoute()
-const current = useCurrentQuest()
 
 watch(route, (newVal) => {
   refresh();
 });
 
 interface QuestDetail {
+  season: CompetitionSeason,
   quest: BountyInfo,
+  status?: QuestStatus,
 }
 
-const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questBounty', async () => {
+const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail', async () => {
   const { $scripts } = useNuxtApp();
 
-  let quest: BountyInfo
-  if (current.value) {
-    quest = current.value
-  } else {
-    quest = await $scripts.getBountyByKey(route.params.questKey as string)
+  const season = await apiGetActiveSeason();
+  const questKey = route.params.key as string;
+  const quest: BountyInfo = await apiGetCurrentQuest(questKey)
+
+  const profile = useUserProfile()
+  let status: QuestStatus | undefined = undefined
+  if (profile.value?.profile) {
+    const address = profile.value?.profile?.address
+    status = await $scripts.getQuestStatus(address, season.seasonId, questKey)
   }
-  return { quest }
+  return { season, quest, status }
 }, {
   server: false
 });
@@ -42,7 +47,7 @@ async function completeBounty() {
 </script>
 
 <template>
-  <main class="container min-h-[calc(100vh-360px)]">
+  <main class="container">
     <div v-if="(pending || !questCfg)" :aria-busy="true" />
     <div v-else class="w-full flex gap-8 justify-between">
       <div class="pt-10 flex-none w-5/12 flex flex-col gap-3">
@@ -60,10 +65,11 @@ async function completeBounty() {
         <div class="flex flex-col gap-2">
           <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="i" />
         </div>
-        <button class="rounded-xl" @click="completeBounty()" :disabled="isInvalid">
-          <LockClosedIcon v-if="isInvalid" class="fill-current w-6 h-6" />
-          <span v-else>Complete</span>
-        </button>
+        <div class="flex flex-col py-2">
+          <button class="rounded-xl" @click="completeBounty()" :disabled="isInvalid">
+            <LockClosedIcon v-if="isInvalid" class="fill-current w-6 h-6" />
+            <span v-else>Complete</span>
+          </button>
           <div role="separator" class="divider my-2" />
           <div class="flex-between">
             <div>
@@ -73,8 +79,9 @@ async function completeBounty() {
               Participants
             </div>
           </div>
+          </div>
       </div>
-      <article class="flex-auto rounded-xl">
+      <article class="flex-auto rounded-xl h-[calc(100vh-200px)]">
         <h2>Guide</h2>
         <div>
           TODO

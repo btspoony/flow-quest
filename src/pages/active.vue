@@ -2,8 +2,7 @@
 const profile = useGithubProfile();
 
 const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', async () => {
-  const { $scripts } = useNuxtApp();
-  return await $scripts.getActiveSeason()
+  return await apiGetActiveSeason()
 }, {
   server: false
 });

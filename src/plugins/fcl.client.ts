@@ -132,6 +132,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         async getActiveSeason(): Promise<CompetitionSeason> {
           // FIXME: load from blockchain
           return Promise.resolve({
+            seasonId: "1",
             endDate: 1672416000,
             bounties: {
               ["001"]: {
@@ -196,6 +197,7 @@ export default defineNuxtPlugin((nuxtApp) => {
          * @param quests
          */
         async getQuestsDetail(
+          seasonId: string,
           quests: BountyIdentifier[]
         ): Promise<BountyInfo[]> {
           // FIXME: load from blockchain
@@ -278,7 +280,7 @@ export default defineNuxtPlugin((nuxtApp) => {
          * get simple bounty info
          * @param id
          */
-        async getBountyById(id: string): Promise<BountyInfo> {
+        async getBountyById(seasonId: string, id: string): Promise<BountyInfo> {
           // FIXME: load from blockchain
           return Promise.resolve({
             id: "001",
@@ -324,7 +326,10 @@ export default defineNuxtPlugin((nuxtApp) => {
          * get bounty info
          * @param key
          */
-        async getBountyByKey(key: string): Promise<BountyInfo> {
+        async getBountyByKey(
+          seasonId: string,
+          key: string
+        ): Promise<BountyInfo> {
           // FIXME: load from blockchain
           return Promise.resolve({
             id: "101",
@@ -350,6 +355,20 @@ export default defineNuxtPlugin((nuxtApp) => {
               referalPoints: 2,
             },
           });
+        },
+        /**
+         * get quest status
+         */
+        async getQuestStatus(
+          acct: string,
+          seasonId: string,
+          key: string
+        ): Promise<QuestStatus> {
+          // FIXME: load from blockchain
+          return {
+            steps: [true, false, false],
+            completed: false,
+          };
         },
       },
       transactions: {

@@ -421,17 +421,18 @@ pub contract CompetitionService {
 
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            assert(!profileRef.isBountyCompleted(seasonId: seasonId, bountyId: bountyId), message: "Ensure bounty not completed")
 
             // ensure quest completed
             if bounty.identifier.category == Interfaces.BountyType.quest {
-                let completedTimes = profileRef.getQuestCompletedTimes(seasonId: seasonId, questKey: bounty.identifier.key)
-                assert(completedTimes > 0, message: "Quset not completed")
+                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
+                assert(status.completed, message: "Quset not completed")
             } else {
                 let challengeRef = bounty.identifier.getChallengeConfig()
                 var allCompleted = true
                 for identifier in challengeRef.quests {
-                    let completedTimes = profileRef.getQuestCompletedTimes(seasonId: seasonId, questKey: identifier.key)
-                    allCompleted = allCompleted && completedTimes > 0
+                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
+                    allCompleted = allCompleted && status.completed
                 }
                 assert(allCompleted, message: "Challenge not completed")
             }
