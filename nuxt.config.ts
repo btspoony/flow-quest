@@ -58,12 +58,7 @@ export default defineNuxtConfig({
   modules: [
     // Doc: https://github.com/nuxt-community/tailwindcss-module
     "@nuxtjs/tailwindcss",
-    // Doc: https://content.nuxtjs.org
-    "@nuxt/content",
   ],
-  content: {
-    // https://content.nuxtjs.org/api/configuration
-  },
   build: {
     transpile: ["@heroicons/vue"],
   },
