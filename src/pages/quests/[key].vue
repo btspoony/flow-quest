@@ -41,7 +41,7 @@ const imageUrl = computed(() => {
 })
 const isInvalid = computed(() => true) // FIXME
 
-function isCompleted(index: number) {
+function isStepCompleted(index: number) {
   return info.value?.status?.steps[index] ?? false
 }
 
@@ -49,6 +49,10 @@ function isLocked(index: number) {
   // FIXME
   return false
 }
+
+const isBountyCompleted = computed(() => {
+  return false
+})
 
 async function completeBounty() {
   // TODO
@@ -73,11 +77,12 @@ async function completeBounty() {
         </div>
         <div class="flex flex-col gap-2">
           <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)"
-            :is-completed="isCompleted(i)" :is-locked="isLocked(i)" />
+            :is-completed="isStepCompleted(i)" :is-locked="isLocked(i)" />
         </div>
         <div class="flex flex-col py-2">
-          <button class="rounded-xl" @click="completeBounty()" :disabled="isInvalid">
-            <LockClosedIcon v-if="isInvalid" class="fill-current w-6 h-6" />
+          <button class="rounded-xl" @click="completeBounty()" :disabled="(isInvalid||isBountyCompleted)">
+            <span v-if="isBountyCompleted">Completed</span>
+            <LockClosedIcon v-if="(isInvalid||isBountyCompleted)" class="fill-current w-6 h-6" />
             <span v-else>Complete</span>
           </button>
           <div role="separator" class="divider my-2" />
