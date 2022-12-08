@@ -80,7 +80,7 @@ const progress = ref(0); // FIXME
       </div>
       <div role="separator" class="mb-10 mt-4 w-full bg-gray-700 h-[1px]" />
       <div class="flex flex-col gap-24">
-        <ItemQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
+        <ItemChallengeQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
           :isLast="(((info?.quests?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"
           :current="currentIndex" />
         <div v-if="challengeCfg?.achievement" class="flex-center flex-col gap-2">
