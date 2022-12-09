@@ -96,9 +96,10 @@ pub contract Community {
         pub let description: String
         pub let image: String?
         pub let steps: UInt64
-        // changable
-        pub let stepsDesc: {UInt64: String}
         pub let extra: {String: String}
+        // changable
+        pub var stepsCfg: MetadataViews.HTTPFile
+        pub var guideMD: MetadataViews.HTTPFile
 
         init(
             communityId: UInt64,
@@ -107,6 +108,8 @@ pub contract Community {
             description: String,
             image: String?,
             steps: UInt64,
+            stepsCfg: String,
+            guideMD: String,
         ) {
             self.category = Interfaces.BountyType.quest
             self.communityId = communityId
@@ -117,8 +120,9 @@ pub contract Community {
             // details
             self.steps = steps
             // changable
-            self.stepsDesc = {}
             self.extra = {}
+            self.stepsCfg = MetadataViews.HTTPFile(stepsCfg)
+            self.guideMD = MetadataViews.HTTPFile(guideMD)
         }
 
         // display
@@ -136,11 +140,6 @@ pub contract Community {
                 description: self.description,
                 thumbnail: thumbnail!
             )
-        }
-
-        // update steps description
-        access(contract) fun updateStepsDesc(idx: UInt64, desc: String) {
-            self.stepsDesc[idx] = desc
         }
 
         // update extra data

@@ -202,30 +202,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         ): Promise<BountyInfo[]> {
           // FIXME: load from blockchain
           return Promise.resolve([
-            {
-              id: "101",
-              config: {
-                category: "quest",
-                key: "s1q1",
-                communityId: "flow",
-                display: {
-                  name: "Quest 1",
-                  description: "quest description",
-                  thumbnail:
-                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-                },
-                steps: 1,
-              },
-              preconditions: [],
-              participants: {},
-              participantAmt: 0,
-              rewardType: "Points",
-              pointReward: {
-                rewardType: "Points",
-                rewardPoints: 20,
-                referalPoints: 2,
-              },
-            },
+            await this.getBountyByKey(seasonId, "create-account"),
             {
               id: "102",
               config: {
@@ -239,6 +216,10 @@ export default defineNuxtPlugin((nuxtApp) => {
                     "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
                 },
                 steps: 1,
+                stepsCfg:
+                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
+                guideMD:
+                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
               },
               preconditions: [],
               participants: {},
@@ -263,6 +244,10 @@ export default defineNuxtPlugin((nuxtApp) => {
                     "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
                 },
                 steps: 1,
+                stepsCfg:
+                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
+                guideMD:
+                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
               },
               preconditions: [],
               participants: {},
@@ -335,7 +320,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             id: "101",
             config: {
               category: "quest",
-              key: "s1q1",
+              key: "create-account",
               communityId: "flow",
               display: {
                 name: "Quest 1",
@@ -343,7 +328,11 @@ export default defineNuxtPlugin((nuxtApp) => {
                 thumbnail:
                   "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
               },
-              steps: 3,
+              steps: 2,
+              stepsCfg:
+                "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
+              guideMD:
+                "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
             },
             preconditions: [],
             participants: {},

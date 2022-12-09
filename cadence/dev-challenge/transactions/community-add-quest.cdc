@@ -7,6 +7,8 @@ transaction(
     description: String,
     image: String?,
     steps: UInt64,
+    stepsCfg: String,
+    guideMD: String,
 ) {
     let builder: &Community.CommunityBuilder
 
@@ -29,6 +31,8 @@ transaction(
             description: description,
             image: image,
             steps: steps,
+            stepsCfg: stepsCfg,
+            guideMD: guideMD,
         )
         community.addQuest(key: key, quest: quest)
     }

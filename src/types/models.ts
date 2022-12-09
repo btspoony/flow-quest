@@ -81,6 +81,8 @@ interface BountyEntity {
 
 interface QuestConfig extends BountyEntity {
   steps: number;
+  stepsCfg: string;
+  guideMD: string;
 }
 
 interface ChallengeConfig extends BountyEntity {
