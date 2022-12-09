@@ -23,7 +23,7 @@ const progress = ref(0); // FIXME
       </div>
     </div>
     <div v-if="props.bounty.config?.display.thumbnail" class="flex-none rounded-xl overflow-hidden">
-      <img class="w-28 h-28" :src="getIPFSUrl(props.bounty.config?.display.thumbnail)" alt="Challenge alt">
+      <img class="w-24 h-24" :src="getIPFSUrl(props.bounty.config?.display.thumbnail)" alt="Challenge alt">
     </div>
   </div>
 </template>

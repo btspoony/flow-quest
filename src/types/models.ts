@@ -85,6 +85,28 @@ interface QuestConfig extends BountyEntity {
   guideMD: string;
 }
 
+interface QuestStepInput {
+  value: string;
+  type: string;
+}
+
+interface QuestStepOutput {
+  expect: "return" | "error";
+  result: any;
+}
+
+interface QuestStepTest {
+  inputs: QuestStepInput[];
+  outputs: QuestStepOutput[];
+}
+
+interface QuestStepsConfig {
+  title: string;
+  code: string;
+  schema: { key: string; type: string }[];
+  tests: QuestStepTest[]; // All tests should be OK, then quest passed
+}
+
 interface ChallengeConfig extends BountyEntity {
   quests: BountyIdentifier[];
   achievement?: {
@@ -167,9 +189,9 @@ interface QuestStatus {
 
 interface SeasonRecord {
   seasonId: string;
-  referredFromCode: string;
-  referredFromAddress: string;
-  referralCode: string;
+  referredFromCode?: string;
+  referredFromAddress?: string;
+  referralCode?: string;
   points: number;
   questScores: { [key: string]: QuestStatus };
   bountiesCompleted: { [uid: string]: number };
@@ -177,11 +199,11 @@ interface SeasonRecord {
 
 interface ProfileData {
   address: string;
-  seasonRecords: { [key: string]: SeasonRecord };
+  activeRecord?: SeasonRecord;
+  seasonRecords?: { [key: string]: SeasonRecord };
 }
 
 interface Profile {
-  loggedIn: boolean;
   profile?: ProfileData;
 }
 

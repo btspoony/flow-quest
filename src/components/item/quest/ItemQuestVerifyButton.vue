@@ -5,6 +5,6 @@ const current = useFlowAccount();
 <template>
   <FlowConnectButton v-if="!current?.loggedIn" />
   <button v-else class="mb-0 rounded-full">
-    BUTTON
+    <span class="font-semibold">Verify</span>
   </button>
 </template>

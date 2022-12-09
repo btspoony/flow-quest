@@ -354,10 +354,26 @@ export default defineNuxtPlugin((nuxtApp) => {
           key: string
         ): Promise<QuestStatus> {
           // FIXME: load from blockchain
-          return {
+          return Promise.resolve({
             steps: [true, false, false],
             completed: false,
-          };
+          });
+        },
+        async isProfileExists(acct: string): Promise<boolean> {
+          // FIXME: load from blockchain
+          return Promise.resolve(false);
+        },
+        async isProfileRegistered(acct: string): Promise<boolean> {
+          // FIXME: load from blockchain
+          return Promise.resolve(false);
+        },
+        async loadUserProfile(acct: string): Promise<ProfileData> {
+          // FIXME: load from blockchain
+          return Promise.resolve({} as ProfileData);
+        },
+        async loadProfileSeasonRecord(acct: string, seasonId: string): Promise<SeasonRecord> {
+          // FIXME: load from blockchain
+          return Promise.resolve({} as SeasonRecord);
         },
       },
       transactions: {

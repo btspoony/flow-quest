@@ -11,6 +11,8 @@ interface QuestDetail {
   season: CompetitionSeason,
   quest: BountyInfo,
   status?: QuestStatus,
+  guideMD: string,
+  stepsCfg: QuestStepsConfig[]
 }
 
 const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail', async () => {
@@ -19,14 +21,25 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail'
   const season = await apiGetActiveSeason();
   const questKey = route.params.key as string;
   const quest: BountyInfo = await apiGetCurrentQuest(questKey)
-
+  // load quest config
+  const [guideMD, stepsCfgStr] = await Promise.all([
+    $fetch((quest.config as QuestConfig).guideMD),
+    $fetch((quest.config as QuestConfig).stepsCfg)
+  ])
+  let stepsCfg: QuestStepsConfig[] = []
+  try {
+    stepsCfg = JSON.parse(stepsCfgStr as string)
+  } catch (e) {
+    console.log('Failed to parse', e)
+  }
+  // load user profile
   const profile = useUserProfile()
   let status: QuestStatus | undefined = undefined
   if (profile.value?.profile) {
     const address = profile.value?.profile?.address
     status = await $scripts.getQuestStatus(address, season.seasonId, questKey)
   }
-  return { season, quest, status }
+  return { season, quest, status, guideMD: guideMD as string, stepsCfg }
 }, {
   server: false
 });
@@ -96,11 +109,8 @@ async function completeBounty() {
           </div>
           </div>
       </div>
-      <article class="flex-auto rounded-xl h-[calc(100vh-200px)]">
-        <h2>Guide</h2>
-        <div>
-          TODO
-        </div>
+      <article class="flex-auto rounded-xl h-[calc(100vh-200px)] prose-sm lg:prose">
+        {{ info?.guideMD }}
       </article>
       </div>
   </main>

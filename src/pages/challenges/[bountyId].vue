@@ -41,8 +41,8 @@ const totalPoints = computed(() => {
   return points
 })
 
-const currentIndex = ref(0); // FIXME
-const progress = ref(0); // FIXME
+const currentIndex = ref(0); // FIXME: load from blockchain
+const progress = ref(0); // FIXME: load from blockchain
 </script>
 
 <template>
