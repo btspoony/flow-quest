@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import md from 'markdown-it';
 import { LockClosedIcon } from '@heroicons/vue/24/solid';
 
+const mdRenderer = md()
 const route = useRoute()
 
 watch(route, (newVal) => {
@@ -39,7 +41,7 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail'
     const address = profile.value?.profile?.address
     status = await $scripts.getQuestStatus(address, season.seasonId, questKey)
   }
-  return { season, quest, status, guideMD: guideMD as string, stepsCfg }
+  return { season, quest, status, guideMD: (guideMD as string ?? ""), stepsCfg }
 }, {
   server: false
 });
@@ -109,8 +111,9 @@ async function completeBounty() {
           </div>
           </div>
       </div>
-      <article class="flex-auto rounded-xl h-[calc(100vh-200px)] prose-sm lg:prose">
-        {{ info?.guideMD }}
+      <article class="flex-auto rounded-xl h-[calc(100vh-200px)] overflow-x-clip overflow-y-scroll">
+        <div v-if="info?.guideMD" class="prose-sm prose-blockquote:py-0 prose-img:my-0"
+          v-html="mdRenderer.render(info?.guideMD)" />
       </article>
       </div>
   </main>
