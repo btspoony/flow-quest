@@ -77,8 +77,8 @@ async function completeBounty() {
 <template>
   <main class="container">
     <div v-if="(pending || !questCfg)" :aria-busy="true" />
-    <div v-else class="w-full flex gap-8 justify-between">
-      <div class="pt-10 flex-none w-5/12 flex flex-col gap-3">
+    <div v-else class="w-full flex flex-wrap lg:flex-nowrap gap-8 justify-between">
+      <div class="pt-10 flex-none w-full lg:w-5/12 flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
           <div class="flex-none flex-center">
             <img class="rounded-full w-20 h-20" :src="imageUrl" alt="Quest Image">
