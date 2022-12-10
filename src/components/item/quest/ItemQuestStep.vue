@@ -2,10 +2,12 @@
 const props = defineProps<{
   quest: BountyInfo,
   step: number,
+  stepsCfg: QuestStepsConfig[]
   isCompleted: boolean,
   isLocked: boolean,
 }>()
-// TODO
+
+const stepCfg = computed(() => props.stepsCfg[props.step])
 </script>
 
 <template>
@@ -14,7 +16,7 @@ const props = defineProps<{
       <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-200 dark:bg-gray-800">{{ step + 1 }}</span>
     </div>
     <div class="flex-auto text-lg font-semibold">
-      Description
+      {{ stepCfg?.title ?? "" }}
     </div>
     <div class="flex-none min-w-[160px]">
       <ItemQuestVerifyButton v-if="(!isLocked || isCompleted)" />

@@ -54,11 +54,14 @@ const imageUrl = computed(() => {
     return undefined
   }
 })
-const isInvalid = computed(() => true) // FIXME
-
 function isStepCompleted(index: number) {
   return info.value?.status?.steps[index] ?? false
 }
+
+const isInvalid = computed(() => {
+  // FIXME
+  return true
+})
 
 function isLocked(index: number) {
   // FIXME
@@ -66,6 +69,7 @@ function isLocked(index: number) {
 }
 
 const isBountyCompleted = computed(() => {
+  // FIXME
   return false
 })
 
@@ -91,7 +95,7 @@ async function completeBounty() {
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)"
+          <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)" :steps-cfg="info?.stepsCfg!"
             :is-completed="isStepCompleted(i)" :is-locked="isLocked(i)" />
         </div>
         <div class="flex flex-col py-2">
@@ -106,12 +110,12 @@ async function completeBounty() {
               {{ info?.quest.participantAmt }} completed
             </div>
             <div>
-              Participants
+              <!-- Participants -->
             </div>
           </div>
           </div>
       </div>
-      <article class="flex-auto rounded-xl h-[calc(100vh-200px)] overflow-x-clip overflow-y-scroll">
+      <article class="flex-auto rounded-xl h-[calc(100vh-240px)] overflow-x-clip overflow-y-scroll">
         <div v-if="info?.guideMD" class="prose-sm prose-blockquote:py-0 prose-img:my-0"
           v-html="mdRenderer.render(info?.guideMD)" />
       </article>
