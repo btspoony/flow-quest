@@ -7,7 +7,7 @@ async function main() {
   const signer = utils.buildSigner();
 
   // load data
-  const seasonData = JSON.parse(
+  const data = JSON.parse(
     fs.readFileSync(
       path.resolve(process.cwd(), process.env.DATA_SEASON_TO_START),
       "utf8"
@@ -23,7 +23,7 @@ async function main() {
   );
 
   const txid = await signer.sendTransaction(code, (arg, t) => [
-    arg(seasonData.endDate.toFixed(1), t.UFix64),
+    arg(data.endDate.toFixed(1), t.UFix64),
   ]);
 
   await utils.watchTransaction(signer, txid);

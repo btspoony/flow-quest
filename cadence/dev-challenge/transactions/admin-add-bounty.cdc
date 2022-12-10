@@ -5,8 +5,7 @@ import CompetitionService from "../CompetitionService.cdc"
 import Helper from "../Helper.cdc"
 
 transaction(
-    seasonId: UInt64,
-    communityId: UInt64,
+    communityKey: String,
     category: UInt8,
     key: String,
     rewardPoints: UInt64,
@@ -21,6 +20,12 @@ transaction(
     }
 
     execute {
+        let comPubRef= Community.borrowCommunityByKey(key: communityKey)
+        assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
+        let communityId = comPubRef!.getID()
+
+        let season = CompetitionService.borrowServicePublic().borrowLatestActiveSeason()
+
         let entityIdentifier = Community.BountyEntityIdentifier(
             category: Interfaces.BountyType(rawValue: category) ?? panic("Wrong category value"),
             communityId: communityId,
@@ -30,7 +35,7 @@ transaction(
         entityIdentifier.getBountyEntity()
 
         self.admin.addBounty(
-            seasonId: seasonId,
+            seasonId: season.getSeasonId(),
             identifier: entityIdentifier,
             preconditions: [], // FIXME: no precondition for now
             reward: Helper.PointReward(rewardPoints, referralPoints),
