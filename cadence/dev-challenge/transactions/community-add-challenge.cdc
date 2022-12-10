@@ -3,7 +3,7 @@ import Community from "../Community.cdc"
 import Helper from "../Helper.cdc"
 
 transaction(
-    communityId: UInt64,
+    communityKey: String,
     key: String,
     title: String,
     description: String,
@@ -24,6 +24,9 @@ transaction(
     }
 
     execute {
+        let comPubRef= Community.borrowCommunityByKey(key: communityKey)
+        assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
+        let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
 
         let quests: [Community.BountyEntityIdentifier] = []

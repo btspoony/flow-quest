@@ -148,6 +148,14 @@ pub contract Community {
                 self.extra[key] = toMerge[key]
             }
         }
+
+        access(contract) fun updateQuestStepsCfg(stepsCfg: String) {
+            self.stepsCfg = MetadataViews.HTTPFile(stepsCfg)
+        }
+
+        access(contract) fun updateQuestGuideMD(guideMD: String) {
+            self.guideMD = MetadataViews.HTTPFile(guideMD)
+        }
     }
 
     pub struct ChallengeConfig: Interfaces.BountyEntityPublic, Interfaces.ChallengeInfoPublic {
