@@ -7,9 +7,9 @@ async function main() {
   const signer = utils.buildSigner();
 
   // load data
-  const seasonData = JSON.parse(
+  const data = JSON.parse(
     fs.readFileSync(
-      path.resolve(process.cwd(), process.env.DATA_SEASON_TO_START),
+      path.resolve(process.cwd(), process.env.DATA_COMMUNITY_INIT),
       "utf8"
     )
   );
@@ -17,13 +17,20 @@ async function main() {
   const code = fs.readFileSync(
     path.join(
       process.cwd(),
-      "cadence/dev-challenge/transactions/admin-start-new-season.cdc"
+      "cadence/dev-challenge/transactions/community-create.cdc"
     ),
     "utf8"
   );
 
   const txid = await signer.sendTransaction(code, (arg, t) => [
-    arg(seasonData.endDate.toFixed(1), t.UFix64),
+    arg(data.key, t.String),
+    arg(data.name, t.String),
+    arg(data.description, t.String),
+    arg(data.image, t.String),
+    arg(data.banner, t.String),
+    arg(data.twitter, t.String),
+    arg(data.discord, t.String),
+    arg(data.website, t.String),
   ]);
 
   await utils.watchTransaction(signer, txid);
