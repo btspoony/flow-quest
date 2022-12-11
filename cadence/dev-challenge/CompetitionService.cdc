@@ -51,6 +51,10 @@ pub contract CompetitionService {
 
     pub resource interface BountyInfoPublic {
         pub fun getBountyIdentifier(): Community.BountyEntityIdentifier
+
+        pub fun getParticipants(): {Address: {String: AnyStruct}}
+        pub fun getParticipantsAddress(): [Address]
+        pub fun getParticipantsAmount(): Int
     }
 
     pub resource BountyInfo: Interfaces.BountyInfoPublic, BountyInfoPublic {
@@ -86,6 +90,14 @@ pub contract CompetitionService {
 
         pub fun getParticipants(): {Address: {String: AnyStruct}} {
             return self.participants
+        }
+
+        pub fun getParticipantsAddress(): [Address] {
+            return self.participants.keys
+        }
+
+        pub fun getParticipantsAmount(): Int {
+            return self.participants.keys.length
         }
 
         pub fun getIdentifier(): AnyStruct{Interfaces.BountyEntityIdentifier} {
