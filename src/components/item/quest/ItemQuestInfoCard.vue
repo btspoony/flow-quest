@@ -8,10 +8,7 @@ const questCfg = computed(() => (props.bounty.config as QuestConfig));
 
 <template>
   <div class="card p-0 w-full h-full flex flex-col gap-4">
-    <div class="flex gap-4 items-center justify-between">
-      <span class="tag">{{ questCfg?.communityId }}</span>
-    </div>
-    <div class="flex gap-4 justify-between">
+    <div class="h-full flex gap-4 justify-between">
       <div class="flex flex-col gap-1">
         <h4 class="mb-2">{{ questCfg?.display.name }}</h4>
         <p class="mb-2 text-sm">

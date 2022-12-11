@@ -9,7 +9,10 @@ const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', 
 </script>
 
 <template>
-  <main class="container min-h-[calc(100vh-240px)]">
+  <main v-if="pending" class="min-h-[80vh] flex-center">
+    <div :aria-busy="true" />
+  </main>
+  <main v-else class="container min-h-[calc(100vh-240px)]">
     <div class="hero" v-if="!profile.auth">
       <div class="page-container hero-content flex-col">
         <h4>Start Challenges</h4>

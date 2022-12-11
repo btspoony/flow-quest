@@ -172,112 +172,36 @@ export default defineNuxtPlugin((nuxtApp) => {
           seasonId: string,
           quests: BountyIdentifier[]
         ): Promise<BountyInfo[]> {
-          // FIXME: load from blockchain
-          return Promise.resolve([
-            await this.getBountyByKey(seasonId, "create-account"),
-            {
-              id: "102",
-              config: {
-                category: "quest",
-                key: "s1q2",
-                communityId: "flow",
-                display: {
-                  name: "Quest 2",
-                  description: "quest description",
-                  thumbnail:
-                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-                },
-                steps: 1,
-                stepsCfg:
-                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
-                guideMD:
-                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
-              },
-              preconditions: [],
-              participants: {},
-              participantAmt: 0,
-              rewardType: "Points",
-              pointReward: {
-                rewardType: "Points",
-                rewardPoints: 50,
-                referalPoints: 5,
-              },
-            },
-            {
-              id: "103",
-              config: {
-                category: "quest",
-                key: "s1q3",
-                communityId: "flow",
-                display: {
-                  name: "Quest 3",
-                  description: "quest description",
-                  thumbnail:
-                    "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-                },
-                steps: 1,
-                stepsCfg:
-                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
-                guideMD:
-                  "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
-              },
-              preconditions: [],
-              participants: {},
-              participantAmt: 0,
-              rewardType: "Points",
-              pointReward: {
-                rewardType: "Points",
-                rewardPoints: 50,
-                referalPoints: 5,
-              },
-            },
-          ]);
+          const result = await executeScript(
+            cadence.scripts.getBountiesDetail,
+            (arg, t) => [
+              arg(seasonId, t.UInt64),
+              arg(
+                quests.map((one) => one.key),
+                t.Array(t.String)
+              ),
+            ],
+            []
+          );
+          if (quests.length !== result?.length) {
+            throw new Error("Result invalid");
+          }
+          return result.map((one: any) => parseBountyInfo(one));
         },
         /**
          * get simple bounty info
          * @param id
          */
         async getBountyById(seasonId: string, id: string): Promise<BountyInfo> {
-          // FIXME: load from blockchain
-          return Promise.resolve({
-            id: "001",
-            config: {
-              category: "challenge",
-              key: "create-account",
-              communityId: "flow",
-              display: {
-                name: "Challenge: Create Account",
-                description: "Challenge description",
-                thumbnail:
-                  "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-              },
-              quests: [
-                {
-                  category: "quest",
-                  key: "S1Q1",
-                  communityId: "flow",
-                },
-                {
-                  category: "quest",
-                  key: "S1Q2",
-                  communityId: "flow",
-                },
-                {
-                  category: "quest",
-                  key: "S1Q3",
-                  communityId: "flow",
-                },
-              ],
-              achievement: {
-                host: "0xa51d7fe9e0080662",
-                eventId: "97505692",
-              },
-            },
-            preconditions: [],
-            participants: {},
-            participantAmt: 0,
-            rewardType: "None",
-          });
+          const result = await executeScript(
+            cadence.scripts.getBountyById,
+            (arg, t) => [arg(seasonId, t.UInt64), arg(id, t.UInt64)],
+            undefined
+          );
+          if (!result) {
+            throw new Error("Result undefined");
+          }
+          return parseBountyInfo(result);
         },
         /**
          * get bounty info
@@ -287,35 +211,18 @@ export default defineNuxtPlugin((nuxtApp) => {
           seasonId: string,
           key: string
         ): Promise<BountyInfo> {
-          // FIXME: load from blockchain
-          return Promise.resolve({
-            id: "101",
-            config: {
-              category: "quest",
-              key: "create-account",
-              communityId: "flow",
-              display: {
-                name: "Quest 1",
-                description: "quest description",
-                thumbnail:
-                  "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-              },
-              steps: 2,
-              stepsCfg:
-                "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/verify.json",
-              guideMD:
-                "https://raw.githubusercontent.com/btspoony/cadence-challenges/main/quests/create-account/README.md",
-            },
-            preconditions: [],
-            participants: {},
-            participantAmt: 0,
-            rewardType: "Points",
-            pointReward: {
-              rewardType: "Points",
-              rewardPoints: 20,
-              referalPoints: 2,
-            },
-          });
+          const result = await executeScript(
+            cadence.scripts.getBountiesDetail,
+            (arg, t) => [
+              arg(seasonId, t.UInt64),
+              arg([key], t.Array(t.String)),
+            ],
+            []
+          );
+          if (result?.length !== 1) {
+            throw new Error("Result invalid");
+          }
+          return parseBountyInfo(result[0]);
         },
         /**
          * get quest status

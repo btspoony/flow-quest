@@ -6,20 +6,20 @@ import Community from "../../../../cadence/dev-challenge/Community.cdc"
 import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
-pub fun main(): SessonInfo {
+pub fun main(
+  seasonId: UInt64,
+  keys: [String],
+): [QueryStructs.BountyInfo] {
   let service = CompetitionService.borrowServicePublic()
-  let activeSeasonId = service.getActiveSeasonID()
-  let season = service.borrowSeasonDetail(seasonId: activeSeasonId)
+  let season = service.borrowSeasonDetail(seasonId: seasonId)
 
-  let bountyIDs = season.getPrimaryBountyIDs()
-  let bounties: {UInt64: QueryStructs.BountyInfo} = {}
-
-  for id in bountyIDs {
-    let bounty = season.borrowBountyDetail(id)
+  let bounties: [QueryStructs.BountyInfo] = []
+  for key in keys {
+    let bounty = season.borrowBountyInfoByKey(key)
     let identifier = bounty.getBountyIdentifier()
     let rewardType = bounty.getRewardType()
-    bounties[id] = QueryStructs.BountyInfo(
-      id: id,
+    bounties.append(QueryStructs.BountyInfo(
+      id: bounty.getID(),
       identifier: identifier,
       display: identifier.getBountyEntity().getStandardDisplay(),
       questDetail: identifier.category == Interfaces.BountyType.quest ? identifier.getQuestConfig().getDetail() : nil,
@@ -30,27 +30,7 @@ pub fun main(): SessonInfo {
       rewardType: rewardType,
       pointReward: rewardType == Helper.QuestRewardType.Points ? bounty.getPointReward() : nil,
       floatReward: rewardType == Helper.QuestRewardType.FLOAT ? bounty.getFLOATReward() : nil,
-    )
+    ))
   }
-
-  return SessonInfo(
-    seasonID: season.getSeasonId(),
-    endDate: season.endDate,
-    bounties: bounties
-  )
-}
-
-pub struct SessonInfo {
-  pub let seasonID: UInt64
-  pub let endDate: UFix64
-  pub let bounties: {UInt64: QueryStructs.BountyInfo}
-  init(
-    seasonID: UInt64,
-    endDate: UFix64,
-    bounties: {UInt64: QueryStructs.BountyInfo}
-  ) {
-    self.seasonID = seasonID
-    self.endDate = endDate
-    self.bounties = bounties
-  }
+  return bounties
 }
