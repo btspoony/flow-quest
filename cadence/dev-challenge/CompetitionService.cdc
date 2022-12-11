@@ -49,7 +49,11 @@ pub contract CompetitionService {
         *  |    |__| | \| |___  |  | |__| | \| |  | |___ |  |    |
          ***********************************************************/
 
-    pub resource BountyInfo: Interfaces.BountyInfoPublic {
+    pub resource interface BountyInfoPublic {
+        pub fun getBountyIdentifier(): Community.BountyEntityIdentifier
+    }
+
+    pub resource BountyInfo: Interfaces.BountyInfoPublic, BountyInfoPublic {
         pub let seasonId: UInt64
         access(contract) let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
         access(contract) let participants: {Address: {String: AnyStruct}}
@@ -85,6 +89,10 @@ pub contract CompetitionService {
         }
 
         pub fun getIdentifier(): AnyStruct{Interfaces.BountyEntityIdentifier} {
+            return self.identifier
+        }
+
+        pub fun getBountyIdentifier(): Community.BountyEntityIdentifier {
             return self.identifier
         }
 
@@ -159,7 +167,11 @@ pub contract CompetitionService {
         }
     }
 
-    pub resource CompetitionSeason: Interfaces.CompetitionPublic {
+    pub resource interface CompetitionPublic {
+        pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
+    }
+
+    pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
         pub var endDate: UFix64
         access(contract) var profiles: {Address: Bool}
         access(contract) var bounties: @{UInt64: BountyInfo}
@@ -206,6 +218,10 @@ pub contract CompetitionService {
         pub fun borrowBountyInfoByKey(_ key: String): &AnyResource{Interfaces.BountyInfoPublic} {
             let bountyId = self.keyIdMapping[key] ?? panic("Missing questKey.")
             return self.borrowBountyInfo(bountyId)
+        }
+
+        pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic} {
+            return self.borrowBountyPrivateRef(bountyId)
         }
 
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
@@ -293,8 +309,12 @@ pub contract CompetitionService {
         }
     }
 
+    pub resource interface CompetitionServicePublic {
+        pub fun borrowSeasonDetail(seasonId: UInt64): &CompetitionSeason{Interfaces.CompetitionPublic, CompetitionPublic}
+    }
+
     // The singleton instance of competition service
-    pub resource CompetitionServiceStore: Interfaces.CompetitionServicePublic {
+    pub resource CompetitionServiceStore: CompetitionServicePublic, Interfaces.CompetitionServicePublic {
         // all seasons in the
         access(self) var latestActiveSeasonId: UInt64
         access(self) var seasons: @{UInt64: CompetitionSeason}
@@ -320,15 +340,23 @@ pub contract CompetitionService {
 
         // ---- readonly methods ----
 
+        pub fun getActiveSeasonID(): UInt64 {
+            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{Interfaces.CompetitionPublic}?
+                ?? panic("Failed to get current active season.")
+            assert(season.isActive(), message: "The current season is not active.")
+            return season.getSeasonId()
+        }
+
+        pub fun borrowLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
+            return self.borrowSeasonPrivateRef(self.getActiveSeasonID())
+        }
+
         pub fun borrowSeason(seasonId: UInt64): &{Interfaces.CompetitionPublic} {
             return self.borrowSeasonPrivateRef(seasonId)
         }
 
-        pub fun borrowLatestActiveSeason(): &{Interfaces.CompetitionPublic} {
-            let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{Interfaces.CompetitionPublic}?
-                ?? panic("Failed to get current active season.")
-            assert(season.isActive(), message: "The current season is not active.")
-            return season
+        pub fun borrowSeasonDetail(seasonId: UInt64): &CompetitionSeason{Interfaces.CompetitionPublic, CompetitionPublic} {
+            return self.borrowSeasonPrivateRef(seasonId)
         }
 
         access(contract) fun borrowSeasonPrivateRef(_ seasonId: UInt64): &CompetitionSeason {
@@ -469,15 +497,17 @@ pub contract CompetitionService {
 
     // ---- public methods ----
 
-    pub fun borrowServicePublic(): &CompetitionServiceStore{Interfaces.CompetitionServicePublic} {
-        return self.account
-            .getCapability<&CompetitionServiceStore{Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
+    pub fun borrowServicePublic(): &CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic} {
+        return self.getPublicCapability()
             .borrow()
             ?? panic("Missing the capability of service store resource")
     }
 
-    pub fun getPublicCapability(): Capability<&{Interfaces.CompetitionServicePublic}> {
-        return self.account.getCapability<&{Interfaces.CompetitionServicePublic}>(self.ServicePublicPath)
+    pub fun getPublicCapability(): Capability<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}> {
+        return self.account
+            .getCapability<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
+                self.ServicePublicPath
+            )
     }
 
     access(account) fun borrowServiceRef(): &CompetitionServiceStore {
@@ -498,7 +528,7 @@ pub contract CompetitionService {
         self.account.save(<- store.createSeasonPointsController(), to: self.ControllerStoragePath)
         // Store the resource of Challenge Seasons in the account
         self.account.save(<- store, to: self.ServiceStoragePath)
-        self.account.link<&CompetitionServiceStore{Interfaces.CompetitionServicePublic}>(
+        self.account.link<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
             self.ServicePublicPath,
             target: self.ServiceStoragePath
         )

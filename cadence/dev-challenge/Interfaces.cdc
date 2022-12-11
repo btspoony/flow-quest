@@ -181,6 +181,7 @@ pub contract Interfaces {
     }
 
     pub resource interface CompetitionServicePublic {
+        pub fun getActiveSeasonID(): UInt64
         pub fun borrowSeason(seasonId: UInt64): &{CompetitionPublic}
         pub fun borrowLatestActiveSeason(): &{CompetitionPublic}
     }
