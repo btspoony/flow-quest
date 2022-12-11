@@ -171,7 +171,6 @@ pub contract Interfaces {
         pub fun getBountyIDs(): [UInt64]
         pub fun getPrimaryBountyIDs(): [UInt64]
         pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
-        pub fun borrowBountyInfoByKey(_ key: String): &AnyResource{BountyInfoPublic}
 
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{BountyEntityPublic, QuestInfoPublic}
 
