@@ -81,6 +81,7 @@ export async function scVerifyQuest(
   questKey: string,
   params: { [key: string]: string }
 ): Promise<boolean> {
+  // FIXME: load from blockchain
   const code = await useStorage().getItem(
     `assets/server/cadence/quests/${questKey}/verify-script.cdc`
   );
