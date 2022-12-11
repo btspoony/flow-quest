@@ -10,6 +10,7 @@
       "testnet-admin": [
         "Interfaces",
         "Helper",
+        "QueryStructs",
         "UserProfile",
         "FLOATVerifiers",
         "Community",

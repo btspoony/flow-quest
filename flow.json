@@ -78,6 +78,7 @@
     },
     "Interfaces": "./cadence/dev-challenge/Interfaces.cdc",
     "Helper": "./cadence/dev-challenge/Helper.cdc",
+    "QueryStructs": "./cadence/dev-challenge/QueryStructs.cdc",
     "UserProfile": "./cadence/dev-challenge/UserProfile.cdc",
     "FLOATVerifiers": "./cadence/dev-challenge/FLOATVerifiers.cdc",
     "Community": "./cadence/dev-challenge/Community.cdc",
