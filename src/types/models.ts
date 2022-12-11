@@ -1,5 +1,9 @@
 // ---- General ----
 
+interface EnumData {
+  rawValue: string;
+}
+
 interface Display {
   name: string;
   description: string;

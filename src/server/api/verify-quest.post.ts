@@ -41,9 +41,14 @@ export default defineEventHandler(async function (event) {
     config.flowPrivateKey,
     keyIndex,
     {
-      Interfaces: config.flowServiceAddress,
-      UserProfile: config.flowServiceAddress,
-      CompetitionService: config.flowServiceAddress,
+      Interfaces: config.public.flowServiceAddress,
+      Helper: config.public.flowServiceAddress,
+      QueryStructs: config.public.flowServiceAddress,
+      UserProfile: config.public.flowServiceAddress,
+      FLOATVerifiers: config.public.flowServiceAddress,
+      Community: config.public.flowServiceAddress,
+      BountyUnlockConditions: config.public.flowServiceAddress,
+      CompetitionService: config.public.flowServiceAddress,
     }
   );
 

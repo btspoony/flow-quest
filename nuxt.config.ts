@@ -9,7 +9,6 @@ export default defineNuxtConfig({
   // Environment Variables
   runtimeConfig: {
     // The private keys which are only available within server-side
-    flowServiceAddress: "",
     flowAdminAddress: "",
     flowPrivateKey: "",
     flowPublicKey: "",
@@ -19,6 +18,7 @@ export default defineNuxtConfig({
       network: "",
       accessApi: "",
       walletDiscovery: "",
+      flowServiceAddress: "",
       oauthGithubClientId: "",
     },
   },

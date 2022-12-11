@@ -22,6 +22,7 @@ export function buildSigner() {
   const signer = new Signer(adminAddress, privateKey, keyIndex, {
     Interfaces: serviceAddress,
     Helper: serviceAddress,
+    QueryStructs: serviceAddress,
     UserProfile: serviceAddress,
     FLOATVerifiers: serviceAddress,
     Community: serviceAddress,

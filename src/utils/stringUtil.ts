@@ -3,5 +3,9 @@
  * @param ipfsHash
  */
 export function getIPFSUrl(ipfsHash: string) {
-  return `https://nftstorage.link/ipfs/${ipfsHash}`;
+  if (ipfsHash.startsWith("http")) {
+    return ipfsHash;
+  } else {
+    return `https://nftstorage.link/ipfs/${ipfsHash}`;
+  }
 }

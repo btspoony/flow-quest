@@ -24,7 +24,7 @@ pub fun main(): SessonInfo {
       identifier: identifier,
       display: bountyEntity.getStandardDisplay(),
       questDetail: identifier.category == Interfaces.BountyType.quest ? identifier.getQuestConfig().getDetail() : nil,
-      challengeDetail: identifier.category == Interfaces.BountyType.challenge ? nil : identifier.getChallengeConfig().getDetail(),
+      challengeDetail: identifier.category == Interfaces.BountyType.challenge ? identifier.getChallengeConfig().getDetail() : nil,
       preconditions: bounty.getPreconditions(),
       participants: bounty.getParticipants(),
       participantAmt: UInt64(bounty.getParticipantsAmount()),

@@ -36,13 +36,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     FlowToken: isMainnet ? "0x1654653399040a61" : "0x7e60df042a9c0868",
     FLOAT: isMainnet ? "0x2d4c3caffbeab845" : "0x0afe396ebc8eee65",
     // dApp address
-    Interfaces: config.flowServiceAddress,
-    Helper: config.flowServiceAddress,
-    UserProfile: config.flowServiceAddress,
-    FLOATVerifiers: config.flowServiceAddress,
-    Community: config.flowServiceAddress,
-    BountyUnlockConditions: config.flowServiceAddress,
-    CompetitionService: config.flowServiceAddress,
+    Interfaces: config.public.flowServiceAddress,
+    Helper: config.public.flowServiceAddress,
+    QueryStructs: config.public.flowServiceAddress,
+    UserProfile: config.public.flowServiceAddress,
+    FLOATVerifiers: config.public.flowServiceAddress,
+    Community: config.public.flowServiceAddress,
+    BountyUnlockConditions: config.public.flowServiceAddress,
+    CompetitionService: config.public.flowServiceAddress,
   };
   // ------ Build scripts ------
 
@@ -130,52 +131,23 @@ export default defineNuxtPlugin((nuxtApp) => {
          * @returns
          */
         async getActiveSeason(): Promise<CompetitionSeason> {
-          // FIXME: load from blockchain
-          return Promise.resolve({
-            seasonId: "1",
-            endDate: 1672416000,
-            bounties: {
-              ["001"]: {
-                id: "001",
-                config: {
-                  category: "challenge",
-                  key: "create-account",
-                  communityId: "flow",
-                  display: {
-                    name: "Challenge: Create Account",
-                    description: "Challenge description",
-                    thumbnail:
-                      "bafkreifzkygc5x4lfju4y46o2cvxizkclrghzjswbawf4a25o6vbs2olla",
-                  },
-                  quests: [
-                    {
-                      category: "quest",
-                      key: "S1Q1",
-                      communityId: "flow",
-                    },
-                    {
-                      category: "quest",
-                      key: "S1Q2",
-                      communityId: "flow",
-                    },
-                    {
-                      category: "quest",
-                      key: "S1Q3",
-                      communityId: "flow",
-                    },
-                  ],
-                  achievement: {
-                    host: "0xa51d7fe9e0080662",
-                    eventId: "97505692",
-                  },
-                },
-                preconditions: [],
-                participantAmt: 0,
-                participants: {},
-                rewardType: "None",
-              },
-            },
-          });
+          const ret = await executeScript(
+            cadence.scripts.getActiveSeason,
+            (arg, t) => [],
+            undefined
+          );
+          if (!ret) {
+            throw new Error("Result undefined");
+          }
+          const bounties: { [key: string]: BountyInfo } = {};
+          for (const id in ret.bounties) {
+            bounties[id] = parseBountyInfo(ret.bounties[id]);
+          }
+          return {
+            seasonId: ret.seasonID,
+            endDate: parseInt(ret.endDate),
+            bounties: bounties,
+          };
         },
         /**
          * Get float information
@@ -371,7 +343,10 @@ export default defineNuxtPlugin((nuxtApp) => {
           // FIXME: load from blockchain
           return Promise.resolve({} as ProfileData);
         },
-        async loadProfileSeasonRecord(acct: string, seasonId: string): Promise<SeasonRecord> {
+        async loadProfileSeasonRecord(
+          acct: string,
+          seasonId: string
+        ): Promise<SeasonRecord> {
           // FIXME: load from blockchain
           return Promise.resolve({} as SeasonRecord);
         },
