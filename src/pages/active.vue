@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const profile = useGithubProfile();
+const github = useGithubProfile();
+const user = useUserProfile();
+const wallet = useFlowAccount();
 
 const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', async () => {
   return await apiGetActiveSeason()
@@ -13,7 +15,7 @@ const { data: seasonData, pending } = useAsyncData<CompetitionSeason>('season', 
     <div :aria-busy="true" />
   </main>
   <main v-else class="container min-h-[calc(100vh-240px)]">
-    <div class="hero" v-if="!profile.auth">
+    <div class="hero" v-if="!github.auth">
       <div class="page-container hero-content flex-col">
         <h4>Start Challenges</h4>
         <p>Login with Github to start the challenge tour</p>

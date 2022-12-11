@@ -203,7 +203,6 @@ interface SeasonRecord {
 interface ProfileData {
   address: string;
   activeRecord?: SeasonRecord;
-  seasonRecords?: { [key: string]: SeasonRecord };
 }
 
 interface Profile {
