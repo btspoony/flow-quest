@@ -118,6 +118,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       return queryResult ?? defaultValue;
     } catch (e) {
       console.error(e);
+      return defaultValue;
     }
   };
 
@@ -232,19 +233,36 @@ export default defineNuxtPlugin((nuxtApp) => {
           seasonId: string,
           key: string
         ): Promise<QuestStatus> {
-          // FIXME: load from blockchain
-          return Promise.resolve({
-            steps: [true, false, false],
-            completed: false,
-          });
+          const result = await executeScript(
+            cadence.scripts.profileGetQuestStatus,
+            (arg, t) => [
+              arg(acct, t.Address),
+              arg(seasonId, t.UInt64),
+              arg([key], t.Array(t.String)),
+            ],
+            undefined
+          );
+          if (!result) {
+            throw new Error("Result undefined");
+          }
+          return result;
         },
-        async isProfileExists(acct: string): Promise<boolean> {
-          // FIXME: load from blockchain
-          return Promise.resolve(false);
+        async isProfileRegistered(
+          acct: string,
+          seasonId: string
+        ): Promise<boolean> {
+          return await executeScript(
+            cadence.scripts.profileIsRegistered,
+            (arg, t) => [arg(acct, t.Address), arg(seasonId, t.UInt64)],
+            false
+          );
         },
-        async isProfileRegistered(acct: string): Promise<boolean> {
-          // FIXME: load from blockchain
-          return Promise.resolve(false);
+        async isProfileCreated(acct: string): Promise<boolean> {
+          return await executeScript(
+            cadence.scripts.profileExists,
+            (arg, t) => [arg(acct, t.Address)],
+            false
+          );
         },
         async loadUserProfile(acct: string): Promise<ProfileData> {
           // FIXME: load from blockchain

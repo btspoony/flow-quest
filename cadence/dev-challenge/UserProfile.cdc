@@ -263,6 +263,10 @@ pub contract UserProfile {
             return self.linkedIdentities[platform] ?? panic("Platform not found.")
         }
 
+        pub fun isRegistered(seasonId: UInt64): Bool {
+            return self.seasonScores[seasonId] != nil
+        }
+
         pub fun getSeasonPoints(seasonId: UInt64): UInt64 {
             let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.points

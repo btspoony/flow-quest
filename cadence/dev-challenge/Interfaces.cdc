@@ -44,6 +44,7 @@ pub contract Interfaces {
         pub fun getReferredFrom(seasonId: UInt64): Address?
 
         // readable
+        pub fun isRegistered(seasonId: UInt64): Bool
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64}
         pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool
         pub fun getQuestStatus(seasonId: UInt64, questKey: String): QuestStatus
