@@ -183,7 +183,8 @@ pub contract UserProfile {
                 assert(competitionRef.isActive(), message: "Competition is not active.")
 
                 let questInfo = competitionRef.borrowQuestRef(questKey)
-                self.questScores[questKey] = QuestRecord(Int(questInfo.steps))
+                let questDetail = questInfo.getDetail()
+                self.questScores[questKey] = QuestRecord(Int(questDetail.steps))
                 record = &self.questScores[questKey] as &QuestRecord?
             }
             return record!

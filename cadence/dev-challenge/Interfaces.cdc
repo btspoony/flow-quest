@@ -95,13 +95,40 @@ pub contract Interfaces {
     }
 
     pub struct interface QuestInfoPublic {
-        // How many steps in the quest
+        pub fun getDetail(): QuestDetail
+    }
+
+    pub struct QuestDetail {
         pub let steps: UInt64
+        pub let stepsCfg: String
+        pub let guideMD: String
+
+        init(
+            steps: UInt64,
+            stepsCfg: String,
+            guideMD: String,
+        ) {
+            self.steps = steps
+            self.stepsCfg = stepsCfg
+            self.guideMD = guideMD
+        }
     }
 
     pub struct interface ChallengeInfoPublic {
+        pub fun getDetail(): ChallengeDetail
+    }
+
+    pub struct ChallengeDetail {
         pub let quests: [AnyStruct{BountyEntityIdentifier}]
-        pub var achievement: Helper.EventIdentifier?;
+        pub let achievement: Helper.EventIdentifier?;
+
+        init(
+            quests: [AnyStruct{BountyEntityIdentifier}],
+            achievement: Helper.EventIdentifier?
+        ) {
+            self.quests = quests
+            self.achievement = achievement
+        }
     }
 
     // =================== Competition ====================

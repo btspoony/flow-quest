@@ -142,6 +142,14 @@ pub contract Community {
             )
         }
 
+        pub fun getDetail(): Interfaces.QuestDetail {
+            return Interfaces.QuestDetail(
+                steps: self.steps,
+                stepsCfg: self.stepsCfg.uri(),
+                guideMD: self.guideMD.uri()
+            )
+        }
+
         // update extra data
         access(contract) fun updateExtra(toMerge: {String: String}) {
             for key in toMerge.keys {
@@ -194,6 +202,13 @@ pub contract Community {
                 name: self.title,
                 description: self.description,
                 thumbnail: MetadataViews.HTTPFile(url: "https://nftstorage.link/ipfs/".concat(self.image))
+            )
+        }
+
+        pub fun getDetail(): Interfaces.ChallengeDetail {
+            return Interfaces.ChallengeDetail(
+                quests: self.quests,
+                achievement: self.achievement
             )
         }
 
