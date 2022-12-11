@@ -193,12 +193,11 @@ interface QuestStatus {
 
 interface SeasonRecord {
   seasonId: string;
-  referredFromCode?: string;
   referredFromAddress?: string;
   referralCode?: string;
   points: number;
   questScores: { [key: string]: QuestStatus };
-  bountiesCompleted: { [uid: string]: number };
+  bountiesCompleted: { [uid: string]: string };
 }
 
 interface ProfileData {

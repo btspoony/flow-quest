@@ -42,6 +42,7 @@ pub contract Interfaces {
 
         pub fun getSeasonPoints(seasonId: UInt64): UInt64
         pub fun getReferredFrom(seasonId: UInt64): Address?
+        pub fun getReferralCode(seasonId: UInt64): String?
 
         // readable
         pub fun isRegistered(seasonId: UInt64): Bool

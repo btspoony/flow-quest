@@ -247,6 +247,9 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
           return result;
         },
+        /**
+         * check if profile registered
+         */
         async isProfileRegistered(
           acct: string,
           seasonId: string
@@ -257,6 +260,9 @@ export default defineNuxtPlugin((nuxtApp) => {
             false
           );
         },
+        /**
+         * check if profile created
+         */
         async isProfileCreated(acct: string): Promise<boolean> {
           return await executeScript(
             cadence.scripts.profileExists,
@@ -264,16 +270,26 @@ export default defineNuxtPlugin((nuxtApp) => {
             false
           );
         },
-        async loadUserProfile(acct: string): Promise<ProfileData> {
-          // FIXME: load from blockchain
-          return Promise.resolve({} as ProfileData);
-        },
+        /**
+         * load profile season record
+         */
         async loadProfileSeasonRecord(
           acct: string,
           seasonId: string
         ): Promise<SeasonRecord> {
+          const result = await executeScript(
+            cadence.scripts.profileGetSeasonRecord,
+            (arg, t) => [arg(acct, t.Address), arg(seasonId, t.UInt64)],
+            undefined
+          );
+          if (!result) {
+            throw new Error("Result undefined");
+          }
+          return parseProfileSeasonRecord(result);
+        },
+        async loadUserProfile(acct: string): Promise<ProfileData> {
           // FIXME: load from blockchain
-          return Promise.resolve({} as SeasonRecord);
+          return Promise.resolve({} as ProfileData);
         },
       },
       transactions: {

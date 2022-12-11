@@ -25,7 +25,7 @@ pub contract UserProfile {
     pub event ProfileUpsertIdentity(profile: Address, platform: String, uid: String, name: String, image: String)
 
     pub event ProfileSeasonAddPoints(profile: Address, seasonId: UInt64, points: UInt64)
-    pub event ProfileSeasonNewSeason(profile: Address, seasonId: UInt64, referredFrom: String?)
+    pub event ProfileSeasonNewSeason(profile: Address, seasonId: UInt64, referredFrom: Address?)
     pub event ProfileSeasonBountyCompleted(profile: Address, seasonId: UInt64, bountyId: UInt64)
     pub event QuestRecordUpdateParams(profile: Address, seasonId: UInt64, questKey: String, step: Int, keys: [String], round: UInt64)
     pub event QuestRecordUpdateResult(profile: Address, seasonId: UInt64, questKey: String, step: Int, result: Bool, round: UInt64)
@@ -122,7 +122,6 @@ pub contract UserProfile {
 
     pub struct SeasonRecord {
         pub let seasonId: UInt64
-        pub let referredFromCode: String?
         pub let referredFromAddress: Address?
         pub var referralCode: String?
         pub var points: UInt64
@@ -134,12 +133,11 @@ pub contract UserProfile {
         init(
             seasonId: UInt64,
             cap: Capability<&{Interfaces.CompetitionServicePublic}>,
-            referredFrom: String?
+            referredFrom: Address?
         ) {
             self.seasonId = seasonId
             self.campetitionServiceCap = cap
-            self.referredFromCode = referredFrom
-            self.referredFromAddress = nil // TODO: parse address from code?
+            self.referredFromAddress = referredFrom
             self.referralCode = nil
             self.points = 0
             self.questScores = {}
@@ -231,7 +229,7 @@ pub contract UserProfile {
     pub resource interface ProfilePrivate {
         pub fun registerForNewSeason(
             serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
-            referredFrom: String?
+            referredFrom: Address?
         )
         pub fun upsertIdentity(platform: String, identity: Interfaces.LinkedIdentity)
     }
@@ -277,6 +275,11 @@ pub contract UserProfile {
             return seasonRef.referredFromAddress
         }
 
+        pub fun getReferralCode(seasonId: UInt64): String? {
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            return seasonRef.referralCode
+        }
+
         pub fun getQuestStatus(seasonId: UInt64, questKey: String): Interfaces.QuestStatus {
             let seasonRef = self.borrowSeasonRecordRef(seasonId)
             return seasonRef.getQuestStatus(questKey: questKey)
@@ -301,7 +304,7 @@ pub contract UserProfile {
 
         pub fun registerForNewSeason(
             serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
-            referredFrom: String?
+            referredFrom: Address?
         ) {
             let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
             let competitionRef = serviceRef.borrowLatestActiveSeason()

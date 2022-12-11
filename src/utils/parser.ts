@@ -1,3 +1,14 @@
+export function parseProfileSeasonRecord(record: any): SeasonRecord {
+  return {
+    seasonId: record.seasonId,
+    points: parseInt(record.points),
+    referredFromAddress: record.referredFromAddress,
+    referralCode: record.referralCode,
+    bountiesCompleted: record.bountiesCompleted,
+    questScores: record.questScores,
+  };
+}
+
 export function parseBountyInfo(info: any): BountyInfo {
   return {
     id: info.id,
