@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const profile = useGithubProfile();
+const wallet = useFlowAccount();
+
 const loading = ref(false);
 
 watchEffect(async () => {
@@ -37,11 +39,14 @@ watchEffect(async () => {
 <template>
   <div>
     <AuthGithubButton v-show="!profile.auth" />
-    <div v-if="profile.auth" class="inline-flex-between">
-      <span v-if="!profile.data || loading" :aria-busy="loading">
+    <div v-if="profile.auth" class="inline-flex-between !gap-3">
+      <span v-if="!profile.data" :aria-busy="loading">
         Loading
       </span>
-      <WidgetProfileHead v-else />
+      <template v-else>
+        <FlowConnectButton v-if="!wallet?.loggedIn" />
+        <WidgetProfileHead />
+      </template>
     </div>
   </div>
 </template>

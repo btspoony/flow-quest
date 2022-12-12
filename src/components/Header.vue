@@ -46,7 +46,7 @@ function isCurrentInActivePage(pageKey: string): boolean {
           <WidgetThemeToggle />
         </li>
         <li>
-          <AuthGithub />
+          <AuthHeader />
         </li>
       </ul>
     </nav>

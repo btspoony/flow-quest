@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { StorageSerializers, RemovableRef, useLocalStorage } from '@vueuse/core';
-import { ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/solid'
+import { StorageSerializers, useLocalStorage } from '@vueuse/core';
+import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/solid'
 
 const details = ref<HTMLDetailsElement | null>(null);
 const profile = useGithubProfile();
+const wallet = useFlowAccount();
 
 function closeDropdown() {
   details.value?.removeAttribute("open")
 }
 
 function onLogout() {
+  const { $fcl } = useNuxtApp();
+  $fcl.unauthenticate();
+
   closeDropdown()
   const storageToken = useLocalStorage<GithubToken>('github-token', null, {
     mergeDefaults: true,
@@ -23,16 +27,19 @@ function onLogout() {
 
 <template>
   <details ref="details" v-if="profile.data" role="list" dir="rtl">
-    <summary aria-haspopup="listbox" role="link" class="after:!h-10">
+    <summary aria-haspopup="listbox" role="link" class="inline-flex-between after:!h-10">
       <div class="w-10 h-10">
         <img class="rounded-full" :src="profile.data?.avatarUrl" alt="AvatarUrl" />
       </div>
+      <div class="flex flex-col items-start text-[var(--h3-color)]">
+        <span class="font-semibold">{{ profile.data.userName }}</span>
+        <span class="text-xs">{{ wallet?.loggedIn && wallet?.addr ? getShortAddress(wallet?.addr) : "No wallet" }} </span>
+      </div>
     </summary>
     <ul role="listbox">
-      <li>
-        <NuxtLink to="/account/profile" @click="closeDropdown()">
-          <div class="flex gap-4 items-center justify-between">
-            <ChevronRightIcon class="fill-current w-5 h-5" />
+      <li v-if="wallet?.loggedIn">
+        <NuxtLink :to="`/account/${wallet.addr}`" @click="closeDropdown()">
+          <div class="flex gap-4 items-center justify-end">
             <span>Profile</span>
             <UserCircleIcon class="fill-secondary w-5 h-5" />
           </div>

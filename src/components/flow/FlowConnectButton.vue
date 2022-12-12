@@ -9,6 +9,8 @@ onMounted(() => {
     current.value = user;
     if (user) {
       console.log(`Flow User loggedIn: ${user.addr}`);
+      const accountProof = user.services?.find(one => one.type === "account-proof")
+      console.log(`Proof: ${JSON.stringify(accountProof?.data)}`)
     }
   });
 });

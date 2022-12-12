@@ -9,3 +9,11 @@ export function getIPFSUrl(ipfsHash: string) {
     return `https://nftstorage.link/ipfs/${ipfsHash}`;
   }
 }
+
+export function getShortAddress(address: string) {
+  return (
+    address.substring(0, 5) +
+    "..." +
+    address.substring(address.length - 3, address.length)
+  );
+}
