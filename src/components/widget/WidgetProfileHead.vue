@@ -5,6 +5,7 @@ import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/sol
 const details = ref<HTMLDetailsElement | null>(null);
 const profile = useGithubProfile();
 const wallet = useFlowAccount();
+const user = useUserProfile();
 
 function closeDropdown() {
   details.value?.removeAttribute("open")
@@ -31,9 +32,19 @@ function onLogout() {
       <div class="w-10 h-10">
         <img class="rounded-full" :src="profile.data?.avatarUrl" alt="AvatarUrl" />
       </div>
-      <div class="flex flex-col items-start text-[var(--h3-color)]">
-        <span class="font-semibold">{{ profile.data.userName }}</span>
-        <span class="text-xs">{{ wallet?.loggedIn && wallet?.addr ? getShortAddress(wallet?.addr) : "No wallet" }} </span>
+      <div class="flex items-center gap-2">
+        <div class="flex flex-col items-start text-[var(--h3-color)]">
+          <span class="font-semibold">{{ profile.data.userName }}</span>
+          <span class="text-xs">{{ wallet?.loggedIn && wallet?.addr ? getShortAddress(wallet?.addr) : "No wallet" }} </span>
+        </div>
+        <div v-if="wallet?.addr" class="tag secondary">
+          <template v-if="user?.activeRecord">
+            Points: {{ user?.activeRecord?.points ?? 0 }}
+          </template>
+          <template v-else>
+            Need Register
+          </template>
+        </div>
       </div>
     </summary>
     <ul role="listbox">

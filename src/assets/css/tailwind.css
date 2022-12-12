@@ -84,11 +84,15 @@
   }
 
   .tag {
-    @apply rounded-full px-3 py-1 text-xs;
+    @apply rounded-full px-3 py-1 text-xs h-6;
     @apply bg-opacity-70 bg-gray-300 dark:bg-gray-700;
 
     &.primary {
       @apply text-white bg-primary dark:bg-primary;
+    }
+
+    &.secondary {
+      @apply text-white bg-secondary dark:bg-secondary;
     }
 
     &.success {

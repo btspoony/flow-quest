@@ -37,8 +37,8 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail'
   // load user profile
   const profile = useUserProfile()
   let status: QuestStatus | undefined = undefined
-  if (profile.value?.profile) {
-    const address = profile.value?.profile?.address
+  if (profile.value) {
+    const address = profile.value?.address
     status = await $scripts.getQuestStatus(address, season.seasonId, questKey)
   }
   return { season, quest, status, guideMD: (guideMD as string ?? ""), stepsCfg }

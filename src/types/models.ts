@@ -205,10 +205,6 @@ interface ProfileData {
   activeRecord?: SeasonRecord;
 }
 
-interface Profile {
-  profile?: ProfileData;
-}
-
 interface GithubToken {
   tokenType: string;
   scope: string;
