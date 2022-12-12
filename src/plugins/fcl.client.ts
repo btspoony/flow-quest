@@ -275,21 +275,27 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async loadProfileSeasonRecord(
           acct: string,
-          seasonId: string
-        ): Promise<SeasonRecord> {
+          seasonId: string | null = null
+        ): Promise<SeasonRecord | undefined> {
           const result = await executeScript(
             cadence.scripts.profileGetSeasonRecord,
-            (arg, t) => [arg(acct, t.Address), arg(seasonId, t.UInt64)],
+            (arg, t) => [
+              arg(acct, t.Address),
+              arg(seasonId, t.Optional(t.UInt64)),
+            ],
             undefined
           );
-          if (!result) {
-            throw new Error("Result undefined");
-          }
+          if (!result) return result;
           return parseProfileSeasonRecord(result);
         },
+        /**
+         * load user profile
+         */
         async loadUserProfile(acct: string): Promise<ProfileData> {
-          // FIXME: load from blockchain
-          return Promise.resolve({} as ProfileData);
+          return {
+            address: acct,
+            activeRecord: await this.loadProfileSeasonRecord(acct),
+          };
         },
       },
       transactions: {

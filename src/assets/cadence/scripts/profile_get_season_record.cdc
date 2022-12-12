@@ -8,21 +8,28 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 
 pub fun main(
   acct: Address,
-  seasonId: UInt64,
+  seasonId: UInt64?,
 ): SeasonRecord {
   let profile = UserProfile.borrowUserProfilePublic(acct)
-  let questKeys = profile.getQuestsParticipanted(seasonId: seasonId)
+
+  var ensureSeasonId = seasonId
+  if ensureSeasonId == nil {
+    ensureSeasonId = CompetitionService.borrowServicePublic().getActiveSeasonID()
+  }
+  let profileSeasonId = ensureSeasonId ?? panic("No seasson id")
+
+  let questKeys = profile.getQuestsParticipanted(seasonId: profileSeasonId)
   let questScores: {String: Interfaces.QuestStatus} = {}
   for key in questKeys {
-    questScores[key] = profile.getQuestStatus(seasonId: seasonId, questKey: key)
+    questScores[key] = profile.getQuestStatus(seasonId: profileSeasonId, questKey: key)
   }
   return SeasonRecord(
-    seasonId: seasonId,
-    referredFromAddress: profile.getReferredFrom(seasonId: seasonId),
-    referralCode: profile.getReferralCode(seasonId: seasonId),
-    points: profile.getSeasonPoints(seasonId: seasonId),
+    seasonId: profileSeasonId,
+    referredFromAddress: profile.getReferredFrom(seasonId: profileSeasonId),
+    referralCode: profile.getReferralCode(seasonId: profileSeasonId),
+    points: profile.getSeasonPoints(seasonId: profileSeasonId),
     questScores: questScores,
-    bountiesCompleted: profile.getBountiesCompleted(seasonId: seasonId)
+    bountiesCompleted: profile.getBountiesCompleted(seasonId: profileSeasonId)
   )
 }
 

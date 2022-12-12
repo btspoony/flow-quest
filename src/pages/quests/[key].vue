@@ -82,7 +82,7 @@ async function completeBounty() {
   <main v-if="pending || !questCfg" class="min-h-[80vh] flex-center">
     <div :aria-busy="true" />
   </main>
-  <main v-else class="container">
+  <FrameGithubAuth v-else>
     <div class="w-full flex flex-wrap lg:flex-nowrap gap-8 justify-between">
       <div class="pt-10 flex-none w-full lg:w-5/12 flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
@@ -121,6 +121,6 @@ async function completeBounty() {
         <div v-if="info?.guideMD" class="prose-sm prose-blockquote:py-0 prose-img:my-0"
           v-html="mdRenderer.render(info?.guideMD)" />
       </article>
-      </div>
-  </main>
+    </div>
+  </FrameGithubAuth>
 </template>

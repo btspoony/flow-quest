@@ -41,3 +41,20 @@ export async function apiGetCurrentQuest(
   }
   return quest;
 }
+
+export async function apiGetCurrentUser(): Promise<ProfileData | null> {
+  const current = useUserProfile();
+  let user: ProfileData;
+  if (current.value) {
+    user = current.value;
+  } else {
+    const wallet = useFlowAccount();
+    if (!wallet.value?.loggedIn) {
+      return null;
+    }
+    const address = wallet.value.addr!;
+    const { $scripts } = useNuxtApp();
+    user = await $scripts.loadUserProfile(address);
+  }
+  return user;
+}

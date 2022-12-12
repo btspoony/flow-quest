@@ -49,7 +49,7 @@ const progress = ref(0); // FIXME: load from blockchain
   <main v-if="pending" class="min-h-[80vh] flex-center">
     <div :aria-busy="true" />
   </main>
-  <main v-else class="relative">
+  <FrameGithubAuth v-else>
     <div class="w-full h-36 relative overflow-hidden -z-10">
       <div class="absolute -inset-5 blur-lg bg-cover bg-center"
         :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
@@ -91,7 +91,7 @@ const progress = ref(0); // FIXME: load from blockchain
         </div>
       </div>
     </section>
-  </main>
+  </FrameGithubAuth>
 </template>
 
 <style scoped>

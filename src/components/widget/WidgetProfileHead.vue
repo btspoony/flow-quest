@@ -7,6 +7,14 @@ const profile = useGithubProfile();
 const wallet = useFlowAccount();
 const user = useUserProfile();
 
+watchEffect(async () => {
+  if (wallet.value?.loggedIn) {
+    user.value = await apiGetCurrentUser()
+  } else {
+    user.value = null
+  }
+})
+
 function closeDropdown() {
   details.value?.removeAttribute("open")
 }
