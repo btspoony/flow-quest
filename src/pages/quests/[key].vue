@@ -37,9 +37,17 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail'
   // load user profile
   const profile = useUserProfile()
   let status: QuestStatus | undefined = undefined
-  if (profile.value) {
-    const address = profile.value?.address
-    status = await $scripts.getQuestStatus(address, season.seasonId, questKey)
+  if (profile.value && profile.value.activeRecord) {
+    status = profile.value.activeRecord.questScores[questKey]
+  } else {
+    const wallet = useFlowAccount()
+    const address = wallet.value?.addr
+    if (address) {
+      const isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
+      if (isRegistered) {
+        status = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey)
+      }
+    }
   }
   return { season, quest, status, guideMD: (guideMD as string ?? ""), stepsCfg }
 }, {

@@ -7,8 +7,8 @@ const profile = useGithubProfile();
 const wallet = useFlowAccount();
 const user = useUserProfile();
 
-watchEffect(async () => {
-  if (wallet.value?.loggedIn) {
+watch(wallet, async (newVal, oldVal) => {
+  if (newVal?.loggedIn) {
     user.value = await apiGetCurrentUser()
   } else {
     user.value = null

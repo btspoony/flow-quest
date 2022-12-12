@@ -228,7 +228,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         /**
          * get quest status
          */
-        async getQuestStatus(
+        async profileGetQuestStatus(
           acct: string,
           seasonId: string,
           key: string
@@ -238,7 +238,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             (arg, t) => [
               arg(acct, t.Address),
               arg(seasonId, t.UInt64),
-              arg([key], t.Array(t.String)),
+              arg(key, t.String),
             ],
             undefined
           );
