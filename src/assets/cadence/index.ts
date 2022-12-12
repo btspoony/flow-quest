@@ -14,6 +14,7 @@ import profileExists from "./scripts/profile_exists.cdc?raw";
 import profileGetQuestStatus from "./scripts/profile_get_quest_status.cdc?raw";
 import profileIsRegistered from "./scripts/profile_is_registered.cdc?raw";
 import profileGetSeasonRecord from "./scripts/profile_get_season_record.cdc?raw";
+import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?raw";
 
 export default {
   transactions: {
@@ -26,7 +27,8 @@ export default {
     getBountiesDetail,
     profileExists,
     profileIsRegistered,
-    profileGetQuestStatus,
     profileGetSeasonRecord,
+    profileGetQuestStatus,
+    profileIsBountyCompleted,
   },
 };

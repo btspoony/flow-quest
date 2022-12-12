@@ -248,6 +248,24 @@ export default defineNuxtPlugin((nuxtApp) => {
           return result;
         },
         /**
+         * get bounty completed
+         */
+        async profileIsBountyCompleted(
+          acct: string,
+          seasonId: string,
+          bountyId: string
+        ): Promise<boolean> {
+          return await executeScript(
+            cadence.scripts.profileGetQuestStatus,
+            (arg, t) => [
+              arg(acct, t.Address),
+              arg(seasonId, t.UInt64),
+              arg(bountyId, t.UInt64),
+            ],
+            false
+          );
+        },
+        /**
          * check if profile registered
          */
         async isProfileRegistered(

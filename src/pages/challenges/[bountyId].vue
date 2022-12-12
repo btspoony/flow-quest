@@ -1,19 +1,21 @@
 <script setup lang="ts">
 const route = useRoute()
 
-watch(route, (newVal) => {
-  refresh();
-});
-
 interface ChallengeDetail {
   season: CompetitionSeason,
   challenge: BountyInfo,
   quests: BountyInfo[]
 }
 
-const { data: info, pending, refresh } = useAsyncData<ChallengeDetail>('challengeBounty', async () => {
+const bountyId = computed(() => route.params.bountyId as string)
+
+watch(bountyId, (newVal) => {
+  refresh();
+});
+
+const { data: info, pending, refresh } = useAsyncData<ChallengeDetail>(`challenge:${bountyId.value}`, async () => {
   const season = await apiGetActiveSeason();
-  const challenge = await apiGetCurrentChallenge(route.params.bountyId as string);
+  const challenge = await apiGetCurrentChallenge(bountyId.value);
 
   const { $scripts } = useNuxtApp();
   const quests: BountyInfo[] = await $scripts.getQuestsDetail(season.seasonId, (challenge.config as ChallengeConfig).quests)

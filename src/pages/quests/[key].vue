@@ -4,25 +4,25 @@ import { LockClosedIcon } from '@heroicons/vue/24/solid';
 
 const mdRenderer = md()
 const route = useRoute()
-
-watch(route, (newVal) => {
-  refresh();
-});
+const user = useUserProfile()
+const wallet = useFlowAccount()
 
 interface QuestDetail {
   season: CompetitionSeason,
   quest: BountyInfo,
-  status?: QuestStatus,
   guideMD: string,
-  stepsCfg: QuestStepsConfig[]
+  stepsCfg: QuestStepsConfig[],
 }
 
-const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail', async () => {
-  const { $scripts } = useNuxtApp();
+const questKey = computed(() => route.params.key as string)
 
+watch(questKey, (newVal) => {
+  refresh();
+});
+
+const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${questKey.value}`, async () => {
   const season = await apiGetActiveSeason();
-  const questKey = route.params.key as string;
-  const quest: BountyInfo = await apiGetCurrentQuest(questKey)
+  const quest: BountyInfo = await apiGetCurrentQuest(questKey.value)
   // load quest config
   const [guideMD, stepsCfgStr] = await Promise.all([
     $fetch((quest.config as QuestConfig).guideMD),
@@ -34,25 +34,50 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>('questDetail'
   } catch (e) {
     console.log('Failed to parse', e)
   }
-  // load user profile
-  const profile = useUserProfile()
-  let status: QuestStatus | undefined = undefined
-  if (profile.value && profile.value.activeRecord) {
-    status = profile.value.activeRecord.questScores[questKey]
-  } else {
-    const wallet = useFlowAccount()
-    const address = wallet.value?.addr
-    if (address) {
-      const isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
-      if (isRegistered) {
-        status = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey)
-      }
-    }
+  return {
+    season,
+    quest,
+    guideMD: (guideMD as string ?? ""),
+    stepsCfg
   }
-  return { season, quest, status, guideMD: (guideMD as string ?? ""), stepsCfg }
 }, {
   server: false
 });
+
+const bountyId = computed(() => info.value?.quest.id)
+
+const { data: isRegistered } = useAsyncData<boolean>('IsUserRegistered', async () => {
+  const { $scripts } = useNuxtApp();
+  const season = await apiGetActiveSeason();
+
+  // load user profile
+  let isRegistered: boolean
+  if (user.value && user.value.activeRecord) {
+    isRegistered = true
+  } else {
+    const address = wallet.value?.addr
+    if (address) {
+      isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
+    } else {
+      isRegistered = false
+    }
+  }
+  return isRegistered
+}, {
+  server: false
+})
+
+const profileStatus = ref<QuestStatus | null>(null)
+const isBountyCompleted = ref(false)
+
+watchEffect(async () => {
+  if (user.value && user.value.activeRecord && bountyId.value) {
+    profileStatus.value = user.value.activeRecord.questScores[questKey.value]
+    isBountyCompleted.value = user.value.activeRecord.bountiesCompleted[bountyId.value] !== undefined
+  } else {
+    await updateQuest()
+  }
+})
 
 const questCfg = computed(() => (info.value?.quest.config as QuestConfig));
 const imageUrl = computed(() => {
@@ -62,9 +87,6 @@ const imageUrl = computed(() => {
     return undefined
   }
 })
-function isStepCompleted(index: number) {
-  return info.value?.status?.steps[index] ?? false
-}
 
 const isInvalid = computed(() => {
   // FIXME
@@ -76,13 +98,22 @@ function isLocked(index: number) {
   return false
 }
 
-const isBountyCompleted = computed(() => {
-  // FIXME
-  return false
-})
+function isStepCompleted(index: number) {
+  return profileStatus.value?.steps[index] ?? false
+}
+
+async function updateQuest() {
+  const { $scripts } = useNuxtApp();
+  const address = wallet.value?.addr
+  if (address && isRegistered.value) {
+    const season = await apiGetActiveSeason();
+    profileStatus.value = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey.value)
+    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value!)
+  }
+}
 
 async function completeBounty() {
-  // TODO
+  // FIXME
 }
 </script>
 
@@ -109,10 +140,12 @@ async function completeBounty() {
             :is-completed="isStepCompleted(i)" :is-locked="isLocked(i)" />
         </div>
         <div class="flex flex-col py-2">
-          <button class="rounded-xl" @click="completeBounty()" :disabled="(isInvalid||isBountyCompleted)">
-            <span v-if="isBountyCompleted">Completed</span>
-            <LockClosedIcon v-if="(isInvalid||isBountyCompleted)" class="fill-current w-6 h-6" />
-            <span v-else>Complete</span>
+          <button class="rounded-xl" @click="completeBounty()" :disabled="(isInvalid || isBountyCompleted)">
+            <div class="inline-flex-between">
+              <span v-if="isBountyCompleted">Completed</span>
+              <LockClosedIcon v-if="(isInvalid || isBountyCompleted)" class="fill-current w-6 h-6" />
+              <span v-else>Complete</span>
+            </div>
           </button>
           <div role="separator" class="divider my-2" />
           <div class="flex-between">
