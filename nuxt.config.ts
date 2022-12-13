@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     oauthGithubClientSecret: "",
     // Keys within public, will be also exposed to the client-side
     public: {
+      appName: "Flow Quest Hacker",
       network: "",
       accessApi: "",
       walletDiscovery: "",

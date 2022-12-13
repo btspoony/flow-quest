@@ -2,14 +2,15 @@
 const route = useRoute();
 const locale = useLocale();
 const isDark = useSharedDark();
+const config = useRuntimeConfig();
 
 useHead({
-  titleTemplate: "%s - Flow Developer Challenges",
+  titleTemplate: `%s - ${config.public.appName}`,
 });
 
 // ----- Data -----
 const description = ref(
-  "A Flow developer competition platform."
+  "A Flow on-chain competition platform."
 );
 </script>
 

@@ -68,13 +68,12 @@ function resetComp() {
       </span>
       <CheckCircleIcon v-else class="fill-success w-8 h-8" />
     </div>
-    <div :class="['flex-auto text-lg', isCompleted ? 'line-through' : 'font-semibold']">
+    <div :class="['flex-auto', isCompleted ? 'line-through' : 'font-semibold']">
       {{ stepCfg?.title ?? "" }}
     </div>
     <div class="flex-none min-w-[160px]">
       <template v-if="(!isLocked || isCompleted)">
-        <FlowConnectButton v-if="!wallet?.loggedIn" />
-        <button v-else-if="!isCompleted" class="mb-0 rounded-full" data-target="modal-dialog"
+        <button v-if="!isCompleted" class="mb-0 rounded-full" data-target="modal-dialog"
           @click.prevent="onOpenDialogue">
           <span class="font-semibold">Verify</span>
         </button>

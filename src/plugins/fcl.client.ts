@@ -6,7 +6,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
 
   const isMainnet = config.public.network === "mainnet";
-  const appName = "Flow Challenge Tour";
 
   // initialize fcl
   fcl
@@ -15,7 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("accessNode.api", config.public.accessApi)
     .put("discovery.wallet", config.public.walletDiscovery)
     .put("sdk.transport", grpcSend)
-    .put("app.detail.title", appName)
+    .put("app.detail.title", config.public.appName)
     .put(
       "app.detail.icon",
       window.location.origin + config.app.baseURL + "apple-touch-icon.png"
@@ -124,7 +123,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      appName: () => appName,
+      appName: () => config.public.appName,
       fcl,
       scripts: {
         /**

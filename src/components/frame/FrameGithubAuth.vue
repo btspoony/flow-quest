@@ -3,6 +3,7 @@ const github = useGithubProfile();
 </script>
 
 <template>
+  <slot name="header" />
   <main class="relative container min-h-[calc(100vh-240px)]">
     <div class="hero" v-if="!github.auth">
       <div class="page-container hero-content flex-col">

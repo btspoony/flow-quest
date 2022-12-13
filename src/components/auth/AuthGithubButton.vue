@@ -66,8 +66,10 @@ function login() {
 </script>
 
 <template>
-  <button :aria-busy="loading" class="rounded-full inline-flex-between max-w-[10rem]" @click="login">
-    <GithubIcon class="fill-current w-5 h-5" />
-    <span>Authenticate</span>
+  <button :aria-busy="loading" class="flex-center rounded-full max-w-[10rem]" @click="login">
+    <div class="inline-flex-around">
+      <GithubIcon class="fill-current w-5 h-5" />
+      <span>Participate</span>
+    </div>
   </button>
 </template>

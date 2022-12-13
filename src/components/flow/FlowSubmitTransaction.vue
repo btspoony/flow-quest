@@ -6,9 +6,15 @@ const props = withDefaults(
   defineProps<{
     method: () => Promise<string | null>;
     content?: string;
+    action?: string;
+    hideButton?: boolean
+    hideTrx?: boolean
   }>(),
   {
     content: "Submit",
+    action: '',
+    hideButton: false,
+    hideTrx: false,
   }
 );
 
@@ -17,11 +23,6 @@ const emit = defineEmits<{
   (e: 'success'): void;
   (e: "error", message: string): void;
 }>();
-
-// expose members
-defineExpose({
-  resetComponent: ref(resetComponent),
-});
 
 const txid = ref<string | null>(null);
 const isLoading = ref(false);
@@ -37,6 +38,7 @@ async function startTransaction() {
   try {
     txid.value = await props.method();
   } catch (err: any) {
+    isSealed.value = true;
     console.error(err);
     const msg = String(err.reason ?? err.message ?? "rejected");
     errorMessage.value = msg.length > 60 ? msg.slice(0, 60) + "..." : msg;
@@ -64,22 +66,36 @@ function resetComponent() {
   isSealed.value = false;
 }
 
+// expose members
+defineExpose({
+  resetComponent: ref(resetComponent),
+  startTransaction: ref(startTransaction),
+  isLoading,
+  isSealed
+});
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
-    <button v-if="!txid" class="rounded-xl" role="button" :aria-busy="isLoading" :disabled="isLoading" aria-disabled="true"
+    <button v-if="!hideButton && !txid" class="rounded-xl flex-center" role="button" :aria-busy="isLoading"
+      :disabled="isLoading" aria-disabled="true"
       @click="startTransaction">
       <slot>
         {{ content }}
       </slot>
     </button>
-    <FlowWaitTransaction v-else :txid="txid" @sealed="onSealed" @error="onError" />
-    <p v-if="errorMessage" class="px-4 mb-0 text-xs text-error w-full">
-      {{ errorMessage }}
-    </p>
-    <slot v-if="isSealed" name="next">
-      <button class="rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
-    </slot>
+    <template v-if="!hideTrx && txid">
+      <FlowWaitTransaction :txid="txid" @sealed="onSealed" @error="onError">
+        <template v-if="action != ''">
+          <h5 class="mb-0">{{ action }}</h5>
+        </template>
+      </FlowWaitTransaction>
+      <p v-if="errorMessage" class="px-4 mb-0 text-xs text-error w-full">
+        {{ errorMessage }}
+      </p>
+      <slot v-if="isSealed" name="next">
+        <button class="rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
+      </slot>
+    </template>
   </div>
 </template>

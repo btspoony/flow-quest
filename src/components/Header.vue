@@ -5,6 +5,9 @@ import { FireIcon, Squares2X2Icon, ChartBarSquareIcon } from "@heroicons/vue/24/
 const router = useRouter()
 const route = useRoute()
 
+const config = useRuntimeConfig();
+const appName = ref(config.public.appName)
+
 function isCurrentInActivePage(pageKey: string): boolean {
   return !route.path.startsWith(`/${pageKey}`)
 }
@@ -18,7 +21,7 @@ function isCurrentInActivePage(pageKey: string): boolean {
           router.push('/');
         }">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span class="font-semibold text-2xl">Flow Dev Explorer</span>
+          <span class="font-semibold text-2xl">{{ appName }}</span>
         </li>
       </ul>
       <ul>

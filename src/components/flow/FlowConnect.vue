@@ -1,27 +1,56 @@
 <script setup lang="ts">
-import { ArrowRightOnRectangleIcon } from "@heroicons/vue/24/solid";
+import type FlowSubmitTransaction from './FlowSubmitTransaction.vue';
 
-const current = useFlowAccount();
+withDefaults(defineProps<{
+  hideTrx?: boolean
+}>(), {
+  hideTrx: false
+})
 
-function logout() {
-  const { $fcl } = useNuxtApp();
-  $fcl.unauthenticate();
+const emit = defineEmits<{
+  (e: 'connected', address: string): void;
+  (e: "registered"): void;
+}>();
+
+const user = useUserProfile()
+const wallet = useFlowAccount()
+
+const submitTx = ref<InstanceType<typeof FlowSubmitTransaction> | null>(null);
+
+watch(user, ensureProfileRegistered, {
+  flush: 'post'
+})
+
+onMounted(() => {
+  ensureProfileRegistered(user.value, null)
+})
+
+function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
+  if (newVal && !newVal.activeRecord) {
+    if (!submitTx.value?.isLoading && !submitTx.value?.isSealed) {
+      submitTx.value?.startTransaction()
+    }
+  }
+}
+
+async function sendProfileRegister(): Promise<string> {
+  const { $transactions } = useNuxtApp()
+  // FIXME: referredFrom
+  return $transactions.registerForNewSeason()
+}
+
+function onConnected(addr: string) {
+  emit('connected', addr)
+}
+
+async function onProfileRegistered() {
+  await reloadCurrentUser()
+  emit('registered')
 }
 </script>
 
 <template>
-  <div>
-    <div v-if="current?.loggedIn" class="inline-flex-between">
-      <span class="flex-auto h-4 leading-4 pl-4 pr-1 font-medium">
-        {{ current?.addr ?? "No Address" }}
-      </span>
-      <button class="rounded-full inline-flex-between" @click="logout">
-        <small>
-          Logout
-        </small>
-        <ArrowRightOnRectangleIcon class="fill-current h-5 w-5" />
-      </button>
-    </div>
-    <FlowConnectButton v-else />
-  </div>
+  <FlowConnectButton v-if="!wallet?.loggedIn" @connected="onConnected" />
+  <FlowSubmitTransaction ref="submitTx" v-if="wallet?.loggedIn && !user?.activeRecord" action="Registering Profile"
+    :method="sendProfileRegister" :hide-button="true" :hide-trx="hideTrx" @success="onProfileRegistered" />
 </template>

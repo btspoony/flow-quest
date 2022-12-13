@@ -81,6 +81,8 @@ watchEffect(async () => {
   } else if (isRegistered.value) {
     await updateQuest()
   }
+}, {
+  flush: 'post'
 })
 
 const questCfg = computed(() => (info.value?.quest.config as QuestConfig));
@@ -153,7 +155,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
         <!-- Quest Prepare -->
         <div class="flex flex-col gap-2">
-          <BtnRegister v-if="wallet?.loggedIn && !isRegistered" @registered="userRefresh" />
+          <FlowConnect v-if="!wallet?.loggedIn || !isRegistered" @registered="userRefresh" />
         </div>
         <!-- Quest steps -->
         <div class="flex flex-col gap-2">
@@ -161,7 +163,7 @@ async function completeBounty(): Promise<string | null> {
             :is-completed="isStepCompleted(i - 1)" :is-locked="isLocked(i - 1)" @success="updateQuest" />
         </div>
         <div class="flex flex-col py-2">
-          <button v-if="(isInvalid || isBountyCompleted)" class="rounded-xl" disabled>
+          <button v-if="(isInvalid || isBountyCompleted)" class="rounded-xl flex-center" disabled>
             <div class="inline-flex-between">
               <span v-if="isBountyCompleted">Completed</span>
               <LockClosedIcon class="fill-current w-6 h-6" />

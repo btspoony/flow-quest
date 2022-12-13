@@ -44,7 +44,7 @@ watchEffect(async () => {
         Loading
       </span>
       <template v-else>
-        <FlowConnectButton v-if="!wallet?.loggedIn" />
+        <FlowConnect v-if="!wallet?.loggedIn" :hide-trx="true" />
         <WidgetProfileHead />
       </template>
     </div>

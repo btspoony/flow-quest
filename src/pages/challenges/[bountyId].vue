@@ -74,11 +74,13 @@ watchEffect(() => {
     <div :aria-busy="true" />
   </main>
   <FrameGithubAuth v-else>
-    <div class="w-full h-36 relative overflow-hidden -z-10">
-      <div class="absolute -inset-5 blur-lg bg-cover bg-center"
-        :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
-      <div class="absolute inset-0 bg-black/50" />
-    </div>
+    <template v-slot:header>
+      <div class="w-full h-36 relative overflow-hidden -z-10">
+        <div class="absolute -inset-5 blur-lg bg-cover bg-center"
+          :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
+        <div class="absolute inset-0 bg-black/50" />
+      </div>
+    </template>
     <div class="h-14" />
     <section class="container max-w-2xl px-4">
       <div class=" -mt-36 mb-4 flex gap-4 items-center flex-col sm:flex-row justify-between sm:justify-center">

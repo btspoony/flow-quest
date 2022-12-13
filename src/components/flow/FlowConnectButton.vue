@@ -3,6 +3,11 @@ import { UserIcon } from "@heroicons/vue/24/solid";
 
 const current = useFlowAccount();
 
+const emit = defineEmits<{
+  (e: 'connected', address: string): void;
+  (e: 'disconnected'): void;
+}>();
+
 onMounted(() => {
   const { $fcl } = useNuxtApp();
   $fcl.currentUser.subscribe((user) => {
@@ -11,6 +16,9 @@ onMounted(() => {
       console.log(`Flow User loggedIn: ${user.addr}`);
       const accountProof = user.services?.find(one => one.type === "account-proof")
       console.log(`Proof: ${JSON.stringify(accountProof?.data)}`)
+      emit('connected', user.addr!)
+    } else {
+      emit('disconnected')
     }
   });
 });
@@ -22,8 +30,10 @@ function login() {
 </script>
 
 <template>
-  <button class="inline-flex-between rounded-full mb-0" @click="login">
-    <UserIcon class="fill-current h-5 w-5" />
-    <small>Connect Wallet</small>
+  <button class="flex-center rounded-full mb-0" @click="login">
+    <div class="inline-flex-around">
+      <UserIcon class="fill-current h-5 w-5" />
+      <small>Connect Wallet</small>
+    </div>
   </button>
 </template>
