@@ -4,7 +4,7 @@ import type { TransactionReceipt } from "@onflow/fcl";
 
 const props = withDefaults(
   defineProps<{
-    method: () => Promise<string>;
+    method: () => Promise<string | null>;
     content?: string;
   }>(),
   {
@@ -64,7 +64,7 @@ function resetComponent() {
 
 <template>
   <div class="flex flex-col gap-2">
-    <button v-if="!txid" :class="['rounded-xl']" role="button" :aria-busy="isLoading" aria-disabled="true"
+    <button v-if="!txid" class="rounded-xl" role="button" :aria-busy="isLoading" :disabled="isLoading" aria-disabled="true"
       @click="startTransaction">
       <slot>
         {{ content }}

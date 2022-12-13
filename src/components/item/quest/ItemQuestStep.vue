@@ -24,7 +24,7 @@ function onOpenDialogue() {
   dialog.value?.openModal()
 }
 
-async function onSubmitAnswer() {
+async function onSubmitAnswer(): Promise<string | null> {
   submitLoading.value = true
   const result = await apiPostVerifyQuest(
     props.quest.config,
@@ -33,7 +33,23 @@ async function onSubmitAnswer() {
       return { key: param.key, value: answers[index] }
     })
   )
-  console.log(result)
+  if (result) {
+    if (result.transactionId) {
+      return result.transactionId
+    }
+    if (!result.isAccountValid) {
+      throw new Error("Account verification invalid")
+    }
+    if (!result.isQuestValid) {
+      throw new Error("Quest verification invalid")
+    }
+  } else {
+    throw new Error("Failed to requeset")
+  }
+  return null
+}
+
+function resetComp() {
   submitLoading.value = false
 }
 
@@ -71,8 +87,9 @@ async function onSubmitAnswer() {
       </div>
     </div>
     <footer class="mt-4">
-      <button class="rounded-xl mb-0" :aria-busy="submitLoading" :disabled="submitLoading"
-        @click="onSubmitAnswer()">Submit</button>
+      <FlowSubmitTransaction :method="onSubmitAnswer" @sealed="resetComp()" @error="resetComp()">
+        Submit
+      </FlowSubmitTransaction>
     </footer>
   </WidgetDialog>
 </template>
