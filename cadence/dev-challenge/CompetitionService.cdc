@@ -111,11 +111,11 @@ pub contract CompetitionService {
         pub fun getRequiredQuestKeys(): [String] {
             let ret: [String] = []
             if self.identifier.category == Interfaces.BountyType.quest {
-                ret.append(self.identifier.toString())
+                ret.append(self.identifier.key)
             } else {
                 let challenge = self.identifier.getChallengeConfig()
                 for one in challenge.quests {
-                    ret.append(one.toString())
+                    ret.append(one.key)
                 }
             }
             return ret
