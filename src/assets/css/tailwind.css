@@ -67,6 +67,10 @@
     &.highlight {
       @apply bg-gradient-to-r from-primary to-secondary;
     }
+
+    &:active {
+      @apply bg-white;
+    }
   }
 
   .card-border {
@@ -80,6 +84,10 @@
 
     &:hover {
       @apply border-gray-400 dark:border-gray-600;
+    }
+
+    &:active {
+      @apply border-white;
     }
   }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const user = useUserProfile()
 
 interface ChallengeDetail {
   season: CompetitionSeason,
@@ -43,8 +44,29 @@ const totalPoints = computed(() => {
   return points
 })
 
-const currentIndex = ref(0); // FIXME: load from blockchain
-const progress = ref(0); // FIXME: load from blockchain
+const currentIndex = ref(0);
+const progress = ref(0);
+
+watchEffect(() => {
+  if (info.value) {
+    if (user.value && user.value.activeRecord && bountyId.value) {
+      let len = info.value.quests.length
+      let current = 0
+      for (let i = 0; i < len; i++) {
+        const quest = info.value.quests[i];
+        const isQuestCompleted = !!user.value.activeRecord.bountiesCompleted[quest.id]
+        if (isQuestCompleted) {
+          current++
+        } else {
+          break
+        }
+      }
+      currentIndex.value = current
+    }
+    progress.value = Math.floor(currentIndex.value / info.value.quests.length * 100)
+  }
+})
+
 </script>
 
 <template>

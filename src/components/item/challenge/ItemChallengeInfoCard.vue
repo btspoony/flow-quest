@@ -3,8 +3,28 @@ const props = defineProps<{
   bounty: BountyInfo
 }>();
 
+const user = useUserProfile()
+
 const challengeCfg = computed(() => (props.bounty.config as ChallengeConfig));
-const progress = ref(0); // FIXME
+const progress = ref(0);
+
+watchEffect(() => {
+  if (user.value && user.value.activeRecord) {
+    let len = challengeCfg.value.quests.length
+    let current = 0
+    for (let i = 0; i < len; i++) {
+      const quest = challengeCfg.value.quests[i];
+      const questscore = user.value.activeRecord.questScores[quest.key]
+      if (questscore?.completed) {
+        current++
+      } else {
+        break
+      }
+    }
+    progress.value = Math.floor(current / len * 100)
+  }
+})
+
 </script>
 
 <template>
