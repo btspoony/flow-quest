@@ -247,15 +247,14 @@ pub contract CompetitionService {
         // ---- writable methods ----
 
         access(account) fun onProfileRegistered(acct: Address) {
-            pre {
-                self.profiles[acct] == nil: "Profile registered."
-            }
-            self.profiles[acct] = true
+            if self.profiles[acct] == nil {
+                self.profiles[acct] = true
 
-            emit ProfileRegistered(
-                seasonId: self.getSeasonId(),
-                participant: acct,
-            )
+                emit ProfileRegistered(
+                    seasonId: self.getSeasonId(),
+                    participant: acct,
+                )
+            }
         }
 
         access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address) {

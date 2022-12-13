@@ -96,7 +96,7 @@ onBeforeUnmount(stopSubscribe);
   <div class="w-full min-w-40 px-3 py-2 rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
     <div class="font-semibold text-lg flex items-center gap-2">
       <span class="">{{ txStatusString }}</span>
-      <a :href="fvsTx(txid)" target="_blank" class="pl-2 link-highlight">
+      <a :href="fvsTx(txid)" target="_blank" class="link-highlight">
         {{ txidDisplay }}
       </a>
     </div>
