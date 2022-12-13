@@ -51,7 +51,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const sendTransaction = async (
     code: string,
     args: fcl.ArgumentFunction
-  ): Promise<string | null> => {
+  ): Promise<string> => {
     let transactionId: string;
 
     try {
@@ -61,9 +61,9 @@ export default defineNuxtPlugin((nuxtApp) => {
       });
       console.log("Tx Sent:", transactionId);
       return transactionId;
-    } catch (e) {
-      console.log(e);
-      return null;
+    } catch (e: any) {
+      console.error(e);
+      throw new Error(e.message);
     }
   };
 

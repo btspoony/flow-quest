@@ -46,7 +46,7 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${ques
 
 const bountyId = computed(() => info.value?.quest.id)
 
-const { data: isRegistered } = useAsyncData<boolean>('IsUserRegistered', async () => {
+const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUserRegistered', async () => {
   const { $scripts } = useNuxtApp();
   const season = await apiGetActiveSeason();
 
@@ -74,7 +74,7 @@ watchEffect(async () => {
   if (user.value && user.value.activeRecord && bountyId.value) {
     profileStatus.value = user.value.activeRecord.questScores[questKey.value]
     isBountyCompleted.value = user.value.activeRecord.bountiesCompleted[bountyId.value] !== undefined
-  } else {
+  } else if (isRegistered.value) {
     await updateQuest()
   }
 })
@@ -88,24 +88,22 @@ const imageUrl = computed(() => {
   }
 })
 
-const isInvalid = computed(() => {
-  // FIXME
-  return true
-})
-
-function isLocked(index: number) {
-  // FIXME
-  return false
+function isLocked(index: number): boolean {
+  return !isRegistered.value
 }
 
 function isStepCompleted(index: number) {
   return profileStatus.value?.steps[index] ?? false
 }
 
+const isInvalid = computed(() => {
+  return !(profileStatus.value?.completed ?? false)
+})
+
 async function updateQuest() {
   const { $scripts } = useNuxtApp();
   const address = wallet.value?.addr
-  if (address && isRegistered.value) {
+  if (address) {
     const season = await apiGetActiveSeason();
     profileStatus.value = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey.value)
     isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value!)
@@ -135,6 +133,11 @@ async function completeBounty() {
             </p>
           </div>
         </div>
+        <!-- Quest Prepare -->
+        <div class="flex flex-col gap-2">
+          <BtnRegister v-if="!isRegistered" @registered="userRefresh" />
+        </div>
+        <!-- Quest steps -->
         <div class="flex flex-col gap-2">
           <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)" :steps-cfg="info?.stepsCfg!"
             :is-completed="isStepCompleted(i)" :is-locked="isLocked(i)" />

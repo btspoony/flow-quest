@@ -16,7 +16,7 @@ const txStatus = ref<TransactionReceipt | null>(null);
 
 const txStatusString = computed(() => {
   const STATUS_MAP: { [key: number]: string } = {
-    0: "UNKNOWN",
+    0: "SENT",
     1: "PENDING",
     2: "FINALIZED",
     3: "EXECUTED",
@@ -61,6 +61,9 @@ async function startSubscribe() {
       txStatus.value = tx;
       if ($fcl.tx.isSealed(tx)) {
         emit("sealed", tx);
+        if (tx.errorMessage && tx.errorMessage.length > 0) {
+          emit("error", tx.errorMessage)
+        }
         unsub();
         unsub = null;
       } else {
@@ -90,13 +93,13 @@ onBeforeUnmount(stopSubscribe);
 </script>
 
 <template>
-  <article class="min-w-40 w-full text-center border-2 border-primary">
-    <p class="font-semibold pb-2 text-lg">
-      <label>{{ txStatusString }}</label>
-      <a :href="fvsTx(txid)" target="_blank" class="pl-2 link-highlight">{{
-          txidDisplay
-      }}</a>
-    </p>
+  <div class="w-full min-w-40 px-3 py-2 rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
+    <div class="font-semibold text-lg flex items-center gap-2">
+      <span class="">{{ txStatusString }}</span>
+      <a :href="fvsTx(txid)" target="_blank" class="pl-2 link-highlight">
+        {{ txidDisplay }}
+      </a>
+    </div>
     <progress class="w-full" :value="progress" max="100"></progress>
-  </article>
+  </div>
 </template>

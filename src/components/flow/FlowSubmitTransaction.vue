@@ -19,11 +19,7 @@ const emit = defineEmits<{
 
 // expose members
 defineExpose({
-  resetComponent: ref(() => {
-    txid.value = null;
-    errorMessage.value = null;
-    isSealed.value = false;
-  }),
+  resetComponent: ref(resetComponent),
 });
 
 const txid = ref<string | null>(null);
@@ -52,26 +48,34 @@ function onSealed(tx: TransactionReceipt) {
   isSealed.value = true;
   emit("sealed", tx);
 }
+
+function onError(msg: string) {
+  errorMessage.value = msg
+  emit("error", msg);
+}
+
+function resetComponent() {
+  txid.value = null;
+  errorMessage.value = null;
+  isSealed.value = false;
+}
+
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <template v-if="!txid">
-      <button :class="[
-        {
-          'no-animation': isLoading,
-          loading: isLoading,
-        },
-      ]" role="button" aria-disabled="true" @click="startTransaction">
-        <slot>
-          {{ content }}
-        </slot>
-      </button>
-      <p v-if="errorMessage" class="px-4 text-sm text-error max-w-[240px]">
-        {{ errorMessage }}
-      </p>
-    </template>
-    <FlowWaitTransaction v-else :txid="txid" @sealed="onSealed" />
-    <slot v-if="isSealed" name="next"></slot>
+  <div class="flex flex-col gap-2">
+    <button v-if="!txid" :class="['rounded-xl']" role="button" :aria-busy="isLoading" aria-disabled="true"
+      @click="startTransaction">
+      <slot>
+        {{ content }}
+      </slot>
+    </button>
+    <FlowWaitTransaction v-else :txid="txid" @sealed="onSealed" @error="onError" />
+    <p v-if="errorMessage" class="px-4 mb-0 text-xs text-error w-full">
+      {{ errorMessage }}
+    </p>
+    <slot v-if="isSealed" name="next">
+      <button class="rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
+    </slot>
   </div>
 </template>
