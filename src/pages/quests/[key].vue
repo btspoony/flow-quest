@@ -47,7 +47,6 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${ques
 const bountyId = computed(() => info.value?.quest.id)
 
 const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUserRegistered', async () => {
-  const { $scripts } = useNuxtApp();
   const season = await apiGetActiveSeason();
 
   // load user profile
@@ -55,6 +54,7 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
   if (user.value && user.value.activeRecord) {
     isRegistered = true
   } else {
+    const { $scripts } = useNuxtApp();
     const address = wallet.value?.addr
     if (address) {
       isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
@@ -69,6 +69,10 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
 
 const profileStatus = ref<QuestStatus | null>(null)
 const isBountyCompleted = ref(false)
+
+watch(wallet, (newVal, oldVal) => {
+  userRefresh()
+})
 
 watchEffect(async () => {
   if (user.value && user.value.activeRecord && bountyId.value) {
@@ -135,7 +139,7 @@ async function completeBounty() {
         </div>
         <!-- Quest Prepare -->
         <div class="flex flex-col gap-2">
-          <BtnRegister v-if="!isRegistered" @registered="userRefresh" />
+          <BtnRegister v-if="wallet?.loggedIn && !isRegistered" @registered="userRefresh" />
         </div>
         <!-- Quest steps -->
         <div class="flex flex-col gap-2">

@@ -232,20 +232,16 @@ export default defineNuxtPlugin((nuxtApp) => {
           acct: string,
           seasonId: string,
           key: string
-        ): Promise<QuestStatus> {
-          const result = await executeScript(
+        ): Promise<QuestStatus | null> {
+          return await executeScript(
             cadence.scripts.profileGetQuestStatus,
             (arg, t) => [
               arg(acct, t.Address),
               arg(seasonId, t.UInt64),
               arg(key, t.String),
             ],
-            undefined
+            null
           );
-          if (!result) {
-            throw new Error("Result undefined");
-          }
-          return result;
         },
         /**
          * get bounty completed
