@@ -1,4 +1,9 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{
+  locked: boolean
+}>(), {
+  locked: false
+})
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void;
 }>()
@@ -25,6 +30,8 @@ function openModal() {
 }
 
 function closeModal() {
+  if (props.locked) return
+
   if (open.value) {
     open.value = false
     dialog.value?.setAttribute('open', "false")
@@ -68,7 +75,7 @@ onUnmounted(() => {
 
 <template>
   <dialog ref="dialog">
-    <article>
+    <article class="min-w-[640px]">
       <a href="#close" aria-label="Close" class="close" data-target="modal-dialog" @click="toggleModal" />
       <slot />
     </article>

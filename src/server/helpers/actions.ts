@@ -1,28 +1,8 @@
 import Signer from "./signer.mjs";
 
-export async function txCtrlerAppendQuestParams(
+export async function txCtrlerSetQuestAnswer(
   signer: Signer,
-  opts: OptionCtrlerAppendQuestParams
-) {
-  const params: { key: string; value: string }[] = [];
-  for (const key in opts.params) {
-    params.push({ key, value: opts.params[key] });
-  }
-  return signer.sendTransaction(
-    await useStorage().getItem(
-      "assets/server/cadence/transactions/ctrler-append-quest-params.cdc"
-    ),
-    (arg, t) => [
-      arg(opts.target, t.String),
-      arg(opts.questKey, t.String),
-      arg(params, t.Dictionary({ key: t.String, value: t.String })),
-    ]
-  );
-}
-
-export async function txCtrlerSetQuestCompleted(
-  signer: Signer,
-  opts: OptionCtrlerSetQuestCompleted
+  opts: OptionCtrlerSetQuestAnswer
 ) {
   const kvpair: { key: string; value: string }[] = [];
   if (opts.params) {
@@ -37,28 +17,7 @@ export async function txCtrlerSetQuestCompleted(
     (arg, t) => [
       arg(opts.target, t.Address),
       arg(opts.questKey, t.String),
-      arg(kvpair, t.Dictionary({ key: t.String, value: t.String })),
-    ]
-  );
-}
-
-export async function txCtrlerSetQuestFailure(
-  signer: Signer,
-  opts: OptionCtrlerSetQuestFailure
-) {
-  const kvpair: { key: string; value: string }[] = [];
-  if (opts.params) {
-    for (const key in opts.params) {
-      kvpair.push({ key, value: opts.params[key] });
-    }
-  }
-  return signer.sendTransaction(
-    await useStorage().getItem(
-      "assets/server/cadence/transactions/ctrler-set-quest-failure.cdc"
-    ),
-    (arg, t) => [
-      arg(opts.target, t.Address),
-      arg(opts.questKey, t.String),
+      arg(String(opts.step), t.Int),
       arg(kvpair, t.Dictionary({ key: t.String, value: t.String })),
     ]
   );
@@ -76,20 +35,40 @@ export async function txCtrlerSetupReferralCode(
   );
 }
 
+export async function scGetQuestDetail(
+  signer: Signer,
+  communityId: string,
+  questKey: string
+): Promise<QuestDetail> {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/scripts/get-quest-detail.cdc`
+  );
+  if (typeof code !== "string") {
+    throw new Error("Unknown script.");
+  }
+  const result = await signer.executeScript(
+    code,
+    (arg, t) => [arg(communityId, t.UInt64), arg(questKey, t.String)],
+    undefined
+  );
+  if (!result) {
+    throw new Error("Failed to executeScript");
+  }
+  return result;
+}
+
 export async function scVerifyQuest(
   signer: Signer,
-  questKey: string,
+  stepCfg: QuestStepsConfig,
   params: { [key: string]: string }
 ): Promise<boolean> {
-  // FIXME: load from blockchain
-  const code = await useStorage().getItem(
-    `assets/server/cadence/quests/${questKey}/verify-script.cdc`
-  );
-  const schema = await useStorage().getItem(
-    `assets/server/json/quests/${questKey}/schema.json`
-  );
-  if (typeof code !== "string" || typeof schema !== "object") {
+  const code = await $fetch(stepCfg.code);
+  console.log(`[Loaded Code]: ${stepCfg.code}`);
+  if (typeof code !== "string") {
     throw new Error("Unknown quests key.");
+  }
+  if (typeof stepCfg.schema !== "object") {
+    throw new Error("Unknown schema.");
   }
   const result = await signer.executeScript(
     code,
@@ -133,7 +112,7 @@ export async function scVerifyQuest(
         "Array(Optional(String))": t.Array(t.Optional(t.String)),
         "Array(Optional(Bool))": t.Array(t.Optional(t.Bool)),
       };
-      return (schema as QuestSchema[]).map((one) => {
+      return stepCfg.schema.map((one) => {
         if (typeof params[one.key] === "undefined") {
           throw new Error(`Missing parameters: ${one.key}`);
         }

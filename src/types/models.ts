@@ -76,18 +76,20 @@ type RewardInfos = PointRewardInfo | FLOATRewardInfo;
 /**
  * Bounty basis data
  */
-interface BountyEntity {
+interface BountyEntity extends BountyIdentifier {
   category: BountyType;
   key: string;
   communityId: string;
   display: Display;
 }
 
-interface QuestConfig extends BountyEntity {
+interface QuestDetail {
   steps: number;
   stepsCfg: string;
   guideMD: string;
 }
+
+interface QuestConfig extends BountyEntity, QuestDetail {}
 
 interface QuestStepInput {
   value: string;
@@ -104,20 +106,27 @@ interface QuestStepTest {
   outputs: QuestStepOutput[];
 }
 
+interface QuestSchema {
+  key: string;
+  type: string;
+}
+
 interface QuestStepsConfig {
   title: string;
   code: string;
-  schema: { key: string; type: string }[];
+  schema: QuestSchema[];
   tests: QuestStepTest[]; // All tests should be OK, then quest passed
 }
 
-interface ChallengeConfig extends BountyEntity {
+interface ChallengeDetail {
   quests: BountyIdentifier[];
   achievement?: {
     host: string;
     eventId: string;
   };
 }
+
+interface ChallengeConfig extends BountyEntity, ChallengeDetail {}
 
 interface FLOATEvent {
   claimable: boolean;

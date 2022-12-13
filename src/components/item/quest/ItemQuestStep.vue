@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type WidgetDialog from '../../widget/WidgetDialog.vue';
+const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 
 const props = defineProps<{
   quest: BountyInfo,
@@ -9,13 +10,31 @@ const props = defineProps<{
   isLocked: boolean,
 }>()
 
-const current = useFlowAccount();
+const wallet = useFlowAccount();
 
-const stepCfg = computed(() => props.stepsCfg[props.step])
-const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null)
+const submitLoading = ref(false);
+const stepCfg = computed(() => props.stepsCfg[props.step]);
 
-function onClickTryVerify(event: MouseEvent) {
+const answers = reactive<string[]>([]);
+
+function onOpenDialogue() {
+  for (let i = 0; i < stepCfg.value.schema.length; i++) {
+    answers[i] = "0xf8d6e0586b0a20c7"
+  }
   dialog.value?.openModal()
+}
+
+async function onSubmitAnswer() {
+  submitLoading.value = true
+  const result = await apiPostVerifyQuest(
+    props.quest.config,
+    props.step,
+    stepCfg.value.schema.map((param, index) => {
+      return { key: param.key, value: answers[index] }
+    })
+  )
+  console.log(result)
+  submitLoading.value = false
 }
 
 </script>
@@ -30,17 +49,30 @@ function onClickTryVerify(event: MouseEvent) {
     </div>
     <div class="flex-none min-w-[160px]">
       <template v-if="(!isLocked || isCompleted)">
-        <FlowConnectButton v-if="!current?.loggedIn" />
-        <button v-else-if="!isCompleted" class="mb-0 rounded-full" data-target="modal-dialog" @click.prevent="onClickTryVerify">
+        <FlowConnectButton v-if="!wallet?.loggedIn" />
+        <button v-else-if="!isCompleted" class="mb-0 rounded-full" data-target="modal-dialog"
+          @click.prevent="onOpenDialogue">
           <span class="font-semibold">Verify</span>
         </button>
       </template>
     </div>
   </div>
-  <WidgetDialog ref="dialog">
-    <h3>TITLE</h3>
-    <footer>
-      FOOTER
+  <WidgetDialog ref="dialog" :locked="submitLoading">
+    <div class="flex-center flex-col">
+      <h3 class="w-full text-center">Submit your answer</h3>
+      <div class="flex flex-col gap-1">
+        <template v-for="(param, index) in stepCfg.schema" :key="`key_${index}`">
+          <label :for="`param_${param.key}`">
+            <span class="text-lg font-semibold">Param[{{ index }}]: {{ param.key }}</span>
+            <input type="text" :id="`param_${param.key}`" :name="`param_${param.key}`" :placeholder="param.type"
+              v-model="answers[index]" required>
+          </label>
+        </template>
+      </div>
+    </div>
+    <footer class="mt-4">
+      <button class="rounded-xl mb-0" :aria-busy="submitLoading" :disabled="submitLoading"
+        @click="onSubmitAnswer()">Submit</button>
     </footer>
   </WidgetDialog>
 </template>

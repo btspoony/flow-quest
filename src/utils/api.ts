@@ -58,3 +58,37 @@ export async function apiGetCurrentUser(): Promise<ProfileData | null> {
   }
   return user;
 }
+
+export async function apiPostVerifyQuest(
+  questIdentifier: BountyIdentifier,
+  step: number,
+  questParams: { key: string; value: string }[]
+): Promise<ResponseVerifyQuest | undefined> {
+  const { $fcl } = useNuxtApp();
+  const user = await $fcl.currentUser.snapshot();
+  const accountProof = user.services?.find(
+    (one) => one.type === "account-proof"
+  );
+  if (!accountProof) {
+    console.log("accountProof not found");
+    throw new Error("accountProof not found");
+  }
+
+  try {
+    const result = await $fetch("/api/verify-quest", {
+      method: "post",
+      body: {
+        address: user.addr,
+        proofNonce: accountProof.data.nonce,
+        proofSigs: accountProof.data.signatures,
+        communityId: questIdentifier.communityId,
+        questKey: questIdentifier.key,
+        step,
+        questParams,
+      },
+    });
+    return result;
+  } catch (e) {
+    console.error(e);
+  }
+}

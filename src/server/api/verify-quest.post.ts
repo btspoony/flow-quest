@@ -2,7 +2,7 @@ import * as fcl from "@onflow/fcl";
 import { z, useValidatedBody } from "h3-zod";
 import { flow, actions, Signer } from "../helpers";
 
-export default defineEventHandler(async function (event) {
+export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
   const config = useRuntimeConfig();
 
   // Step.0 verify body parameters
@@ -19,9 +19,12 @@ export default defineEventHandler(async function (event) {
           signature: z.string(),
         })
       ),
-      questKey: z.string(), // required, quest id
+      // required, quest identifier
+      communityId: z.string(),
+      questKey: z.string(),
+      // required, quest answer related
+      step: z.number(),
       questParams: z.array(
-        // required, quest related
         z.object({
           key: z.string(),
           value: z.string(),
@@ -87,6 +90,27 @@ export default defineEventHandler(async function (event) {
   if (isAccountValid) {
     console.log(`Request[${body.address}] - Step.1: Signature verified`);
 
+    const questDetail = await actions.scGetQuestDetail(
+      signer,
+      body.communityId,
+      body.questKey
+    );
+
+    if (
+      typeof questDetail?.stepsCfg !== "string" ||
+      !questDetail?.stepsCfg.startsWith("http")
+    ) {
+      throw new Error("Invalid quest detail.");
+    }
+    const stepsCfg: QuestStepsConfig[] = JSON.parse(
+      (await $fetch(questDetail?.stepsCfg)) ?? {}
+    );
+    const stepCfg = stepsCfg[body.step];
+    if (!stepCfg) throw new Error("Missing step Cfg");
+    console.log(
+      `Request[${body.address}] - Step.2-1: loaded cfg from ${questDetail?.stepsCfg}`
+    );
+
     // Step.2 Verify the quest result on testnet
     if (isProduction) {
       flow.switchToTestnet();
@@ -98,9 +122,9 @@ export default defineEventHandler(async function (event) {
     for (const one of body.questParams) {
       params[one.key] = one.value;
     }
-    isQuestValid = await actions.scVerifyQuest(signer, body.questKey, params);
+    isQuestValid = await actions.scVerifyQuest(signer, stepCfg, params);
     console.log(
-      `Request[${body.address}] - Step.2: Quest verification: ${isQuestValid}`
+      `Request[${body.address}] - Step.2-2: Quest verification: ${isQuestValid}`
     );
 
     // Step.3 Run a transaction on mainnet
@@ -112,15 +136,10 @@ export default defineEventHandler(async function (event) {
 
     if (isQuestValid) {
       // run the reward transaction
-      transactionId = await actions.txCtrlerSetQuestCompleted(signer, {
+      transactionId = await actions.txCtrlerSetQuestAnswer(signer, {
         target: body.address,
         questKey: body.questKey,
-        params,
-      });
-    } else {
-      transactionId = await actions.txCtrlerSetQuestFailure(signer, {
-        target: body.address,
-        questKey: body.questKey,
+        step: body.step,
         params,
       });
     }
