@@ -2,7 +2,9 @@ import * as fcl from "@onflow/fcl";
 import { z, useValidatedBody } from "h3-zod";
 import { flow, actions, Signer } from "../helpers";
 
-export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
+export default defineEventHandler<ResponseCompleteBounty>(async function (
+  event
+) {
   const config = useRuntimeConfig();
 
   // Step.0 verify body parameters
@@ -20,20 +22,13 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
         })
       ),
       // required, quest identifier
-      communityId: z.string(),
-      questKey: z.string(),
-      // required, quest answer related
-      step: z.number(),
-      questParams: z.array(
-        z.object({
-          key: z.string(),
-          value: z.string(),
-        })
-      ),
+      bountyId: z.string(),
     })
   );
 
-  console.log(`Request<VerifyQuest>[${body.address}] - Step.0: Body verified`);
+  console.log(
+    `Request<Complete Bounty>[${body.address}] - Step.0: Body verified`
+  );
 
   const isProduction = config.public.network === "mainnet";
 
@@ -84,80 +79,38 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     }
   );
 
-  let isQuestValid = false;
+  let isBountyCompleted = false;
   let transactionId: string | null = null;
 
   if (isAccountValid) {
     console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.1: Signature verified`
-    );
-
-    const questDetail = await actions.scGetQuestDetail(
-      signer,
-      body.communityId,
-      body.questKey
-    );
-
-    if (
-      typeof questDetail?.stepsCfg !== "string" ||
-      !questDetail?.stepsCfg.startsWith("http")
-    ) {
-      throw new Error("Invalid quest detail.");
-    }
-    const stepsCfg: QuestStepsConfig[] = JSON.parse(
-      (await $fetch(questDetail?.stepsCfg)) ?? {}
-    );
-    const stepCfg = stepsCfg[body.step];
-    if (!stepCfg) throw new Error("Missing step Cfg");
-    console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.2-1: loaded cfg from ${questDetail?.stepsCfg}`
+      `Request<Complete Bounty>[${body.address}] - Step.1: Signature verified`
     );
 
     // Step.2 Verify the quest result on testnet
-    if (isProduction) {
-      flow.switchToTestnet();
-    } else {
-      flow.switchToEmulator();
-    }
-    // run a script to ensure transactions
-    const params: { [key: string]: string } = {};
-    for (const one of body.questParams) {
-      params[one.key] = one.value;
-    }
-    isQuestValid = await actions.scVerifyQuest(signer, stepCfg, params);
-    console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.2-2: Quest verification: ${isQuestValid}`
-    );
+    // FIXME Check to ensure bounty completed
+    isBountyCompleted = true;
 
-    // Step.3 Run a transaction on mainnet
-    if (isProduction) {
-      flow.switchToMainnet();
-    } else {
-      flow.switchToTestnet();
-    }
-
-    if (isQuestValid) {
+    if (isBountyCompleted) {
       // run the reward transaction
-      transactionId = await actions.txCtrlerSetQuestAnswer(signer, {
+      transactionId = await actions.txCompleteBounty(signer, {
         target: body.address,
-        questKey: body.questKey,
-        step: body.step,
-        params,
+        bountyId: body.bountyId,
       });
     }
 
     if (transactionId) {
       console.log(
-        `Request<VerifyQuest>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+        `Request<Complete Bounty>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
       );
     }
   }
 
   // Step.4 Return the transaction id
   return {
-    ok: isAccountValid && isQuestValid && transactionId !== null,
+    ok: isAccountValid && isBountyCompleted && transactionId !== null,
     isAccountValid,
-    isQuestValid,
+    isBountyCompleted,
     transactionId,
   };
 });

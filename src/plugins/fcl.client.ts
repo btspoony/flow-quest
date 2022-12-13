@@ -117,7 +117,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       });
       return queryResult ?? defaultValue;
     } catch (e) {
-      console.error(e);
+      console.error(`[CODE]: ${code}`, args, e);
       return defaultValue;
     }
   };
@@ -252,7 +252,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           bountyId: string
         ): Promise<boolean> {
           return await executeScript(
-            cadence.scripts.profileGetQuestStatus,
+            cadence.scripts.profileIsBountyCompleted,
             (arg, t) => [
               arg(acct, t.Address),
               arg(seasonId, t.UInt64),

@@ -114,8 +114,22 @@ async function updateQuest() {
   }
 }
 
-async function completeBounty() {
-  // FIXME
+async function completeBounty(): Promise<string | null> {
+  const result = await apiPostCompleteBounty(bountyId.value!)
+  if (result) {
+    if (result.transactionId) {
+      return result.transactionId
+    }
+    if (!result.isAccountValid) {
+      throw new Error("Account verification invalid")
+    }
+    if (!result.isBountyCompleted) {
+      throw new Error("Bounty not completed")
+    }
+  } else {
+    throw new Error("Failed to requeset")
+  }
+  return null
 }
 </script>
 
@@ -144,16 +158,18 @@ async function completeBounty() {
         <!-- Quest steps -->
         <div class="flex flex-col gap-2">
           <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)" :steps-cfg="info?.stepsCfg!"
-            :is-completed="isStepCompleted(i)" :is-locked="isLocked(i)" />
+            :is-completed="isStepCompleted(i - 1)" :is-locked="isLocked(i - 1)" @success="updateQuest" />
         </div>
         <div class="flex flex-col py-2">
-          <button class="rounded-xl" @click="completeBounty()" :disabled="(isInvalid || isBountyCompleted)">
+          <button v-if="(isInvalid || isBountyCompleted)" class="rounded-xl" disabled>
             <div class="inline-flex-between">
               <span v-if="isBountyCompleted">Completed</span>
-              <LockClosedIcon v-if="(isInvalid || isBountyCompleted)" class="fill-current w-6 h-6" />
-              <span v-else>Complete</span>
+              <LockClosedIcon class="fill-current w-6 h-6" />
             </div>
           </button>
+          <FlowSubmitTransaction v-else-if="bountyId" :method="completeBounty" @success="reloadCurrentUser()">
+            Complete
+          </FlowSubmitTransaction>
           <div role="separator" class="divider my-2" />
           <div class="flex-between">
             <div>

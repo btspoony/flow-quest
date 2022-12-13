@@ -44,26 +44,28 @@ export async function apiGetCurrentQuest(
 
 export async function apiGetCurrentUser(): Promise<ProfileData | null> {
   const current = useUserProfile();
-  let user: ProfileData;
+  let user: ProfileData | null;
   if (current.value) {
     user = current.value;
   } else {
-    const wallet = useFlowAccount();
-    if (!wallet.value?.loggedIn) {
-      return null;
-    }
-    const address = wallet.value.addr!;
-    const { $scripts } = useNuxtApp();
-    user = await $scripts.loadUserProfile(address);
+    user = await reloadCurrentUser();
   }
   return user;
 }
 
-export async function apiPostVerifyQuest(
-  questIdentifier: BountyIdentifier,
-  step: number,
-  questParams: { key: string; value: string }[]
-): Promise<ResponseVerifyQuest | undefined> {
+export async function reloadCurrentUser(): Promise<ProfileData | null> {
+  const current = useUserProfile();
+  const wallet = useFlowAccount();
+  if (!wallet.value?.loggedIn) {
+    return null;
+  }
+  const address = wallet.value.addr!;
+  const { $scripts } = useNuxtApp();
+  current.value = await $scripts.loadUserProfile(address);
+  return current.value;
+}
+
+export async function fetchAccountProof() {
   const { $fcl } = useNuxtApp();
   const user = await $fcl.currentUser.snapshot();
   const accountProof = user.services?.find(
@@ -73,19 +75,49 @@ export async function apiPostVerifyQuest(
     console.log("accountProof not found");
     throw new Error("accountProof not found");
   }
+  return {
+    address: user.addr,
+    proofNonce: accountProof.data.nonce,
+    proofSigs: accountProof.data.signatures,
+  };
+}
 
+export async function apiPostVerifyQuest(
+  questIdentifier: BountyIdentifier,
+  step: number,
+  questParams: { key: string; value: string }[]
+): Promise<ResponseVerifyQuest | undefined> {
   try {
     const result = await $fetch("/api/verify-quest", {
       method: "post",
-      body: {
-        address: user.addr,
-        proofNonce: accountProof.data.nonce,
-        proofSigs: accountProof.data.signatures,
-        communityId: questIdentifier.communityId,
-        questKey: questIdentifier.key,
-        step,
-        questParams,
-      },
+      body: Object.assign(
+        {
+          communityId: questIdentifier.communityId,
+          questKey: questIdentifier.key,
+          step,
+          questParams,
+        },
+        await fetchAccountProof()
+      ),
+    });
+    return result;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function apiPostCompleteBounty(
+  bountyId: string
+): Promise<ResponseCompleteBounty | undefined> {
+  try {
+    const result = await $fetch("/api/complete-bounty", {
+      method: "post",
+      body: Object.assign(
+        {
+          bountyId: bountyId,
+        },
+        await fetchAccountProof()
+      ),
     });
     return result;
   } catch (e) {

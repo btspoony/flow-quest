@@ -14,6 +14,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: "sealed", tx: TransactionReceipt): void;
+  (e: 'success'): void;
   (e: "error", message: string): void;
 }>();
 
@@ -46,6 +47,9 @@ async function startTransaction() {
 
 function onSealed(tx: TransactionReceipt) {
   isSealed.value = true;
+  if (!tx.errorMessage) {
+    emit("success")
+  }
   emit("sealed", tx);
 }
 

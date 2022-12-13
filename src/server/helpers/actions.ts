@@ -23,6 +23,18 @@ export async function txCtrlerSetQuestAnswer(
   );
 }
 
+export async function txCompleteBounty(
+  signer: Signer,
+  opts: OptionCtlerCompleteBounty
+) {
+  return signer.sendTransaction(
+    await useStorage().getItem(
+      "assets/server/cadence/transactions/ctrler-complete-bounty.cdc"
+    ),
+    (arg, t) => [arg(opts.target, t.Address), arg(opts.bountyId, t.UInt64)]
+  );
+}
+
 export async function txCtrlerSetupReferralCode(
   signer: Signer,
   opts: OptionCtrlerSetupReferralCode

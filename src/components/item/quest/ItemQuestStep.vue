@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CheckCircleIcon } from '@heroicons/vue/24/solid';
 import type WidgetDialog from '../../widget/WidgetDialog.vue';
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 
@@ -8,6 +9,10 @@ const props = defineProps<{
   stepsCfg: QuestStepsConfig[]
   isCompleted: boolean,
   isLocked: boolean,
+}>()
+
+const emit = defineEmits<{
+  (e: 'success'): void
 }>()
 
 const wallet = useFlowAccount();
@@ -58,9 +63,12 @@ function resetComp() {
 <template>
   <div class="card card-border p-4 flex items-center justify-between gap-2">
     <div class="flex-none">
-      <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-200 dark:bg-gray-800">{{ step + 1 }}</span>
+      <span v-if="!isCompleted" class="rounded-full inline-block w-8 h-8 flex-center bg-gray-200 dark:bg-gray-800">
+        {{ step + 1 }}
+      </span>
+      <CheckCircleIcon v-else class="fill-success w-8 h-8" />
     </div>
-    <div class="flex-auto text-lg font-semibold">
+    <div :class="['flex-auto text-lg', isCompleted ? 'line-through' : 'font-semibold']">
       {{ stepCfg?.title ?? "" }}
     </div>
     <div class="flex-none min-w-[160px]">
@@ -87,7 +95,7 @@ function resetComp() {
       </div>
     </div>
     <footer class="mt-4">
-      <FlowSubmitTransaction :method="onSubmitAnswer" @sealed="resetComp()" @error="resetComp()">
+      <FlowSubmitTransaction :method="onSubmitAnswer" @sealed="resetComp()" @error="resetComp()" @success="emit('success')">
         Submit
       </FlowSubmitTransaction>
     </footer>
