@@ -83,9 +83,9 @@ function stopSubscribe() {
 }
 
 function fvsTx(txId: string) {
-  const config = useRuntimeConfig();
-  const env = config.public.network;
-  return `https://flow-view-source.com/${env}/tx/${txId}`;
+  // const config = useRuntimeConfig();
+  // const env = config.public.network;
+  return `https://f.dnz.dev/${txId}`;
 }
 
 onMounted(startSubscribe);
