@@ -24,7 +24,7 @@ const answers = reactive<string[]>([]);
 
 function onOpenDialogue() {
   for (let i = 0; i < stepCfg.value.schema.length; i++) {
-    answers[i] = "0xf8d6e0586b0a20c7"
+    answers[i] = ""
   }
   dialog.value?.openModal()
 }

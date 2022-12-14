@@ -114,20 +114,29 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     );
 
     // Step.2 Verify the quest result on testnet
-    if (isProduction) {
-      flow.switchToTestnet();
+    if (typeof stepCfg.test.network !== "string")
+      throw new Error("Network is missing.");
+    if (typeof stepCfg.test.expect !== "string")
+      throw new Error("Expect is missing.");
+    if (typeof stepCfg.test.result === "undefined")
+      throw new Error("Result is missing.");
+
+    if (stepCfg.test.network === "mainnet") {
+      flow.switchToMainnet();
     } else {
-      flow.switchToEmulator();
+      flow.switchToTestnet();
     }
+
     // run a script to ensure transactions
     const params: { [key: string]: string } = {};
     for (const one of body.questParams) {
       params[one.key] = one.value;
     }
-    isQuestValid = await actions.scVerifyQuest(signer, stepCfg, params);
+    const result = await actions.scVerifyQuest(signer, stepCfg, params);
     console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.2-2: Quest verification: ${isQuestValid}`
+      `Request<VerifyQuest>[${body.address}] - Step.2-2: Quest result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
     );
+    isQuestValid = result === stepCfg.test.result;
 
     // Step.3 Run a transaction on mainnet
     if (isProduction) {

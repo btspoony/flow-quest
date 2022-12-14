@@ -73,7 +73,7 @@ export async function scVerifyQuest(
   signer: Signer,
   stepCfg: QuestStepsConfig,
   params: { [key: string]: string }
-): Promise<boolean> {
+): Promise<any> {
   const code = await $fetch(stepCfg.code);
   console.log(`[Loaded Code]: ${stepCfg.code}`);
   if (typeof code !== "string") {
@@ -137,5 +137,5 @@ export async function scVerifyQuest(
     },
     false
   );
-  return !!result;
+  return result;
 }

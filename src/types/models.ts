@@ -91,19 +91,10 @@ interface QuestDetail {
 
 interface QuestConfig extends BountyEntity, QuestDetail {}
 
-interface QuestStepInput {
-  value: string;
-  type: string;
-}
-
-interface QuestStepOutput {
+interface QuestStepTest {
+  network: "testnet" | "mainnet";
   expect: "return" | "error";
   result: any;
-}
-
-interface QuestStepTest {
-  inputs: QuestStepInput[];
-  outputs: QuestStepOutput[];
 }
 
 interface QuestSchema {
@@ -115,7 +106,7 @@ interface QuestStepsConfig {
   title: string;
   code: string;
   schema: QuestSchema[];
-  tests: QuestStepTest[]; // All tests should be OK, then quest passed
+  test: QuestStepTest; // All tests should be OK, then quest passed
 }
 
 interface ChallengeDetail {
