@@ -90,7 +90,7 @@ watchEffect(() => {
         </div>
         <div v-if="challengeCfg" class="flex-1 flex gap-1 flex-col justify-between min-w-[360px]">
           <div class="flex items-center justify-center sm:justify-start min-h-[1.5rem]">
-            <ItemCommunityTag :community-id="challengeCfg?.communityId" />
+            <TagCommunity :community-id="challengeCfg?.communityId" />
           </div>
           <h3 class="section-header-text mb-3">{{ challengeCfg?.display.name }}</h3>
           <div class="flex gap-2 items-center justify-start">
