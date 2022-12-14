@@ -32,6 +32,7 @@ onUnmounted(() => {
 })
 
 function receiveMessage(event: any) {
+  console.log(JSON.stringify(event.data))
   if (event.origin !== window.location.origin) {
     console.warn(`Message received by ${event.origin}; IGNORED.`);
     return;
