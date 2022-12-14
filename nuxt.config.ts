@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     oauthHost: "",
     // Keys within public, will be also exposed to the client-side
     public: {
-      appName: "Flow Quest Hacker",
+      appName: "Flow Challenge Tour",
       network: "",
       accessApi: "",
       walletDiscovery: "",
