@@ -15,7 +15,7 @@ const isOdd = computed(() => props.index % 2 === 0)
   <div :class="['w-full relative flex gap-0', isOdd ? 'justify-start' : 'justify-end']">
     <div class="relative w-[560px]">
       <div class="absolute w-full" v-if="isCurrentProcess">
-        <span class="tag absolute -top-8 left-1/2" style="transform: translateX(-50%);">Next Quest:</span>
+        <span class="tag tag-sm absolute -top-9 left-1/2" style="transform: translateX(-50%);">Next Quest:</span>
       </div>
       <ItemBountyInfoCard :bounty="bounty" :highlight="isCurrentProcess" :locked="(index > current)" />
       <div v-if="!isLast"

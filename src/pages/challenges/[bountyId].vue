@@ -62,6 +62,8 @@ watchEffect(() => {
         }
       }
       currentIndex.value = current
+    } else {
+      currentIndex.value = 0
     }
     progress.value = Math.floor(currentIndex.value / info.value.quests.length * 100)
   }
@@ -103,7 +105,7 @@ watchEffect(() => {
       <div class="mb-4 prose-sm lg:prose">
         {{ challengeCfg?.display.description }}
       </div>
-      <div role="separator" class="divider mb-10 mt-4" />
+      <div role="separator" class="divider mb-11 mt-4" />
       <div class="flex flex-col gap-24">
         <ItemChallengeQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
           :isLast="(((info?.quests?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"

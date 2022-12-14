@@ -3,7 +3,16 @@ const props = defineProps<{
   bounty: BountyInfo
 }>()
 
+const user = useUserProfile()
+
 const questCfg = computed(() => (props.bounty.config as QuestConfig));
+
+const isCompleted = ref(false)
+watchEffect(() => {
+  if (user.value && user.value.activeRecord) {
+    isCompleted.value = user.value.activeRecord.bountiesCompleted[props.bounty.id] !== undefined
+  }
+})
 </script>
 
 <template>
@@ -15,7 +24,10 @@ const questCfg = computed(() => (props.bounty.config as QuestConfig));
           {{ questCfg?.display.description }}
         </p>
       </div>
-      <div class="flex flex-col items-center justify-end">
+      <div class="flex flex-col items-end justify-between">
+        <div>
+          <TagCompleted v-if="isCompleted" />
+        </div>
         <span class="tag" v-if="bounty.rewardType === 'Points'">
           {{ bounty.pointReward?.rewardPoints }} Points
         </span>

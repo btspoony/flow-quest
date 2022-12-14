@@ -95,6 +95,14 @@
     @apply rounded-full px-2 py-1 text-xs h-6;
     @apply bg-opacity-70 bg-gray-300 dark:bg-gray-700;
 
+    &.tag-sm {
+      @apply text-sm h-7;
+    }
+
+    &.tag-lg {
+      @apply text-lg h-9 px-3;
+    }
+
     &.primary {
       @apply text-white bg-primary dark:bg-primary;
     }
