@@ -4,7 +4,6 @@ export default defineEventHandler(async (event) => {
 <head></head>
 <body>
 <script>
-  console.log(window.opener)
   if (window.opener == null) window.location = "/";
 
   const url = new URL(window.location);
@@ -25,7 +24,7 @@ export default defineEventHandler(async (event) => {
     }
   });
 
-  // window.close();
+  window.close();
 </script>
 </body>
 </html>
