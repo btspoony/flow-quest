@@ -11,6 +11,8 @@ const isCompleted = ref(false)
 watchEffect(() => {
   if (user.value && user.value.activeRecord) {
     isCompleted.value = user.value.activeRecord.bountiesCompleted[props.bounty.id] !== undefined
+  } else {
+    isCompleted.value = false
   }
 })
 </script>

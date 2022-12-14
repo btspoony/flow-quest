@@ -22,6 +22,8 @@ watchEffect(() => {
       }
     }
     progress.value = Math.floor(current / len * 100)
+  } else {
+    progress.value = 0
   }
 })
 
