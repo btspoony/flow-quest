@@ -6,3 +6,6 @@ export const useCurrentQuest = () =>
 
 export const useActiveSeason = () =>
   useState<CompetitionSeason | null>("activeSeason", () => ref(null));
+
+export const useCommunityBasics = (communityId: string) =>
+  useState<CommunityBasics | null>(`community:${communityId}`, () => ref(null));

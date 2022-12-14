@@ -108,15 +108,15 @@ export default defineNuxtPlugin((nuxtApp) => {
     args: fcl.ArgumentFunction,
     defaultValue: any
   ): Promise<any> => {
+    const cadence = replaceImportAddresses(code, addressMapping);
     try {
-      const cadence = replaceImportAddresses(code, addressMapping);
       const queryResult = await fcl.query({
         cadence,
         args,
       });
       return queryResult ?? defaultValue;
     } catch (e) {
-      console.error(`[CODE]: ${code}`, args, e);
+      console.error(`[CODE]: ${cadence}`, args, e);
       return defaultValue;
     }
   };
@@ -162,6 +162,19 @@ export default defineNuxtPlugin((nuxtApp) => {
             cadence.scripts.getFLOATEvent,
             (arg, t) => [arg(host, t.Address), arg(eventId, t.UInt64)],
             undefined
+          );
+        },
+        /**
+         * Get community basics
+         * @param communityId
+         */
+        async getCommunityBasics(
+          communityId: string
+        ): Promise<CommunityBasics | null> {
+          return await executeScript(
+            cadence.scripts.getCommunityBasics,
+            (arg, t) => [arg(communityId, t.UInt64)],
+            null
           );
         },
         /**

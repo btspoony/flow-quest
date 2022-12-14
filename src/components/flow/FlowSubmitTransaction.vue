@@ -84,17 +84,17 @@ defineExpose({
         {{ content }}
       </slot>
     </button>
-    <template v-if="!hideTrx && txid">
-      <FlowWaitTransaction :txid="txid" @sealed="onSealed" @error="onError">
+    <template v-if="!hideTrx">
+      <FlowWaitTransaction v-if="txid" :txid="txid" @sealed="onSealed" @error="onError">
         <template v-if="action != ''">
           <h5 class="mb-0">{{ action }}</h5>
         </template>
       </FlowWaitTransaction>
-      <p v-if="errorMessage" class="px-4 mb-0 text-xs text-error w-full">
+      <p v-if="errorMessage" class="w-full px-4 mb-0 text-xs text-failure">
         {{ errorMessage }}
       </p>
-      <slot v-if="isSealed" name="next">
-        <button class="rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
+      <slot v-if="txid && isSealed" name="next">
+        <button class="mx-0 rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
       </slot>
     </template>
   </div>

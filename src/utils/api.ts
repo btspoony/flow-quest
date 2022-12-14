@@ -42,6 +42,29 @@ export async function apiGetCurrentQuest(
   return quest;
 }
 
+const communityPromises: { [key: string]: Promise<CommunityBasics | null> } =
+  {};
+
+export async function apiGetCommunityBasics(
+  communityId: string
+): Promise<CommunityBasics | null> {
+  const community = useCommunityBasics(communityId);
+  let result: CommunityBasics | null;
+  if (community.value) {
+    result = community.value;
+  } else {
+    const existsPromise = communityPromises[communityId];
+    if (existsPromise) {
+      result = community.value = await existsPromise;
+    } else {
+      const { $scripts } = useNuxtApp();
+      communityPromises[communityId] = $scripts.getCommunityBasics(communityId);
+      result = community.value = await communityPromises[communityId];
+    }
+  }
+  return result;
+}
+
 export async function apiGetCurrentUser(): Promise<ProfileData | null> {
   const current = useUserProfile();
   let user: ProfileData | null;

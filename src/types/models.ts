@@ -147,16 +147,25 @@ interface CommuntiyBountyBasics {
   createdAt: number;
 }
 
-interface Community {
-  owner: string;
-  communityId: string;
-  display: Display;
-  banner?: string;
+interface CommunityDisplay {
+  name: string;
+  description: string;
+  imageUrl?: string;
+  bannerUrl?: string;
   socials: {
     twitter?: string;
     discord?: string;
     website?: string;
   };
+}
+
+interface CommunityBasics {
+  owner: string;
+  communityId: string;
+  display: CommunityDisplay;
+}
+
+interface Community extends CommunityBasics {
   quests: { [key: string]: QuestConfig };
   challenges: { [key: string]: ChallengeConfig };
   bounties: CommuntiyBountyBasics[];

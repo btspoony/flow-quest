@@ -30,7 +30,8 @@ watchEffect(() => {
 <template>
   <div class="card card-border double-border h-36 w-full flex items-center justify-between gap-4">
     <div class="flex-1 flex flex-col justify-between gap-2 h-full">
-      <div>
+      <div class="inline-flex gap-2 items-center justify-start">
+        <ItemCommunityTag :community-id="challengeCfg?.communityId" />
         <span class="tag">
           {{ challengeCfg.quests.length }} quests
         </span>
