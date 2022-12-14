@@ -12,8 +12,10 @@ export default defineEventHandler(async (event) => {
     })
   );
 
-  const baseURL = "http://localhost:3000/";
-  const redirectionURL = new URL("close-popup", baseURL);
+  const redirectionURL = new URL(
+    "close-popup",
+    config.oauthHost ?? "http://localhost:3000/"
+  );
 
   if (parsed.success) {
     if (typeof parsed.data.code === "string") {
