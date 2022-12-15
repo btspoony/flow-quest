@@ -20,11 +20,11 @@ function onClickCard() {
   if (props.bounty.config.category === 'challenge') {
     const current = useCurrentChallenge()
     current.value = props.bounty
-    router.push(`/challenges/${props.bounty.id}`)
+    router.push(geneReferralLinkObject(`/challenges/${props.bounty.id}`))
   } else {
     const quest = useCurrentQuest()
     quest.value = props.bounty
-    router.push(`/quests/${props.bounty.config.key}`)
+    router.push(geneReferralLinkObject(`/quests/${props.bounty.config.key}`))
   }
 }
 </script>

@@ -130,4 +130,13 @@ watchEffect(() => {
   animation: spin 20s linear infinite;
   transform-origin: center;
 }
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>

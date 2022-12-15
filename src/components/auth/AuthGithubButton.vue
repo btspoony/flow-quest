@@ -33,7 +33,7 @@ onUnmounted(() => {
 
 function receiveMessage(event: any) {
   if (event.origin !== window.location.origin) {
-    console.warn(`Message received by ${event.origin}; IGNORED.`);
+    console.info(`Message received by ${event.origin}; IGNORED.`);
     return;
   }
   if (event.data?.source !== "auth-popup") {

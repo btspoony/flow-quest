@@ -57,7 +57,7 @@ function onLogout() {
     </summary>
     <ul role="listbox">
       <li v-if="wallet?.loggedIn">
-        <NuxtLink :to="`/account/${wallet.addr}`" @click="closeDropdown()">
+        <NuxtLink :to="geneReferralLink(`/account/${wallet.addr}`)" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-end">
             <span>Profile</span>
             <UserCircleIcon class="fill-secondary w-5 h-5" />

@@ -17,30 +17,31 @@ function isCurrentInActivePage(pageKey: string): boolean {
   <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)]">
     <nav class="container">
       <ul>
-        <li class="inline-flex-between cursor-pointer" @click="() => {
-          router.push('/');
-        }">
+        <li class="inline-flex-between cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
           <FlowLogo class="fill-white w-10 h-10" />
           <span class="font-semibold text-2xl">{{ appName }}</span>
         </li>
       </ul>
       <ul>
         <li class="flex-center">
-          <NuxtLink to="/active" :class="['inline-flex-between', { secondary: isCurrentInActivePage('active') }]">
+          <NuxtLink :to="geneReferralLink('/active')"
+            :class="['inline-flex-between', { secondary: isCurrentInActivePage('active') }]">
             <FireIcon class="fill-secondary w-6 h-6" />
             Competition
           </NuxtLink>
         </li>
-      <!--
+        <!--
         <li class="flex-center">
-          <NuxtLink to="/communities" :class="['inline-flex-between', { secondary: isCurrentInActivePage('communities') }]">
+          <NuxtLink :to="geneReferralLink('/communities')"
+            :class="['inline-flex-between', { secondary: isCurrentInActivePage('communities') }]">
             <Squares2X2Icon class="fill-current w-6 h-6" />
             Communities
           </NuxtLink>
-        </li>
-      -->
+        </li> -->
+
         <!-- <li class="flex-center">
-          <NuxtLink to="/leaderboard" :class="['inline-flex-between', { secondary: isCurrentInActivePage('leaderboard') }]">
+          <NuxtLink :to="geneReferralLink('/leaderboard')"
+            :class="['inline-flex-between', { secondary: isCurrentInActivePage('leaderboard') }]">
             <ChartBarSquareIcon class="fill-current w-6 h-6" />
             Leaderboard
           </NuxtLink>

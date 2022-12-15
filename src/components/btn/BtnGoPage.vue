@@ -5,7 +5,7 @@ const props = defineProps<{
 const router = useRouter();
 
 function onClick() {
-  router.push(props.next);
+  router.push(geneReferralLinkObject(props.next));
 }
 </script>
 
