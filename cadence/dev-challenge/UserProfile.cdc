@@ -407,9 +407,11 @@ pub contract UserProfile {
             )
         }
 
-        access(account) fun setupReferralCode(seasonId: UInt64) {
+        access(account) fun setupReferralCode(seasonId: UInt64, code: String) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
-            let code = "" // TODO
+
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            seasonRef.setupReferralCode(code: code)
 
             emit ProfileSetupReferralCode(
                 profile: profileAddr,

@@ -182,6 +182,9 @@ pub contract CompetitionService {
     pub resource interface CompetitionPublic {
         pub fun borrowBountyInfoByKey(_ key: String): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
         pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
+        // Referral Mapping
+        pub fun getReferralAddress(_ code: String): Address?
+        pub fun getReferralCode(_ addr: Address): String?
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
@@ -191,6 +194,9 @@ pub contract CompetitionService {
         access(contract) var primaryBounties: [UInt64]
         // QuestKey -> BountyID
         access(self) var keyIdMapping: {String: UInt64}
+        // Referral Mapping
+        access(contract) var referralCodesToAddrs: {String: Address}
+        access(contract) var referralAddrsToCodes: {Address: String}
 
         init(
             endDate: UFix64,
@@ -200,6 +206,8 @@ pub contract CompetitionService {
             self.bounties <- {}
             self.primaryBounties = []
             self.keyIdMapping = {}
+            self.referralCodesToAddrs = {}
+            self.referralAddrsToCodes = {}
         }
 
         destroy() {
@@ -237,6 +245,14 @@ pub contract CompetitionService {
             return self.borrowBountyPrivateRef(bountyId)
         }
 
+        pub fun getReferralAddress(_ code: String): Address? {
+            return self.referralCodesToAddrs[code]
+        }
+
+        pub fun getReferralCode(_ addr: Address): String? {
+            return self.referralAddrsToCodes[addr]
+        }
+
         pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
             let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
             let bountyRef = self.borrowBountyPrivateRef(bountyId)
@@ -260,6 +276,15 @@ pub contract CompetitionService {
         access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address) {
             let bounty = &self.bounties[bountyId] as &BountyInfo? ?? panic("Failed to borrow bounty")
             bounty.onParticipantCompleted(acct: acct)
+        }
+
+        access(contract) fun setReferralCode(addr: Address, code: String) {
+            pre {
+                self.referralAddrsToCodes[addr] == nil: "Referral code exists"
+                self.referralCodesToAddrs[code] == nil: "Referral code exists"
+            }
+            self.referralAddrsToCodes[addr] = code
+            self.referralCodesToAddrs[code] = addr
         }
 
         access(contract) fun updateEndDate(datetime: UFix64) {
@@ -495,9 +520,25 @@ pub contract CompetitionService {
         }
 
         pub fun setupReferralCode(acct: Address, seasonId: UInt64) {
-            // get profile and update points
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
+
+            let hash = getCurrentBlock().id
+            let acctHash = acct.toString().utf8
+            let codeArr: [UInt8] = []
+            var i = 0
+            while i < 4 {
+                codeArr.append(hash[hash.length - 1 - i])
+                codeArr.append(acctHash[i])
+                i = i + 1
+            }
+            let code = String.encodeHex(codeArr)
+            // set to season
+            seasonRef.setReferralCode(addr: acct, code: code)
+
+            // get profile and set code in profile
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.setupReferralCode(seasonId: seasonId)
+            profileRef.setupReferralCode(seasonId: seasonId, code: code)
         }
 
         access(self) fun addPoints(acct: Address, seasonId: UInt64, points: UInt64) {
