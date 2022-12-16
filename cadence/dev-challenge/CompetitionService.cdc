@@ -190,21 +190,31 @@ pub contract CompetitionService {
         pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
 
         pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool
-        // Properties
+        // --- Properties ---
         pub fun getEndDate(): UFix64
         // Referral
         pub fun getReferralThreshold(): UInt64
         pub fun getReferralAddress(_ code: String): Address?
         pub fun getReferralCode(_ addr: Address): String?
+        // leaderboard
+        pub fun getRank(_ addr: Address): Int
+        pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]}
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
-        access(contract) let properties: {CompetitionProperty: AnyStruct}
-        access(contract) var profiles: {Address: Bool}
         access(contract) var bounties: @{UInt64: BountyInfo}
         access(contract) var primaryBounties: [UInt64]
         // QuestKey -> BountyID
         access(self) var keyIdMapping: {String: UInt64}
+        // Properties
+        access(contract) let properties: {CompetitionProperty: AnyStruct}
+        access(contract) var profiles: {Address: Bool}
+        // leaderboard Rank -> Score
+        access(contract) var leaderboardRanking: [UInt64]
+        // leaderboard Address -> Rank
+        access(contract) var leaderboardAddressMap: {Address: Int}
+        // leaderboard Score -> Address
+        access(contract) var leaderboardScores: {UInt64: {Address: Bool}}
         // Referral Mapping
         access(contract) var referralCodesToAddrs: {String: Address}
         access(contract) var referralAddrsToCodes: {Address: String}
@@ -223,6 +233,10 @@ pub contract CompetitionService {
             // setup properties
             self.properties[CompetitionProperty.EndDate] = endDate
             self.properties[CompetitionProperty.ReferralThreshold] = referralThreshold
+            // leaderboard
+            self.leaderboardRanking = []
+            self.leaderboardAddressMap = {}
+            self.leaderboardScores = {}
         }
 
         destroy() {
@@ -316,6 +330,24 @@ pub contract CompetitionService {
             return isCompleted
         }
 
+        pub fun getRank(_ addr: Address): Int {
+            return self.leaderboardAddressMap[addr] ?? self.leaderboardRanking.length
+        }
+
+        pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]} {
+            let maxAmount = limit ?? 100
+            let totalLen = self.leaderboardRanking.length
+            let rankingScores = self.leaderboardRanking.slice(from: 0, upTo: maxAmount > totalLen ? totalLen : maxAmount)
+
+            let ret: {UInt64: [Address]} = {}
+            for score in rankingScores {
+                if let addrs = self.leaderboardScores[score] {
+                    ret[score] = addrs.keys
+                }
+            }
+            return ret
+        }
+
         // ---- writable methods ----
 
         access(account) fun onProfileRegistered(acct: Address) {
@@ -341,6 +373,40 @@ pub contract CompetitionService {
             }
             self.referralAddrsToCodes[addr] = code
             self.referralCodesToAddrs[code] = addr
+        }
+
+        access(contract) fun updateRanking(addr: Address, points: UInt64) {
+            let oldRank = self.leaderboardAddressMap[addr]
+            // remove old rank
+            if oldRank != nil  {
+                let score = self.leaderboardRanking[oldRank!]
+                if score == points {
+                    return
+                }
+                if let addrMap = self.leaderboardScores[score] {
+                    addrMap.remove(key: addr)
+                }
+            }
+            // update current rank
+            if let addrMap = self.leaderboardScores[points] {
+                addrMap[addr] = true
+            } else {
+                self.leaderboardScores[points] = { addr: true }
+            }
+            // search the rank
+            var left = 0
+            var right = oldRank ?? self.leaderboardRanking.length - 1
+            while left <= right {
+                let mid = (left + right) / 2
+                let scoreTest = self.leaderboardRanking[mid]
+                if scoreTest < points {
+                    left = mid + 1
+                } else {
+                    right = mid - 1
+                }
+            }
+            self.leaderboardRanking.insert(at: left, points)
+            self.leaderboardAddressMap.insert(key: addr, left)
         }
 
         access(contract) fun updateReferralThreshold(threshold: UInt64) {
@@ -616,6 +682,11 @@ pub contract CompetitionService {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
             profileRef.addPoints(seasonId: seasonId, points: points)
+
+            // update leaderboard
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.updateRanking(addr: acct, points: profileRef.getSeasonPoints(seasonId: seasonId))
         }
     }
 

@@ -306,12 +306,16 @@ pub contract UserProfile {
             serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
             referredFrom: Address?
         ) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
             let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
             let competitionRef = serviceRef.borrowLatestActiveSeason()
             assert(competitionRef.isActive(), message: "Competition is not active.")
 
+            // ensure referred from others
+            assert(referredFrom == nil || referredFrom! != profileAddr, message: "Invalid referral from")
+
             // add to competition
-            let profileAddr = self.owner?.address ?? panic("Owner not exist")
             competitionRef.onProfileRegistered(acct: profileAddr)
 
             let seasonId = competitionRef.getSeasonId()
