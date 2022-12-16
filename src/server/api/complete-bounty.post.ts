@@ -88,8 +88,12 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
     );
 
     // Step.2 Verify the quest result on testnet
-    // FIXME Check to ensure bounty completed
-    isBountyCompleted = true;
+    // Check to ensure bounty completed
+    isBountyCompleted = await actions.scCheckBountyComplete(
+      signer,
+      body.address,
+      body.bountyId
+    );
 
     if (isBountyCompleted) {
       // run the reward transaction

@@ -69,6 +69,24 @@ export async function scGetQuestDetail(
   return result;
 }
 
+export async function scCheckBountyComplete(
+  signer: Signer,
+  acct: string,
+  bountyId: string
+): Promise<boolean> {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/scripts/check-bounty-complete.cdc`
+  );
+  if (typeof code !== "string") {
+    throw new Error("Unknown script.");
+  }
+  return await signer.executeScript(
+    code,
+    (arg, t) => [arg(acct, t.Address), arg(bountyId, t.UInt64)],
+    false
+  );
+}
+
 export async function scVerifyQuest(
   signer: Signer,
   stepCfg: QuestStepsConfig,

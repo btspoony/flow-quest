@@ -182,6 +182,8 @@ pub contract CompetitionService {
     pub resource interface CompetitionPublic {
         pub fun borrowBountyInfoByKey(_ key: String): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
         pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
+
+        pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool
         // Referral Mapping
         pub fun getReferralAddress(_ code: String): Address?
         pub fun getReferralCode(_ addr: Address): String?
@@ -245,6 +247,13 @@ pub contract CompetitionService {
             return self.borrowBountyPrivateRef(bountyId)
         }
 
+        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
+            let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
+            let bountyRef = self.borrowBountyPrivateRef(bountyId)
+            assert(bountyRef.identifier.category == Interfaces.BountyType.quest, message: "Bounty should be a quest.")
+            return bountyRef.identifier.getQuestConfig()
+        }
+
         pub fun getReferralAddress(_ code: String): Address? {
             return self.referralCodesToAddrs[code]
         }
@@ -253,11 +262,36 @@ pub contract CompetitionService {
             return self.referralAddrsToCodes[addr]
         }
 
-        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
-            let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
-            let bountyRef = self.borrowBountyPrivateRef(bountyId)
-            assert(bountyRef.identifier.category == Interfaces.BountyType.quest, message: "Bounty should be a quest.")
-            return bountyRef.identifier.getQuestConfig()
+        /**
+         * check if bounty completed
+         */
+        pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool {
+            let seasonId = self.getSeasonId()
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            let completedInProfile = profileRef.isBountyCompleted(seasonId: seasonId, bountyId: bountyId)
+            // already completed
+            if completedInProfile {
+                return completedInProfile
+            }
+
+            let bounty = self.borrowBountyPrivateRef(bountyId)
+            // result
+            var isCompleted = false
+            // ensure quest completed
+            if bounty.identifier.category == Interfaces.BountyType.quest {
+                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
+                isCompleted = status.completed
+            } else {
+                let challengeRef = bounty.identifier.getChallengeConfig()
+                var allCompleted = true
+                for identifier in challengeRef.quests {
+                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
+                    allCompleted = allCompleted && status.completed
+                }
+                isCompleted = allCompleted
+            }
+            return isCompleted
         }
 
         // ---- writable methods ----
@@ -488,19 +522,9 @@ pub contract CompetitionService {
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
             assert(!profileRef.isBountyCompleted(seasonId: seasonId, bountyId: bountyId), message: "Ensure bounty not completed")
 
-            // ensure quest completed
-            if bounty.identifier.category == Interfaces.BountyType.quest {
-                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
-                assert(status.completed, message: "Quset not completed")
-            } else {
-                let challengeRef = bounty.identifier.getChallengeConfig()
-                var allCompleted = true
-                for identifier in challengeRef.quests {
-                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
-                    allCompleted = allCompleted && status.completed
-                }
-                assert(allCompleted, message: "Challenge not completed")
-            }
+            let checkCompleted = seasonRef.checkBountyCompleteStatus(acct: acct, bountyId: bountyId)
+            // ensure bounty completed
+            assert(checkCompleted, message: "Bounty not completed")
 
             // distribute rewards
             if bounty.rewardType == Helper.QuestRewardType.Points {
