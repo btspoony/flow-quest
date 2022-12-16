@@ -33,7 +33,8 @@ pub contract CompetitionService {
     pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, bountyId: UInt64)
     pub event BountyCompleted(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
     pub event ProfileRegistered(seasonId: UInt64, participant: Address)
-    pub event SeasonEndDateUpdated(seasonId: UInt64, datetime: UFix64)
+    pub event SeasonPropertyEndDateUpdated(seasonId: UInt64, key: UInt8, value: UFix64)
+    pub event SeasonPropertyReferralThresholdUpdated(seasonId: UInt64, key: UInt8, value: UInt64)
 
     pub event SeasonCreated(seasonId: UInt64)
 
@@ -179,18 +180,26 @@ pub contract CompetitionService {
         }
     }
 
+    pub enum CompetitionProperty: UInt8 {
+        pub case EndDate
+        pub case ReferralThreshold
+    }
+
     pub resource interface CompetitionPublic {
         pub fun borrowBountyInfoByKey(_ key: String): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
         pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
 
         pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool
-        // Referral Mapping
+        // Properties
+        pub fun getEndDate(): UFix64
+        // Referral
+        pub fun getReferralThreshold(): UInt64
         pub fun getReferralAddress(_ code: String): Address?
         pub fun getReferralCode(_ addr: Address): String?
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
-        pub var endDate: UFix64
+        access(contract) let properties: {CompetitionProperty: AnyStruct}
         access(contract) var profiles: {Address: Bool}
         access(contract) var bounties: @{UInt64: BountyInfo}
         access(contract) var primaryBounties: [UInt64]
@@ -202,14 +211,18 @@ pub contract CompetitionService {
 
         init(
             endDate: UFix64,
+            referralThreshold: UInt64
         ) {
-            self.endDate = endDate
+            self.properties = {}
             self.profiles = {}
             self.bounties <- {}
             self.primaryBounties = []
             self.keyIdMapping = {}
             self.referralCodesToAddrs = {}
             self.referralAddrsToCodes = {}
+            // setup properties
+            self.properties[CompetitionProperty.EndDate] = endDate
+            self.properties[CompetitionProperty.ReferralThreshold] = referralThreshold
         }
 
         destroy() {
@@ -222,8 +235,17 @@ pub contract CompetitionService {
             return self.uuid
         }
 
+        // properties
+        pub fun getEndDate(): UFix64 {
+            return self.properties[CompetitionProperty.EndDate] as! UFix64
+        }
+
+        pub fun getReferralThreshold(): UInt64 {
+            return self.properties[CompetitionProperty.ReferralThreshold] as! UInt64
+        }
+
         pub fun isActive(): Bool {
-            return self.endDate > getCurrentBlock().timestamp
+            return self.getEndDate() > getCurrentBlock().timestamp
         }
 
         pub fun getBountyIDs(): [UInt64] {
@@ -321,15 +343,26 @@ pub contract CompetitionService {
             self.referralCodesToAddrs[code] = addr
         }
 
+        access(contract) fun updateReferralThreshold(threshold: UInt64) {
+            self.properties[CompetitionProperty.ReferralThreshold] = threshold
+
+            emit SeasonPropertyReferralThresholdUpdated(
+                seasonId: self.getSeasonId(),
+                key: CompetitionProperty.ReferralThreshold.rawValue,
+                value: threshold
+            )
+        }
+
         access(contract) fun updateEndDate(datetime: UFix64) {
             pre {
                 datetime > getCurrentBlock().timestamp: "Cannot update end date before now."
             }
-            self.endDate = datetime
+            self.properties[CompetitionProperty.EndDate] = datetime
 
-            emit SeasonEndDateUpdated(
+            emit SeasonPropertyEndDateUpdated(
                 seasonId: self.getSeasonId(),
-                datetime: datetime,
+                key: CompetitionProperty.EndDate.rawValue,
+                value: datetime
             )
         }
 
@@ -438,7 +471,8 @@ pub contract CompetitionService {
         // ---- writable methods ----
 
         access(contract) fun startNewSeason(
-            endDate: UFix64
+            endDate: UFix64,
+            referralThreshold: UInt64
         ): UInt64 {
             // ensure one time one season
             if self.latestActiveSeasonId != 0 {
@@ -448,6 +482,7 @@ pub contract CompetitionService {
 
             let season <- create CompetitionSeason(
                 endDate: endDate,
+                referralThreshold: referralThreshold
             )
             let seasonId = season.uuid
             self.seasons[seasonId] <-! season
@@ -463,9 +498,12 @@ pub contract CompetitionService {
     /// Mainly used to manage competition
     pub resource CompetitionAdmin {
 
-        pub fun startNewSeason(endDate: UFix64): UInt64 {
+        pub fun startNewSeason(
+            endDate: UFix64,
+            referralThreshold: UInt64
+        ): UInt64 {
             let serviceIns = CompetitionService.borrowServiceRef()
-            return serviceIns.startNewSeason(endDate: endDate)
+            return serviceIns.startNewSeason(endDate: endDate, referralThreshold: referralThreshold)
         }
 
         pub fun addBounty(
@@ -487,6 +525,15 @@ pub contract CompetitionService {
             let serviceIns = CompetitionService.borrowServiceRef()
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateEndDate(datetime: datetime)
+        }
+
+        pub fun updateReferralThreshold(
+            seasonId: UInt64,
+            threshold: UInt64
+        ) {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.updateReferralThreshold(threshold: threshold)
         }
     }
 

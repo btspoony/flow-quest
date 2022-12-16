@@ -190,6 +190,7 @@ interface BountyInfo {
 interface CompetitionSeason {
   seasonId: string;
   endDate: number;
+  referralThreshold: number;
   bounties: { [uid: string]: BountyInfo };
 }
 

@@ -146,6 +146,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           return {
             seasonId: ret.seasonID,
             endDate: parseInt(ret.endDate),
+            referralThreshold: parseInt(ret.referralThreshold),
             bounties: bounties,
           };
         },

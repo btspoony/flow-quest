@@ -24,6 +24,7 @@ async function main() {
 
   const txid = await signer.sendTransaction(code, (arg, t) => [
     arg(data.endDate.toFixed(1), t.UFix64),
+    arg(data.threshold.toString(), t.UInt64),
   ]);
 
   await utils.watchTransaction(signer, txid);

@@ -166,9 +166,9 @@ pub contract Interfaces {
 
     // Competition public interface
     pub resource interface CompetitionPublic {
-        pub var endDate: UFix64
-
+        // status
         pub fun isActive(): Bool
+        // information
         pub fun getSeasonId(): UInt64
         pub fun getBountyIDs(): [UInt64]
         pub fun getPrimaryBountyIDs(): [UInt64]
