@@ -30,7 +30,7 @@ export default defineEventHandler<ResponseReferralCodeGenerate>(async function (
   const signer = await utils.pickOneSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
-  let isPointsNotEnough = false;
+  let isPointsEnough = false;
   let transactionId: string | null = null;
 
   if (isAccountValid) {
@@ -44,12 +44,12 @@ export default defineEventHandler<ResponseReferralCodeGenerate>(async function (
       flow.switchToTestnet();
     }
 
-    isPointsNotEnough = await actions.scCheckPointsToGeneReferralCode(
+    isPointsEnough = await actions.scCheckPointsToGeneReferralCode(
       signer,
       body.address
     );
 
-    if (isPointsNotEnough) {
+    if (isPointsEnough) {
       // run the reward transaction
       transactionId = await actions.txCtrlerSetupReferralCode(
         signer,
@@ -65,9 +65,9 @@ export default defineEventHandler<ResponseReferralCodeGenerate>(async function (
   }
 
   return {
-    ok: isAccountValid && isPointsNotEnough && transactionId !== null,
+    ok: isAccountValid && isPointsEnough && transactionId !== null,
     isAccountValid,
-    isPointsNotEnough,
+    isPointsEnough,
     transactionId,
   };
 });

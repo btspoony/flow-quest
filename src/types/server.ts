@@ -41,6 +41,6 @@ interface ResponseCompleteBounty {
 interface ResponseReferralCodeGenerate {
   ok: boolean;
   isAccountValid: boolean;
-  isPointsNotEnough: boolean;
+  isPointsEnough: boolean;
   transactionId: string | null;
 }
