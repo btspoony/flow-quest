@@ -251,11 +251,11 @@ pub contract CompetitionService {
 
         // properties
         pub fun getEndDate(): UFix64 {
-            return self.properties[CompetitionProperty.EndDate] as! UFix64
+            return (self.properties[CompetitionProperty.EndDate] as! UFix64?)!
         }
 
         pub fun getReferralThreshold(): UInt64 {
-            return self.properties[CompetitionProperty.ReferralThreshold] as! UInt64
+            return (self.properties[CompetitionProperty.ReferralThreshold] as! UInt64?)!
         }
 
         pub fun isActive(): Bool {
