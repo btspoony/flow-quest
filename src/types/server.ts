@@ -1,3 +1,13 @@
+interface OptionAccountProof {
+  address: string;
+  proofNonce: string;
+  proofSigs: {
+    keyId: number;
+    addr: string;
+    signature: string;
+  }[];
+}
+
 interface OptionProfileRegister {
   referredFrom?: string;
 }
@@ -14,10 +24,6 @@ interface OptionCtlerCompleteBounty {
   bountyId: string;
 }
 
-interface OptionCtrlerSetupReferralCode {
-  target: string;
-}
-
 interface ResponseVerifyQuest {
   ok: boolean;
   isAccountValid: boolean;
@@ -29,5 +35,12 @@ interface ResponseCompleteBounty {
   ok: boolean;
   isAccountValid: boolean;
   isBountyCompleted: boolean;
+  transactionId: string | null;
+}
+
+interface ResponseReferralCodeGenerate {
+  ok: boolean;
+  isAccountValid: boolean;
+  isPointsNotEnough: boolean;
   transactionId: string | null;
 }
