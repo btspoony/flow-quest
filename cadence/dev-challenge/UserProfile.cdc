@@ -306,12 +306,16 @@ pub contract UserProfile {
             serviceCap: Capability<&{Interfaces.CompetitionServicePublic}>,
             referredFrom: Address?
         ) {
+            let profileAddr = self.owner?.address ?? panic("Owner not exist")
+
             let serviceRef = serviceCap.borrow() ?? panic("Failed to get service capability.")
             let competitionRef = serviceRef.borrowLatestActiveSeason()
             assert(competitionRef.isActive(), message: "Competition is not active.")
 
+            // ensure referred from others
+            assert(referredFrom == nil || referredFrom! != profileAddr, message: "Invalid referral from")
+
             // add to competition
-            let profileAddr = self.owner?.address ?? panic("Owner not exist")
             competitionRef.onProfileRegistered(acct: profileAddr)
 
             let seasonId = competitionRef.getSeasonId()
@@ -407,9 +411,11 @@ pub contract UserProfile {
             )
         }
 
-        access(account) fun setupReferralCode(seasonId: UInt64) {
+        access(account) fun setupReferralCode(seasonId: UInt64, code: String) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
-            let code = "" // TODO
+
+            let seasonRef = self.borrowSeasonRecordRef(seasonId)
+            seasonRef.setupReferralCode(code: code)
 
             emit ProfileSetupReferralCode(
                 profile: profileAddr,
@@ -441,8 +447,8 @@ pub contract UserProfile {
         self.totalProfiles = 0
         self.platformMapping = {}
 
-        self.ProfileStoragePath = /storage/DevCompetitionProfilePathV1
-        self.ProfilePublicPath = /public/DevCompetitionProfilePathV1
+        self.ProfileStoragePath = /storage/DevCompetitionProfilePathV2
+        self.ProfilePublicPath = /public/DevCompetitionProfilePathV2
 
         emit ContractInitialized()
     }

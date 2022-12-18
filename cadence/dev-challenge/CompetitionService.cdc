@@ -33,7 +33,8 @@ pub contract CompetitionService {
     pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, bountyId: UInt64)
     pub event BountyCompleted(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
     pub event ProfileRegistered(seasonId: UInt64, participant: Address)
-    pub event SeasonEndDateUpdated(seasonId: UInt64, datetime: UFix64)
+    pub event SeasonPropertyEndDateUpdated(seasonId: UInt64, key: UInt8, value: UFix64)
+    pub event SeasonPropertyReferralThresholdUpdated(seasonId: UInt64, key: UInt8, value: UInt64)
 
     pub event SeasonCreated(seasonId: UInt64)
 
@@ -179,27 +180,63 @@ pub contract CompetitionService {
         }
     }
 
+    pub enum CompetitionProperty: UInt8 {
+        pub case EndDate
+        pub case ReferralThreshold
+    }
+
     pub resource interface CompetitionPublic {
         pub fun borrowBountyInfoByKey(_ key: String): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
         pub fun borrowBountyDetail(_ bountyId: UInt64): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic}
+
+        pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool
+        // --- Properties ---
+        pub fun getEndDate(): UFix64
+        // Referral
+        pub fun getReferralThreshold(): UInt64
+        pub fun getReferralAddress(_ code: String): Address?
+        pub fun getReferralCode(_ addr: Address): String?
+        // leaderboard
+        pub fun getRank(_ addr: Address): Int
+        pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]}
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
-        pub var endDate: UFix64
-        access(contract) var profiles: {Address: Bool}
         access(contract) var bounties: @{UInt64: BountyInfo}
         access(contract) var primaryBounties: [UInt64]
         // QuestKey -> BountyID
         access(self) var keyIdMapping: {String: UInt64}
+        // Properties
+        access(contract) let properties: {CompetitionProperty: AnyStruct}
+        access(contract) var profiles: {Address: Bool}
+        // leaderboard Rank -> Score
+        access(contract) var leaderboardRanking: [UInt64]
+        // leaderboard Address -> Rank
+        access(contract) var leaderboardAddressMap: {Address: Int}
+        // leaderboard Score -> Address
+        access(contract) var leaderboardScores: {UInt64: {Address: Bool}}
+        // Referral Mapping
+        access(contract) var referralCodesToAddrs: {String: Address}
+        access(contract) var referralAddrsToCodes: {Address: String}
 
         init(
             endDate: UFix64,
+            referralThreshold: UInt64
         ) {
-            self.endDate = endDate
+            self.properties = {}
             self.profiles = {}
             self.bounties <- {}
             self.primaryBounties = []
             self.keyIdMapping = {}
+            self.referralCodesToAddrs = {}
+            self.referralAddrsToCodes = {}
+            // setup properties
+            self.properties[CompetitionProperty.EndDate] = endDate
+            self.properties[CompetitionProperty.ReferralThreshold] = referralThreshold
+            // leaderboard
+            self.leaderboardRanking = []
+            self.leaderboardAddressMap = {}
+            self.leaderboardScores = {}
         }
 
         destroy() {
@@ -212,8 +249,17 @@ pub contract CompetitionService {
             return self.uuid
         }
 
+        // properties
+        pub fun getEndDate(): UFix64 {
+            return (self.properties[CompetitionProperty.EndDate] as! UFix64?)!
+        }
+
+        pub fun getReferralThreshold(): UInt64 {
+            return (self.properties[CompetitionProperty.ReferralThreshold] as! UInt64?)!
+        }
+
         pub fun isActive(): Bool {
-            return self.endDate > getCurrentBlock().timestamp
+            return self.getEndDate() > getCurrentBlock().timestamp
         }
 
         pub fun getBountyIDs(): [UInt64] {
@@ -244,6 +290,64 @@ pub contract CompetitionService {
             return bountyRef.identifier.getQuestConfig()
         }
 
+        pub fun getReferralAddress(_ code: String): Address? {
+            return self.referralCodesToAddrs[code]
+        }
+
+        pub fun getReferralCode(_ addr: Address): String? {
+            return self.referralAddrsToCodes[addr]
+        }
+
+        /**
+         * check if bounty completed
+         */
+        pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool {
+            let seasonId = self.getSeasonId()
+            // get profile and update points
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            let completedInProfile = profileRef.isBountyCompleted(seasonId: seasonId, bountyId: bountyId)
+            // already completed
+            if completedInProfile {
+                return completedInProfile
+            }
+
+            let bounty = self.borrowBountyPrivateRef(bountyId)
+            // result
+            var isCompleted = false
+            // ensure quest completed
+            if bounty.identifier.category == Interfaces.BountyType.quest {
+                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
+                isCompleted = status.completed
+            } else {
+                let challengeRef = bounty.identifier.getChallengeConfig()
+                var allCompleted = true
+                for identifier in challengeRef.quests {
+                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
+                    allCompleted = allCompleted && status.completed
+                }
+                isCompleted = allCompleted
+            }
+            return isCompleted
+        }
+
+        pub fun getRank(_ addr: Address): Int {
+            return self.leaderboardAddressMap[addr] ?? self.leaderboardRanking.length
+        }
+
+        pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]} {
+            let maxAmount = limit ?? 100
+            let totalLen = self.leaderboardRanking.length
+            let rankingScores = self.leaderboardRanking.slice(from: 0, upTo: maxAmount > totalLen ? totalLen : maxAmount)
+
+            let ret: {UInt64: [Address]} = {}
+            for score in rankingScores {
+                if let addrs = self.leaderboardScores[score] {
+                    ret[score] = addrs.keys
+                }
+            }
+            return ret
+        }
+
         // ---- writable methods ----
 
         access(account) fun onProfileRegistered(acct: Address) {
@@ -262,15 +366,69 @@ pub contract CompetitionService {
             bounty.onParticipantCompleted(acct: acct)
         }
 
+        access(contract) fun setReferralCode(addr: Address, code: String) {
+            pre {
+                self.referralAddrsToCodes[addr] == nil: "Referral code exists"
+                self.referralCodesToAddrs[code] == nil: "Referral code exists"
+            }
+            self.referralAddrsToCodes[addr] = code
+            self.referralCodesToAddrs[code] = addr
+        }
+
+        access(contract) fun updateRanking(addr: Address, points: UInt64) {
+            let oldRank = self.leaderboardAddressMap[addr]
+            // remove old rank
+            if oldRank != nil  {
+                let score = self.leaderboardRanking[oldRank!]
+                if score == points {
+                    return
+                }
+                if let addrMap = self.leaderboardScores[score] {
+                    addrMap.remove(key: addr)
+                }
+            }
+            // update current rank
+            if let addrMap = self.leaderboardScores[points] {
+                addrMap[addr] = true
+            } else {
+                self.leaderboardScores[points] = { addr: true }
+            }
+            // search the rank
+            var left = 0
+            var right = oldRank ?? self.leaderboardRanking.length - 1
+            while left <= right {
+                let mid = (left + right) / 2
+                let scoreTest = self.leaderboardRanking[mid]
+                if scoreTest < points {
+                    left = mid + 1
+                } else {
+                    right = mid - 1
+                }
+            }
+            self.leaderboardRanking.insert(at: left, points)
+            self.leaderboardAddressMap.insert(key: addr, left)
+        }
+
+        access(contract) fun updateReferralThreshold(threshold: UInt64) {
+            self.properties[CompetitionProperty.ReferralThreshold] = threshold
+
+            emit SeasonPropertyReferralThresholdUpdated(
+                seasonId: self.getSeasonId(),
+                key: CompetitionProperty.ReferralThreshold.rawValue,
+                value: threshold
+            )
+        }
+
         access(contract) fun updateEndDate(datetime: UFix64) {
             pre {
                 datetime > getCurrentBlock().timestamp: "Cannot update end date before now."
             }
-            self.endDate = datetime
+            self.properties[CompetitionProperty.EndDate] = datetime
 
-            emit SeasonEndDateUpdated(
+            emit SeasonPropertyEndDateUpdated(
                 seasonId: self.getSeasonId(),
-                datetime: datetime,
+                key: CompetitionProperty.EndDate.rawValue,
+                value: datetime
             )
         }
 
@@ -379,7 +537,8 @@ pub contract CompetitionService {
         // ---- writable methods ----
 
         access(contract) fun startNewSeason(
-            endDate: UFix64
+            endDate: UFix64,
+            referralThreshold: UInt64
         ): UInt64 {
             // ensure one time one season
             if self.latestActiveSeasonId != 0 {
@@ -389,6 +548,7 @@ pub contract CompetitionService {
 
             let season <- create CompetitionSeason(
                 endDate: endDate,
+                referralThreshold: referralThreshold
             )
             let seasonId = season.uuid
             self.seasons[seasonId] <-! season
@@ -404,9 +564,12 @@ pub contract CompetitionService {
     /// Mainly used to manage competition
     pub resource CompetitionAdmin {
 
-        pub fun startNewSeason(endDate: UFix64): UInt64 {
+        pub fun startNewSeason(
+            endDate: UFix64,
+            referralThreshold: UInt64
+        ): UInt64 {
             let serviceIns = CompetitionService.borrowServiceRef()
-            return serviceIns.startNewSeason(endDate: endDate)
+            return serviceIns.startNewSeason(endDate: endDate, referralThreshold: referralThreshold)
         }
 
         pub fun addBounty(
@@ -428,6 +591,15 @@ pub contract CompetitionService {
             let serviceIns = CompetitionService.borrowServiceRef()
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateEndDate(datetime: datetime)
+        }
+
+        pub fun updateReferralThreshold(
+            seasonId: UInt64,
+            threshold: UInt64
+        ) {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.updateReferralThreshold(threshold: threshold)
         }
     }
 
@@ -463,19 +635,9 @@ pub contract CompetitionService {
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
             assert(!profileRef.isBountyCompleted(seasonId: seasonId, bountyId: bountyId), message: "Ensure bounty not completed")
 
-            // ensure quest completed
-            if bounty.identifier.category == Interfaces.BountyType.quest {
-                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
-                assert(status.completed, message: "Quset not completed")
-            } else {
-                let challengeRef = bounty.identifier.getChallengeConfig()
-                var allCompleted = true
-                for identifier in challengeRef.quests {
-                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
-                    allCompleted = allCompleted && status.completed
-                }
-                assert(allCompleted, message: "Challenge not completed")
-            }
+            let checkCompleted = seasonRef.checkBountyCompleteStatus(acct: acct, bountyId: bountyId)
+            // ensure bounty completed
+            assert(checkCompleted, message: "Bounty not completed")
 
             // distribute rewards
             if bounty.rewardType == Helper.QuestRewardType.Points {
@@ -495,15 +657,36 @@ pub contract CompetitionService {
         }
 
         pub fun setupReferralCode(acct: Address, seasonId: UInt64) {
-            // get profile and update points
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
+
+            let hash = getCurrentBlock().id
+            let acctHash = acct.toString().utf8
+            let codeArr: [UInt8] = []
+            var i = 0
+            while i < 4 {
+                codeArr.append(hash[hash.length - 1 - i])
+                codeArr.append(acctHash[i])
+                i = i + 1
+            }
+            let code = String.encodeHex(codeArr)
+            // set to season
+            seasonRef.setReferralCode(addr: acct, code: code)
+
+            // get profile and set code in profile
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.setupReferralCode(seasonId: seasonId)
+            profileRef.setupReferralCode(seasonId: seasonId, code: code)
         }
 
         access(self) fun addPoints(acct: Address, seasonId: UInt64, points: UInt64) {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
             profileRef.addPoints(seasonId: seasonId, points: points)
+
+            // update leaderboard
+            let serviceIns = CompetitionService.borrowServiceRef()
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.updateRanking(addr: acct, points: profileRef.getSeasonPoints(seasonId: seasonId))
         }
     }
 

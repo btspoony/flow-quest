@@ -4,6 +4,7 @@ import CompetitionService from "../CompetitionService.cdc"
 
 transaction(
     endDate: UFix64,
+    referralThreshold: UInt64
 ) {
     let admin: &CompetitionService.CompetitionAdmin
 
@@ -13,6 +14,9 @@ transaction(
     }
 
     execute {
-        self.admin.startNewSeason(endDate: endDate)
+        self.admin.startNewSeason(
+            endDate: endDate,
+            referralThreshold: referralThreshold,
+        )
     }
 }

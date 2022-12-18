@@ -37,13 +37,13 @@ export async function txCompleteBounty(
 
 export async function txCtrlerSetupReferralCode(
   signer: Signer,
-  opts: OptionCtrlerSetupReferralCode
+  target: string
 ) {
   return signer.sendTransaction(
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-setup-referral-code.cdc"
     ),
-    (arg, t) => [arg(opts.target, t.String)]
+    (arg, t) => [arg(target, t.String)]
   );
 }
 
@@ -67,6 +67,41 @@ export async function scGetQuestDetail(
     throw new Error("Failed to executeScript");
   }
   return result;
+}
+
+export async function scCheckBountyComplete(
+  signer: Signer,
+  acct: string,
+  bountyId: string
+): Promise<boolean> {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/scripts/check-bounty-complete.cdc`
+  );
+  if (typeof code !== "string") {
+    throw new Error("Unknown script.");
+  }
+  return await signer.executeScript(
+    code,
+    (arg, t) => [arg(acct, t.Address), arg(bountyId, t.UInt64)],
+    false
+  );
+}
+
+export async function scCheckPointsToGeneReferralCode(
+  signer: Signer,
+  acct: string
+): Promise<boolean> {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/scripts/check-points-to-gene-referral.cdc`
+  );
+  if (typeof code !== "string") {
+    throw new Error("Unknown script.");
+  }
+  return await signer.executeScript(
+    code,
+    (arg, t) => [arg(acct, t.Address)],
+    false
+  );
 }
 
 export async function scVerifyQuest(

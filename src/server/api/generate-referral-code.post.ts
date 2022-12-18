@@ -1,7 +1,7 @@
 import { z, useValidatedBody } from "h3-zod";
 import { flow, actions, utils } from "../helpers";
 
-export default defineEventHandler<ResponseCompleteBounty>(async function (
+export default defineEventHandler<ResponseReferralCodeGenerate>(async function (
   event
 ) {
   const config = useRuntimeConfig();
@@ -20,24 +20,22 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
           signature: z.string(),
         })
       ),
-      // required, quest identifier
-      bountyId: z.string(),
     })
   );
 
   console.log(
-    `Request<Complete Bounty>[${body.address}] - Step.0: Body verified`
+    `Request<Gene Referral Code>[${body.address}] - Step.0: Body verified`
   );
 
   const signer = await utils.pickOneSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
-  let isBountyCompleted = false;
+  let isPointsEnough = false;
   let transactionId: string | null = null;
 
   if (isAccountValid) {
     console.log(
-      `Request<Complete Bounty>[${body.address}] - Step.1: Signature verified`
+      `Request<Gene Referral Code>[${body.address}] - Step.1: Signature verified`
     );
 
     if (config.public.network === "mainnet") {
@@ -46,34 +44,30 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
       flow.switchToTestnet();
     }
 
-    // Step.2 Verify the quest result on testnet
-    // Check to ensure bounty completed
-    isBountyCompleted = await actions.scCheckBountyComplete(
+    isPointsEnough = await actions.scCheckPointsToGeneReferralCode(
       signer,
-      body.address,
-      body.bountyId
+      body.address
     );
 
-    if (isBountyCompleted) {
+    if (isPointsEnough) {
       // run the reward transaction
-      transactionId = await actions.txCompleteBounty(signer, {
-        target: body.address,
-        bountyId: body.bountyId,
-      });
+      transactionId = await actions.txCtrlerSetupReferralCode(
+        signer,
+        body.address
+      );
     }
 
     if (transactionId) {
       console.log(
-        `Request<Complete Bounty>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+        `Request<Gene Referral Code>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
       );
     }
   }
 
-  // Step.4 Return the transaction id
   return {
-    ok: isAccountValid && isBountyCompleted && transactionId !== null,
+    ok: isAccountValid && isPointsEnough && transactionId !== null,
     isAccountValid,
-    isBountyCompleted,
+    isPointsEnough,
     transactionId,
   };
 });

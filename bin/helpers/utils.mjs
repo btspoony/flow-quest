@@ -7,7 +7,7 @@ env.config();
 export function buildSigner() {
   const adminAddress = process.env.NUXT_FLOW_ADMIN_ADDRESS;
   const privateKey = process.env.NUXT_FLOW_PRIVATE_KEY;
-  const serviceAddress = process.env.NUXT_FLOW_SERVICE_ADDRESS;
+  const serviceAddress = process.env.NUXT_PUBLIC_FLOW_SERVICE_ADDRESS;
   if (!adminAddress || !privateKey || !serviceAddress) {
     throw new Error("Missing env");
   }

@@ -1,6 +1,5 @@
-import * as fcl from "@onflow/fcl";
 import { z, useValidatedBody } from "h3-zod";
-import { flow, actions, Signer } from "../helpers";
+import { flow, actions, utils } from "../helpers";
 
 export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
   const config = useRuntimeConfig();
@@ -37,52 +36,8 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
 
   const isProduction = config.public.network === "mainnet";
 
-  // FIXME: using index pool
-  const keyIndex = 0;
-  const signer = new Signer(
-    config.flowAdminAddress,
-    config.flowPrivateKey,
-    keyIndex,
-    {
-      Interfaces: config.public.flowServiceAddress,
-      Helper: config.public.flowServiceAddress,
-      QueryStructs: config.public.flowServiceAddress,
-      UserProfile: config.public.flowServiceAddress,
-      FLOATVerifiers: config.public.flowServiceAddress,
-      Community: config.public.flowServiceAddress,
-      BountyUnlockConditions: config.public.flowServiceAddress,
-      CompetitionService: config.public.flowServiceAddress,
-    }
-  );
-
-  // Step.1 Verify account proof on mainnet
-  if (isProduction) {
-    flow.switchToMainnet();
-  } else {
-    flow.switchToTestnet();
-  }
-
-  const isAccountValid = await fcl.AppUtils.verifyAccountProof(
-    flow.APP_IDENTIFIER,
-    {
-      address: body.address,
-      nonce: body.proofNonce,
-      signatures: body.proofSigs.map((one) => ({
-        f_type: "CompositeSignature",
-        f_vsn: "1.0.0",
-        keyId: one.keyId,
-        addr: one.addr,
-        signature: one.signature,
-      })),
-    },
-    {
-      // use blocto adddres to avoid self-custodian
-      // https://docs.blocto.app/blocto-sdk/javascript-sdk/flow/account-proof
-      fclCryptoContract: isProduction
-        ? "0xdb6b70764af4ff68"
-        : "0x5b250a8a85b44a67",
-    }
-  );
+  const signer = await utils.pickOneSigner();
+  const isAccountValid = await utils.verifyAccountProof(body);
 
   let isQuestValid = false;
   let transactionId: string | null = null;
@@ -91,6 +46,12 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     console.log(
       `Request<VerifyQuest>[${body.address}] - Step.1: Signature verified`
     );
+
+    if (isProduction) {
+      flow.switchToMainnet();
+    } else {
+      flow.switchToTestnet();
+    }
 
     const questDetail = await actions.scGetQuestDetail(
       signer,

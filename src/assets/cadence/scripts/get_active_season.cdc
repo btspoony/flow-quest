@@ -35,7 +35,8 @@ pub fun main(): SessonInfo {
 
   return SessonInfo(
     seasonID: season.getSeasonId(),
-    endDate: season.endDate,
+    endDate: season.getEndDate(),
+    referralThreshold: season.getReferralThreshold(),
     bounties: bounties
   )
 }
@@ -43,14 +44,17 @@ pub fun main(): SessonInfo {
 pub struct SessonInfo {
   pub let seasonID: UInt64
   pub let endDate: UFix64
+  pub let referralThreshold: UInt64
   pub let bounties: {UInt64: QueryStructs.BountyInfo}
   init(
     seasonID: UInt64,
     endDate: UFix64,
+    referralThreshold: UInt64,
     bounties: {UInt64: QueryStructs.BountyInfo}
   ) {
     self.seasonID = seasonID
     self.endDate = endDate
+    self.referralThreshold = referralThreshold
     self.bounties = bounties
   }
 }

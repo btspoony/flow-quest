@@ -1,3 +1,6 @@
+export const useReferralCode = () =>
+  useState<string | null>("appReferralCode", () => ref(null));
+
 export const useCurrentChallenge = () =>
   useState<BountyInfo | null>("currentChallenge", () => ref(null));
 

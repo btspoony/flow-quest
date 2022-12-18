@@ -57,7 +57,7 @@ pub contract Interfaces {
         access(account) fun updateQuestVerificationResult(seasonId: UInt64, questKey: String, step: Int, result: Bool)
         access(account) fun completeBounty(seasonId: UInt64, bountyId: UInt64)
 
-        access(account) fun setupReferralCode(seasonId: UInt64)
+        access(account) fun setupReferralCode(seasonId: UInt64, code: String)
     }
 
     // =================== Community ====================
@@ -166,9 +166,9 @@ pub contract Interfaces {
 
     // Competition public interface
     pub resource interface CompetitionPublic {
-        pub var endDate: UFix64
-
+        // status
         pub fun isActive(): Bool
+        // information
         pub fun getSeasonId(): UInt64
         pub fun getBountyIDs(): [UInt64]
         pub fun getPrimaryBountyIDs(): [UInt64]
