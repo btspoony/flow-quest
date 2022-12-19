@@ -2,6 +2,7 @@
  * transactions for dev challenges
  */
 import profileRegister from "./transactions/profile-register.cdc?raw";
+import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 
 /**
  * scripts for quest checking
@@ -20,21 +21,22 @@ import profileGetSeasonRecord from "./scripts/profile_get_season_record.cdc?raw"
 import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?raw";
 
 export default {
-  transactions: {
-    profileRegister,
-  },
-  scripts: {
-    getFLOATEvent,
-    getActiveSeason,
-    getBountyById,
-    getBountiesDetail,
-    getCommunityBasics,
-    getReferralAddrByCode,
-    getReferralCodeByAddr,
-    profileExists,
-    profileIsRegistered,
-    profileGetSeasonRecord,
-    profileGetQuestStatus,
-    profileIsBountyCompleted,
-  },
+    transactions: {
+        profileRegister,
+        profileRegisterWithUser,
+    },
+    scripts: {
+        getFLOATEvent,
+        getActiveSeason,
+        getBountyById,
+        getBountiesDetail,
+        getCommunityBasics,
+        getReferralAddrByCode,
+        getReferralCodeByAddr,
+        profileExists,
+        profileIsRegistered,
+        profileGetSeasonRecord,
+        profileGetQuestStatus,
+        profileIsBountyCompleted,
+    },
 };

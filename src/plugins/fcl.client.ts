@@ -349,10 +349,29 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       transactions: {
         async registerForNewSeason(referredFrom: string | null) {
-          return sendTransaction(
-            cadence.transactions.profileRegister,
-            (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
-          );
+          const user = useGithubProfile();
+          let result;
+          if (user.value && user.value.data) {
+            result = await sendTransaction(
+              cadence.transactions.profileRegisterWithUser,
+              (arg, t) => [
+                arg(referredFrom, t.Optional(t.Address)),
+                arg("github", t.Optional(t.String)),
+                arg(String(user.value.data?.id), t.Optional(t.String)), // userId: String?,
+                arg(user.value.data?.userName, t.Optional(t.String)), // userName: String?,
+                arg(user.value.data?.bio, t.Optional(t.String)), // userBio: String?,
+                arg(user.value.data?.avatarUrl, t.Optional(t.String)), // userImage: String?,
+              ]
+            );
+            console.log(`Registered with user.`);
+          } else {
+            result = await sendTransaction(
+              cadence.transactions.profileRegister,
+              (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
+            );
+            console.log(`Registered without user info.`);
+          }
+          return result;
         },
       },
       watchTransaction,
