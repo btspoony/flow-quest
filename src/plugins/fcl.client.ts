@@ -239,6 +239,28 @@ export default defineNuxtPlugin((nuxtApp) => {
           return parseBountyInfo(result[0]);
         },
         /**
+         * get referral address
+         */
+        async getReferralAddrByCode(code: string): Promise<string | null> {
+          const result = await executeScript(
+            cadence.scripts.getReferralAddrByCode,
+            (arg, t) => [arg(code, t.String)],
+            null
+          );
+          return result;
+        },
+        /**
+         * get referral code
+         */
+        async getReferralCodeByAddr(address: string): Promise<string | null> {
+          const result = await executeScript(
+            cadence.scripts.getReferralCodeByAddr,
+            (arg, t) => [arg(address, t.Address)],
+            null
+          );
+          return result;
+        },
+        /**
          * get quest status
          */
         async profileGetQuestStatus(
@@ -326,7 +348,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       },
       transactions: {
-        async registerForNewSeason(referredFrom?: string) {
+        async registerForNewSeason(referredFrom: string | null) {
           return sendTransaction(
             cadence.transactions.profileRegister,
             (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
