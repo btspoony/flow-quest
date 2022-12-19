@@ -37,6 +37,7 @@ transaction(
                     thumbnail: MetadataViews.HTTPFile(url: userImage!)
                 )
             )
+            self.profile.upsertIdentity(platform: platform!, identity: identity)
         }
 
         // register new season
