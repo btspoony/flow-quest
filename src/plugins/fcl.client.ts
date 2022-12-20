@@ -261,6 +261,58 @@ export default defineNuxtPlugin((nuxtApp) => {
           return result;
         },
         /**
+         * get ranking
+         */
+        async getRankingStatus(
+          limit = 100,
+          address: string | null = null
+        ): Promise<RankingStatus | null> {
+          const result = await executeScript(
+            cadence.scripts.getRankingStatus,
+            (arg, t) => [
+              arg(String(limit), t.Optional(t.Int)),
+              arg(address, t.Optional(t.Address)),
+            ],
+            null
+          );
+          let acctRankingScore: RankingScore | undefined = undefined;
+          if (
+            address &&
+            typeof result.accountPoint === "string" &&
+            typeof result.accountRank === "string"
+          ) {
+            acctRankingScore = {
+              account: address,
+              rank: parseInt(result.accountRank),
+              score: parseInt(result.accountPoint),
+            };
+          }
+          const topsScores: RankingScore[] = [];
+          if (typeof result.tops === "object") {
+            for (const score in result.tops) {
+              const addrs = result.tops[score];
+              for (const address of addrs) {
+                topsScores.push({
+                  account: address,
+                  score: typeof score === "number" ? score : parseInt(score),
+                  rank: 0,
+                });
+              }
+            } // end for
+            topsScores.sort((a, b) => b.score - a.score);
+            let rank = 0;
+            topsScores.forEach((one) => {
+              one.rank = rank++;
+            });
+          }
+          return {
+            account: acctRankingScore,
+            tops: topsScores,
+          };
+          // }
+          // return result;
+        },
+        /**
          * get quest status
          */
         async profileGetQuestStatus(
@@ -325,11 +377,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         async profilesGetIdentity(
           accts: string[]
         ): Promise<AccountProfileIdentity[]> {
-          return await executeScript(
+          const result = await executeScript(
             cadence.scripts.profilesGetIdentity,
             (arg, t) => [arg(accts, t.Array(t.Address))],
             []
           );
+          if (!Array.isArray(result)) return [];
+          return result.map((one) => {
+            one.identity.display = parseDisplay(one.identity.display);
+            return one;
+          });
         },
         /**
          * load profile get identities
@@ -337,11 +394,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         async loadProfileGetIdentities(
           acct: string
         ): Promise<ProfileIdentity[]> {
-          return await executeScript(
+          const result = await executeScript(
             cadence.scripts.profileGetIdentities,
             (arg, t) => [arg(acct, t.Address)],
             []
           );
+          if (!Array.isArray(result)) return [];
+          return result.map((one) => {
+            one.display = parseDisplay(one.display);
+            return one;
+          });
         },
         /**
          * load profile season record

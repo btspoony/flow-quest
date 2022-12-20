@@ -9,6 +9,14 @@ export function parseProfileSeasonRecord(record: any): SeasonRecord {
   };
 }
 
+export function parseDisplay(display: any): Display {
+  return {
+    name: display.name,
+    description: display.description,
+    thumbnail: display.thumbnail.url,
+  };
+}
+
 export function parseBountyInfo(info: any): BountyInfo {
   return {
     id: info.id,
@@ -16,11 +24,7 @@ export function parseBountyInfo(info: any): BountyInfo {
       category: parseIdentifierCategory(info.identifier.category),
       communityId: info.identifier.communityId,
       key: info.identifier.key,
-      display: {
-        name: info.display.name,
-        description: info.display.description,
-        thumbnail: info.display.thumbnail.url,
-      },
+      display: parseDisplay(info.display),
       steps: parseInt(info.questDetail?.steps ?? 0),
       stepsCfg: info.questDetail?.stepsCfg,
       guideMD: info.questDetail?.guideMD,

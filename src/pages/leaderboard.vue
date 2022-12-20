@@ -1,10 +1,6 @@
-<script setup lang="ts">
-// TODO
-</script>
-
 <template>
-  <main class="container">
-    <h1>Leaderboard</h1>
+  <main class="container max-w-3xl py-8">
+    <h2>Leaderboard</h2>
     <NuxtPage />
   </main>
 </template>

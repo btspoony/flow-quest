@@ -253,3 +253,17 @@ interface AccountProfileIdentity {
   account: string;
   identity: ProfileIdentity;
 }
+
+// ---- Ranking ----
+
+interface RankingStatus {
+  account?: RankingScore
+  tops: RankingScore[]
+}
+
+interface RankingScore {
+  account: string;
+  rank: number;
+  score: number;
+  identity?: ProfileIdentity;
+}
