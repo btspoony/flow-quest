@@ -320,6 +320,30 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * Get profiles' identity
+         */
+        async profilesGetIdentity(
+          accts: string[]
+        ): Promise<AccountProfileIdentity[]> {
+          return await executeScript(
+            cadence.scripts.profilesGetIdentity,
+            (arg, t) => [arg(accts, t.Array(t.Address))],
+            []
+          );
+        },
+        /**
+         * load profile get identities
+         */
+        async loadProfileGetIdentities(
+          acct: string
+        ): Promise<ProfileIdentity[]> {
+          return await executeScript(
+            cadence.scripts.profileGetIdentities,
+            (arg, t) => [arg(acct, t.Address)],
+            []
+          );
+        },
+        /**
          * load profile season record
          */
         async loadProfileSeasonRecord(
@@ -336,15 +360,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
           if (!result) return result;
           return parseProfileSeasonRecord(result);
-        },
-        /**
-         * load user profile
-         */
-        async loadUserProfile(acct: string): Promise<ProfileData> {
-          return {
-            address: acct,
-            activeRecord: await this.loadProfileSeasonRecord(acct),
-          };
         },
       },
       transactions: {
