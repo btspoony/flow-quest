@@ -76,15 +76,43 @@ export async function apiGetCurrentUser(): Promise<ProfileData | null> {
   return user;
 }
 
-export async function reloadCurrentUser(): Promise<ProfileData | null> {
+export async function reloadCurrentUser(
+  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {}
+): Promise<ProfileData | null> {
   const current = useUserProfile();
   const wallet = useFlowAccount();
   if (!wallet.value?.loggedIn) {
     return null;
   }
+
   const address = wallet.value.addr!;
   const { $scripts } = useNuxtApp();
-  current.value = await $scripts.loadUserProfile(address);
+
+  let activeRecord: SeasonRecord | undefined;
+  let linkedIdentities: { [key: string]: ProfileIdentity } = {};
+
+  if (current.value) {
+    activeRecord = current.value?.activeRecord;
+    linkedIdentities = current.value?.linkedIdentities;
+  }
+
+  if (!ignores.ignoreIdentities) {
+    const identities = await $scripts.loadProfileGetIdentities(address);
+    linkedIdentities = {};
+    for (const identity of identities) {
+      linkedIdentities[identity.platform] = identity;
+    }
+  }
+
+  if (!ignores.ignoreSeason) {
+    activeRecord = await $scripts.loadProfileSeasonRecord(address);
+  }
+
+  current.value = {
+    address,
+    activeRecord,
+    linkedIdentities,
+  };
   return current.value;
 }
 

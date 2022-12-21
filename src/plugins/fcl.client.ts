@@ -239,6 +239,80 @@ export default defineNuxtPlugin((nuxtApp) => {
           return parseBountyInfo(result[0]);
         },
         /**
+         * get referral address
+         */
+        async getReferralAddrByCode(code: string): Promise<string | null> {
+          const result = await executeScript(
+            cadence.scripts.getReferralAddrByCode,
+            (arg, t) => [arg(code, t.String)],
+            null
+          );
+          return result;
+        },
+        /**
+         * get referral code
+         */
+        async getReferralCodeByAddr(address: string): Promise<string | null> {
+          const result = await executeScript(
+            cadence.scripts.getReferralCodeByAddr,
+            (arg, t) => [arg(address, t.Address)],
+            null
+          );
+          return result;
+        },
+        /**
+         * get ranking
+         */
+        async getRankingStatus(
+          limit = 100,
+          address: string | null = null
+        ): Promise<RankingStatus | null> {
+          const result = await executeScript(
+            cadence.scripts.getRankingStatus,
+            (arg, t) => [
+              arg(String(limit), t.Optional(t.Int)),
+              arg(address, t.Optional(t.Address)),
+            ],
+            null
+          );
+          let acctRankingScore: RankingScore | undefined = undefined;
+          if (
+            address &&
+            typeof result.accountPoint === "string" &&
+            typeof result.accountRank === "string"
+          ) {
+            acctRankingScore = {
+              account: address,
+              rank: parseInt(result.accountRank),
+              score: parseInt(result.accountPoint),
+            };
+          }
+          const topsScores: RankingScore[] = [];
+          if (typeof result.tops === "object") {
+            for (const score in result.tops) {
+              const addrs = result.tops[score];
+              for (const address of addrs) {
+                topsScores.push({
+                  account: address,
+                  score: typeof score === "number" ? score : parseInt(score),
+                  rank: 0,
+                });
+              }
+            } // end for
+            topsScores.sort((a, b) => b.score - a.score);
+            let rank = 0;
+            topsScores.forEach((one) => {
+              one.rank = rank++;
+            });
+          }
+          return {
+            account: acctRankingScore,
+            tops: topsScores,
+          };
+          // }
+          // return result;
+        },
+        /**
          * get quest status
          */
         async profileGetQuestStatus(
@@ -298,6 +372,40 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * Get profiles' identity
+         */
+        async profilesGetIdentity(
+          accts: string[]
+        ): Promise<AccountProfileIdentity[]> {
+          const result = await executeScript(
+            cadence.scripts.profilesGetIdentity,
+            (arg, t) => [arg(accts, t.Array(t.Address))],
+            []
+          );
+          if (!Array.isArray(result)) return [];
+          return result.map((one) => {
+            one.identity.display = parseDisplay(one.identity.display);
+            return one;
+          });
+        },
+        /**
+         * load profile get identities
+         */
+        async loadProfileGetIdentities(
+          acct: string
+        ): Promise<ProfileIdentity[]> {
+          const result = await executeScript(
+            cadence.scripts.profileGetIdentities,
+            (arg, t) => [arg(acct, t.Address)],
+            []
+          );
+          if (!Array.isArray(result)) return [];
+          return result.map((one) => {
+            one.display = parseDisplay(one.display);
+            return one;
+          });
+        },
+        /**
          * load profile season record
          */
         async loadProfileSeasonRecord(
@@ -315,22 +423,32 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (!result) return result;
           return parseProfileSeasonRecord(result);
         },
-        /**
-         * load user profile
-         */
-        async loadUserProfile(acct: string): Promise<ProfileData> {
-          return {
-            address: acct,
-            activeRecord: await this.loadProfileSeasonRecord(acct),
-          };
-        },
       },
       transactions: {
-        async registerForNewSeason(referredFrom?: string) {
-          return sendTransaction(
-            cadence.transactions.profileRegister,
-            (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
-          );
+        async registerForNewSeason(referredFrom: string | null) {
+          const user = useGithubProfile();
+          let result;
+          if (user.value && user.value.data) {
+            result = await sendTransaction(
+              cadence.transactions.profileRegisterWithUser,
+              (arg, t) => [
+                arg(referredFrom, t.Optional(t.Address)),
+                arg("github", t.Optional(t.String)),
+                arg(String(user.value.data?.id), t.Optional(t.String)), // userId: String?,
+                arg(user.value.data?.userName, t.Optional(t.String)), // userName: String?,
+                arg(user.value.data?.bio, t.Optional(t.String)), // userBio: String?,
+                arg(user.value.data?.avatarUrl, t.Optional(t.String)), // userImage: String?,
+              ]
+            );
+            console.log(`Registered with user.`);
+          } else {
+            result = await sendTransaction(
+              cadence.transactions.profileRegister,
+              (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
+            );
+            console.log(`Registered without user info.`);
+          }
+          return result;
         },
       },
       watchTransaction,

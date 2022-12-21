@@ -34,9 +34,17 @@ function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData
 }
 
 async function sendProfileRegister(): Promise<string> {
-  const { $transactions } = useNuxtApp()
-  // FIXME: referredFrom
-  return $transactions.registerForNewSeason()
+  const { $transactions, $scripts } = useNuxtApp()
+  let referredFrom: string | null = null
+
+  const referralCode = useReferralCode()
+  if (referralCode.value) {
+    referredFrom = await $scripts.getReferralAddrByCode(referralCode.value)
+    if (referredFrom) {
+      console.log(`refer from address: ${referredFrom}`)
+    }
+  }
+  return $transactions.registerForNewSeason(referredFrom)
 }
 
 function onConnected(addr: string) {

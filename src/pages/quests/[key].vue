@@ -169,7 +169,8 @@ async function completeBounty(): Promise<string | null> {
               <LockClosedIcon class="fill-current w-6 h-6" />
             </div>
           </button>
-          <FlowSubmitTransaction v-else-if="bountyId" :method="completeBounty" @success="reloadCurrentUser()">
+          <FlowSubmitTransaction v-else-if="bountyId" :method="completeBounty"
+            @success="reloadCurrentUser({ ignoreIdentities: true })">
             Complete
           </FlowSubmitTransaction>
           <div role="separator" class="divider my-2" />

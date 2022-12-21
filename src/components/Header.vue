@@ -39,13 +39,13 @@ function isCurrentInActivePage(pageKey: string): boolean {
           </NuxtLink>
         </li> -->
 
-        <!-- <li class="flex-center">
+        <li class="flex-center">
           <NuxtLink :to="geneReferralLink('/leaderboard')"
             :class="['inline-flex-between', { secondary: isCurrentInActivePage('leaderboard') }]">
             <ChartBarSquareIcon class="fill-current w-6 h-6" />
             Leaderboard
           </NuxtLink>
-        </li> -->
+        </li>
         <li>
           <WidgetThemeToggle />
         </li>

@@ -213,6 +213,7 @@ interface SeasonRecord {
 interface ProfileData {
   address: string;
   activeRecord?: SeasonRecord;
+  linkedIdentities: { [key: string]: ProfileIdentity };
 }
 
 interface GithubToken {
@@ -240,4 +241,29 @@ interface GithubProfileData {
 interface GithubProfile {
   auth?: GithubToken;
   data?: GithubProfileData;
+}
+
+interface ProfileIdentity {
+  platform: string;
+  uid: string;
+  display: Display;
+}
+
+interface AccountProfileIdentity {
+  account: string;
+  identity: ProfileIdentity;
+}
+
+// ---- Ranking ----
+
+interface RankingStatus {
+  account?: RankingScore
+  tops: RankingScore[]
+}
+
+interface RankingScore {
+  account: string;
+  rank: number;
+  score: number;
+  identity?: ProfileIdentity;
 }
