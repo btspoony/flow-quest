@@ -78,7 +78,7 @@ defineExpose({
 <template>
   <div class="flex flex-col gap-2">
     <button v-if="!hideButton && !txid" class="rounded-xl flex-center" role="button" :aria-busy="isLoading"
-      :disabled="isLoading" aria-disabled="true"
+      :disabled="isLoading" :aria-disabled="isLoading"
       @click="startTransaction">
       <slot>
         {{ content }}

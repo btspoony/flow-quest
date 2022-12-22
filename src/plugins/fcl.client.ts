@@ -166,6 +166,25 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * check if float claimed
+         */
+        async hasFLOATClaimed(
+          host: string,
+          eventId: string,
+          account: string
+        ): Promise<boolean> {
+          const ret = await executeScript(
+            cadence.scripts.hasFLOATClaimed,
+            (arg, t) => [
+              arg(host, t.Address),
+              arg(eventId, t.UInt64),
+              arg(account, t.Address),
+            ],
+            false
+          );
+          return !!ret;
+        },
+        /**
          * Get community basics
          * @param communityId
          */
@@ -449,6 +468,15 @@ export default defineNuxtPlugin((nuxtApp) => {
             console.log(`Registered without user info.`);
           }
           return result;
+        },
+        /**
+         * claim float
+         */
+        async claimFloat(host: string, eventId: string) {
+          return await sendTransaction(
+            cadence.transactions.claimFloat,
+            (arg, t) => [arg(host, t.Address), arg(eventId, t.UInt64)]
+          );
         },
       },
       watchTransaction,

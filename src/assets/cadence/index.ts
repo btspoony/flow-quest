@@ -3,11 +3,13 @@
  */
 import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
+import claimFloat from "./transactions/claim-float.cdc?raw";
 
 /**
  * scripts for quest checking
  */
 import getFLOATEvent from "./scripts/get_event.cdc?raw";
+import hasFLOATClaimed from "./scripts/has_claimed_event.cdc?raw";
 import getActiveSeason from "./scripts/get_active_season.cdc?raw";
 import getBountyById from "./scripts/get_bounty_by_id.cdc?raw";
 import getBountiesDetail from "./scripts/get_bounties_detail.cdc?raw";
@@ -27,9 +29,11 @@ export default {
     transactions: {
         profileRegister,
         profileRegisterWithUser,
+        claimFloat,
     },
     scripts: {
         getFLOATEvent,
+        hasFLOATClaimed,
         getActiveSeason,
         getBountyById,
         getBountiesDetail,

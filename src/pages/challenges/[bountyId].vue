@@ -69,6 +69,38 @@ watchEffect(() => {
   }
 })
 
+const floatClaimable = ref(false)
+const floatClaimed = ref(false)
+
+watchEffect(async () => {
+  const achiInfo = challengeCfg?.value.achievement
+  if (progress.value >= 100 && achiInfo && user.value?.address) {
+    await updateHasClaimed()
+    floatClaimable.value = !floatClaimed.value
+  } else {
+    floatClaimable.value = false
+  }
+})
+
+async function updateHasClaimed() {
+  const { $scripts } = useNuxtApp()
+  const achiInfo = challengeCfg?.value.achievement
+  if (achiInfo && user.value?.address) {
+    floatClaimed.value = await $scripts.hasFLOATClaimed(achiInfo.host, achiInfo.eventId, user.value?.address)
+  } else {
+    floatClaimed.value = false
+  }
+}
+
+async function claimFloat(): Promise<string | null> {
+  if (!challengeCfg?.value.achievement) {
+    return null
+  }
+  const { $transactions } = useNuxtApp()
+  const achi = challengeCfg?.value.achievement
+  return $transactions.claimFloat(achi.host, achi.eventId)
+}
+
 </script>
 
 <template>
@@ -116,6 +148,11 @@ watchEffect(() => {
             <div class="shiny" />
             <ItemFLOATEvent :host="challengeCfg?.achievement.host" :event-id="challengeCfg?.achievement.eventId" />
           </div>
+          <button v-if="floatClaimed" class="secondary outline rounded-xl w-[8rem]" disabled>Claimed</button>
+          <FlowSubmitTransaction v-else-if="floatClaimable" class="min-w-[8rem]" :method="claimFloat"
+            @success="updateHasClaimed()">
+            Claim
+          </FlowSubmitTransaction>
         </div>
       </div>
     </section>
@@ -124,7 +161,7 @@ watchEffect(() => {
 
 <style scoped>
 .shiny {
-  @apply absolute pointer-events-none w-64 h-64 -top-14 -left-20;
+  @apply absolute pointer-events-none w-80 h-80 -top-24 -left-24 -z-10;
   @apply bg-center bg-[url(/assets/images/shiny.png)] bg-contain;
 
   animation: spin 20s linear infinite;
