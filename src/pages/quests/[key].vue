@@ -165,8 +165,8 @@ async function completeBounty(): Promise<string | null> {
         <div class="flex flex-col py-2">
           <button v-if="(isInvalid || isBountyCompleted)" class="rounded-xl flex-center" disabled>
             <div class="inline-flex-between">
+              <LockClosedIcon v-if="!isBountyCompleted" class="fill-current w-6 h-6" />
               <span v-if="isBountyCompleted">Completed</span>
-              <LockClosedIcon class="fill-current w-6 h-6" />
             </div>
           </button>
           <FlowSubmitTransaction v-else-if="bountyId" :method="completeBounty"

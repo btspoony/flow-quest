@@ -394,16 +394,16 @@ pub contract CompetitionService {
             } else {
                 self.leaderboardScores[newPoint] = { addr: true }
             }
+
             // search the rank
             var left = 0
             var right = oldRank ?? self.leaderboardRanking.length - 1
             while left <= right {
                 let mid = (left + right) / 2
-                let scoreTest = self.leaderboardRanking[mid]
-                if scoreTest < newPoint {
-                    left = mid + 1
-                } else {
+                if newPoint > self.leaderboardRanking[mid] {
                     right = mid - 1
+                } else {
+                    left = mid + 1
                 }
             }
             self.leaderboardRanking.insert(at: left, newPoint)

@@ -154,6 +154,7 @@ class FlowSigner {
       return queryResult ?? defaultValue;
     } catch (e) {
       console.error(e);
+      return defaultValue;
     }
   }
 }
