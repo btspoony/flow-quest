@@ -43,8 +43,8 @@ const { data: info, pending, refresh } = useAsyncData<RankingStatus | null>(`ran
   <section class="mb-0">
     <h5>Top 100 of current season</h5>
     <div v-if="pending" class="w-full h-20" :aria-busy="true" />
-    <template v-else>
+    <div v-else class="flex flex-col gap-4">
       <ItemLeaderboardBar v-for="(one, index) in info?.tops" :key="`item_${index}`" :score="one" />
-    </template>
+    </div>
   </section>
 </template>
