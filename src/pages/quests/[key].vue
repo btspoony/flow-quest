@@ -109,10 +109,13 @@ const isInvalid = computed(() => {
 async function updateQuest() {
   const { $scripts } = useNuxtApp();
   const address = wallet.value?.addr
-  if (address) {
+  if (address && bountyId.value) {
     const season = await apiGetActiveSeason();
     profileStatus.value = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey.value)
-    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value!)
+    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value)
+  } else {
+    profileStatus.value = null
+    isBountyCompleted.value = false
   }
 }
 

@@ -73,8 +73,7 @@ const floatClaimable = ref(false)
 const floatClaimed = ref(false)
 
 watchEffect(async () => {
-  const achiInfo = challengeCfg?.value.achievement
-  if (progress.value >= 100 && achiInfo && user.value?.address) {
+  if (progress.value >= 100 && challengeCfg?.value?.achievement && user.value?.address) {
     await updateHasClaimed()
     floatClaimable.value = !floatClaimed.value
   } else {
@@ -84,7 +83,7 @@ watchEffect(async () => {
 
 async function updateHasClaimed() {
   const { $scripts } = useNuxtApp()
-  const achiInfo = challengeCfg?.value.achievement
+  const achiInfo = challengeCfg?.value?.achievement
   if (achiInfo && user.value?.address) {
     floatClaimed.value = await $scripts.hasFLOATClaimed(achiInfo.host, achiInfo.eventId, user.value?.address)
   } else {
