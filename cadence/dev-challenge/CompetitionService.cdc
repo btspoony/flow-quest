@@ -383,14 +383,12 @@ pub contract CompetitionService {
             }
             let oldRank = self.leaderboardAddressMap[addr]
             // remove old rank
-            if oldRank != nil  {
-                if let addrMap = self.leaderboardScores[oldPoint] {
-                    addrMap.remove(key: addr)
-                }
+            if oldRank != nil && self.leaderboardScores[oldPoint] != nil {
+                self.leaderboardScores[oldPoint]!.remove(key: addr)
             }
             // update current rank
-            if let addrMap = self.leaderboardScores[newPoint] {
-                addrMap[addr] = true
+            if self.leaderboardScores[newPoint] != nil {
+                self.leaderboardScores[newPoint]!.insert(key: addr, true)
             } else {
                 self.leaderboardScores[newPoint] = { addr: true }
             }
