@@ -336,9 +336,11 @@ pub contract UserProfile {
         pub fun upsertIdentity(platform: String, identity: Interfaces.LinkedIdentity) {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
             let uid = platform.concat("#").concat(identity.uid)
-            assert(UserProfile.platformMapping[uid] == nil, message: "The UID registered.")
 
-            UserProfile.platformMapping[uid] = profileAddr
+            if UserProfile.platformMapping[uid] == nil {
+                UserProfile.platformMapping[uid] = profileAddr
+            }
+
             self.linkedIdentities[platform] = identity
 
             emit ProfileUpsertIdentity(
