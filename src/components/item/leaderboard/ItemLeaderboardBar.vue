@@ -1,11 +1,17 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   score: RankingScore
 }>()
+
+const router = useRouter()
+
+function goAccountPage() {
+  router.push(geneReferralLinkObject(`/account/${props.score.account}`))
+}
 </script>
 
 <template>
-  <div class="card card-border p-4 w-full flex gap-4 items-center justify-around">
+  <div class="card card-border p-4 w-full flex gap-4 items-center justify-around cursor-pointer" @click="goAccountPage">
     <div class="flex-none">
       <span v-if="score.rank === 0" class="circle-badge border-[#FFF71D] bg-yellow-400 text-white">
         {{ score.rank + 1 }}
