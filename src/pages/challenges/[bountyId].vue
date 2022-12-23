@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  key: route => route.path
+})
+
 const route = useRoute()
 const user = useUserProfile()
 

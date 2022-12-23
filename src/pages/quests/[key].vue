@@ -2,6 +2,10 @@
 import md from 'markdown-it';
 import { LockClosedIcon } from '@heroicons/vue/24/solid';
 
+definePageMeta({
+  key: route => route.path
+})
+
 const mdRenderer = md()
 const route = useRoute()
 const user = useUserProfile()
