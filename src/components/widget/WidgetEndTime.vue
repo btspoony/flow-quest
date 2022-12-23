@@ -24,7 +24,7 @@ const sec = computed(() => Math.floor(resttime.value % 60));
 <template>
   <div class="mb-8 flex-center !gap-2">
     <span class="mr-3">
-      <slot /> remainning:
+      <slot /> remaining:
     </span>
     <template v-if="days > 0">
       <span class="font-bold">{{ days }}</span>
