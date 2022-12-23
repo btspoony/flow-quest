@@ -130,15 +130,14 @@ export default defineNuxtPlugin((nuxtApp) => {
          * Get Bounties in the active season
          * @returns
          */
-        async getActiveSeason(): Promise<CompetitionSeason> {
+        async getActiveSeason(): Promise<CompetitionSeason | null> {
           const ret = await executeScript(
             cadence.scripts.getActiveSeason,
             (arg, t) => [],
-            undefined
+            null
           );
-          if (!ret) {
-            throw new Error("Result undefined");
-          }
+          if (!ret) return null;
+
           const bounties: { [key: string]: BountyInfo } = {};
           for (const id in ret.bounties) {
             bounties[id] = parseBountyInfo(ret.bounties[id]);
