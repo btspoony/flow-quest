@@ -12,8 +12,8 @@ const user = useUserProfile()
 const wallet = useFlowAccount()
 
 interface QuestDetail {
-  season: CompetitionSeason,
-  quest: BountyInfo,
+  season: CompetitionSeason | null,
+  quest: BountyInfo | null,
   guideMD: string,
   stepsCfg: QuestStepsConfig[],
 }
@@ -26,17 +26,25 @@ watch(questKey, (newVal) => {
 
 const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${questKey.value}`, async () => {
   const season = await apiGetActiveSeason();
-  const quest: BountyInfo = await apiGetCurrentQuest(questKey.value)
-  // load quest config
-  const [guideMD, stepsCfgStr] = await Promise.all([
-    $fetch((quest.config as QuestConfig).guideMD),
-    $fetch((quest.config as QuestConfig).stepsCfg)
-  ])
+  const quest = await apiGetCurrentQuest(questKey.value)
+  let guideMD: any
+  let stepsCfgStr: any
+
+  if (quest) {
+    // load quest config
+    [guideMD, stepsCfgStr] = await Promise.all([
+      $fetch((quest?.config as QuestConfig).guideMD),
+      $fetch((quest?.config as QuestConfig).stepsCfg)
+    ])
+  }
+
   let stepsCfg: QuestStepsConfig[] = []
-  try {
-    stepsCfg = JSON.parse(stepsCfgStr as string)
-  } catch (e) {
-    console.log('Failed to parse', e)
+  if (stepsCfgStr) {
+    try {
+      stepsCfg = JSON.parse(stepsCfgStr as string)
+    } catch (e) {
+      console.log('Failed to parse', e)
+    }
   }
   return {
     season,
@@ -48,7 +56,7 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${ques
   server: false
 });
 
-const bountyId = computed(() => info.value?.quest.id)
+const bountyId = computed(() => info.value?.quest?.id)
 
 const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUserRegistered', async () => {
   const season = await apiGetActiveSeason();
@@ -60,7 +68,7 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
   } else {
     const { $scripts } = useNuxtApp();
     const address = wallet.value?.addr
-    if (address) {
+    if (address && season) {
       isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
     } else {
       isRegistered = false
@@ -89,7 +97,7 @@ watchEffect(async () => {
   flush: 'post'
 })
 
-const questCfg = computed(() => (info.value?.quest.config as QuestConfig));
+const questCfg = computed(() => (info.value?.quest?.config as QuestConfig));
 const imageUrl = computed(() => {
   if (questCfg.value?.display.thumbnail) {
     return getIPFSUrl(questCfg.value?.display.thumbnail)
@@ -113,8 +121,8 @@ const isInvalid = computed(() => {
 async function updateQuest() {
   const { $scripts } = useNuxtApp();
   const address = wallet.value?.addr
-  if (address && bountyId.value) {
-    const season = await apiGetActiveSeason();
+  const season = await apiGetActiveSeason();
+  if (address && bountyId.value && season) {
     profileStatus.value = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey.value)
     isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value)
   } else {
@@ -183,7 +191,7 @@ async function completeBounty(): Promise<string | null> {
           <div role="separator" class="divider my-2" />
           <div class="flex-between">
             <div>
-              {{ info?.quest.participantAmt }} completed
+              {{ info?.quest?.participantAmt }} completed
             </div>
             <div>
               <!-- Participants -->

@@ -2,13 +2,16 @@
 definePageMeta({
   key: route => route.path
 })
-// TODO
+
 </script>
 
 <template>
-  <div class="hero min-h-[80vh]">
-    <div class="hero-content">
-      Profile Page(WIP)
-    </div>
-  </div>
+  <FrameMain>
+    <template v-slot:header>
+      <div class="w-full h-36 relative overflow-hidden -z-10">
+        HEADER
+      </div>
+    </template>
+    Profile Page(WIP)
+  </FrameMain>
 </template>
