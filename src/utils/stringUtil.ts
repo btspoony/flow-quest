@@ -38,3 +38,7 @@ export function geneReferralLinkObject(uri: string): RouteLocationRaw {
   }
   return result;
 }
+
+export function shorten(str: string, max = 10): string {
+  return str.length <= max ? str : `${str.slice(0, max)}...`;
+}

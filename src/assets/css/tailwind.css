@@ -72,6 +72,11 @@
     @apply bg-gradient-to-r from-secondary to-yellow-500;
   }
 
+  .header-text {
+    @apply border-gray-600 lg:border-white dark:border-white;
+    @apply text-gray-600 lg:text-white dark:text-white;
+  }
+
   .card {
     @apply relative rounded-xl p-[3px] m-0;
     @apply bg-[var(--card-background-color)];

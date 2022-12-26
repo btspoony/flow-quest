@@ -46,7 +46,7 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
     <div class="relative max-w-3xl mx-auto -mt-32">
       <div v-if="pending" :aria-busy="true"></div>
       <template v-else-if="profileIdentity">
-        <section class="mb-6 flex flex-col md:flex-row gap-4 md:gap-6">
+        <section class="mb-6 flex flex-col lg:flex-row gap-4 lg:gap-6">
           <div class="flex-none">
             <div class="rounded-full bg-highlight w-40 h-40 flex-center shadow-xl">
               <div class="rounded-full bg-white w-[9.5rem] h-[9.5rem] flex-center">
@@ -54,18 +54,18 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
               </div>
             </div>
           </div>
-          <div class="flex-auto py-2 md:py-8 flex flex-col gap-1">
+          <div class="flex-auto py-2 lg:py-8 flex flex-col gap-1">
             <div
-              class="flex-between pb-2 border-solid border-x-0 border-t-0 border-b-1 profile-text">
-              <span class="text-5xl font-black bg-clip-text text-transparent bg-secondary uppercase">
-                {{ profileIdentity.display.name }}
+              class="flex-between pb-2 border-solid border-x-0 border-t-0 border-b-1 header-text">
+              <span class="text-4xl font-black bg-clip-text text-transparent bg-secondary uppercase">
+                {{ shorten(profileIdentity.display.name, 12) }}
               </span>
-              <span class="px-3 py-1 rounded-full font-semibold border border-solid bg-gray-300/20 profile-text">
+              <span class="px-3 py-1 rounded-full font-semibold border border-solid bg-gray-300/20 header-text">
                 {{ profileAddr }}
               </span>
             </div>
-            <div class="flex-between profile-text">
-              {{ profileIdentity.display.description }}
+            <div class="flex-between header-text">
+              {{ shorten(profileIdentity.display.description, 72) }}
             </div>
           </div>
         </section>
@@ -87,10 +87,5 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
 .profile-header {
   @apply w-full h-full absolute;
   @apply bg-cover bg-center;
-}
-
-.profile-text {
-  @apply border-gray-600 md:border-white dark:border-white;
-  @apply text-gray-600 md:text-white dark:text-white;
 }
 </style>
