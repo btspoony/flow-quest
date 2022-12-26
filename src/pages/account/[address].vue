@@ -10,6 +10,7 @@ const currentProfile = useCurrentProfile()
 const profileAddr = computed<string>(() => route.params.address as string)
 
 const { data: profile, pending } = useAsyncData<ProfileData | null>(`user:${profileAddr}`, async () => {
+  await apiGetActiveSeason()
   let profile: ProfileData | null
   if (user.value?.address === profileAddr.value) {
     profile = user.value
@@ -18,6 +19,8 @@ const { data: profile, pending } = useAsyncData<ProfileData | null>(`user:${prof
   }
   currentProfile.value = profile
   return profile
+}, {
+  server: false
 })
 
 const profileIdentity = computed<ProfileIdentity | null>(() => {
@@ -36,8 +39,8 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
     <template v-slot:header>
       <div class="h-8"></div>
       <div class="w-full h-56 relative overflow-hidden -z-50">
-        <div class="profile-header"></div>
-        <div class="absolute inset-0 bg-black/40" />
+        <div class="profile-header bg-[url(/assets/images/profile-bg.jpg)]"></div>
+        <div class="absolute inset-0 bg-black/50" />
       </div>
     </template>
     <div class="relative max-w-3xl mx-auto -mt-32">
@@ -66,7 +69,7 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
             </div>
           </div>
         </section>
-        <section class="mb-0 flex flex-col gap-4">
+        <section class="mb-0 flex flex-col gap-8">
           <nav>
             <ul class="flex gap-2">
               <li><a href="#" class="tab-link active">Current Season</a></li>
@@ -83,7 +86,7 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
 <style scoped>
 .profile-header {
   @apply w-full h-full absolute;
-  @apply bg-cover bg-center bg-[url(/assets/images/profile-bg.jpg)];
+  @apply bg-cover bg-center;
 }
 
 .profile-text {

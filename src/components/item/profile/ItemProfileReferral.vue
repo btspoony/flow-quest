@@ -1,0 +1,62 @@
+<script setup lang="ts">
+import { ClipboardDocumentIcon } from '@heroicons/vue/20/solid'
+import { useClipboard } from '@vueuse/core'
+
+const user = useUserProfile()
+const props = defineProps<{
+  profile: ProfileData
+}>()
+const season = useActiveSeason();
+
+const isUserSelf = computed<boolean>(() => user.value?.address === props.profile.address)
+const referralCode = computed<string | undefined>(() => props.profile.activeRecord?.referralCode)
+const copyURL = computed<string>(() => {
+  let host: string
+  if (process.client) {
+    host = `${window.location.protocol}//${window.location.host}/`
+  } else {
+    host = '/'
+  }
+  return referralCode.value ? `${host}?referral=${referralCode.value}` : host
+});
+const { text, copy, copied, isSupported } = useClipboard();
+
+const executable = computed<boolean>(() => season.value ? season.value?.referralThreshold <= (props.profile.activeRecord?.points ?? 0) : false)
+
+async function generateCode(): Promise<string> {
+  return ""
+}
+</script>
+
+<template>
+  <section v-if="isUserSelf" class="hero card card-border">
+    <div class="hero-content flat w-[90%] align-start flex-col">
+      <div class="inline-flex-between text-4xl font-semibold !gap-8">
+        <span class="py-2">Referral Code</span>
+        <span v-if="referralCode" class="rounded-full bg-secondary text-white px-4 py-2">
+          <span class="font-extrabold">{{ referralCode ?? "UNKNOWN" }}</span>
+        </span>
+      </div>
+      <div class="divider"></div>
+      <div class="w-full text-xl flex flex-col gap-2">
+        <template v-if="referralCode">
+          <span>Invite others to get more points</span>
+          <code class="inline-flex-between text-sm" :data-tooltip="copied ? `${text} copied` : undefined">
+            <span>{{ copyURL }}</span>
+            <ClipboardDocumentIcon v-if="isSupported" class="fill-current w-5 h-5 cursor-pointer" @click="copy(copyURL)" />
+          </code>
+        </template>
+        <FlowSubmitTransaction v-else :disabled="!executable" :method="generateCode"
+          @success="reloadCurrentUser({ ignoreIdentities: true })">
+          Generate Referral Code
+          <template v-slot:disabled>
+            <div class="inline-flex-between">
+              Obtain more than <b class="tag">{{ season?.referralThreshold }}</b> points to generate referral
+              code
+            </div>
+          </template>
+        </FlowSubmitTransaction>
+      </div>
+    </div>
+  </section>
+</template>

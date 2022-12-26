@@ -38,6 +38,10 @@
       @apply flex justify-center items-center;
       @apply z-0 gap-4 py-20;
 
+      &.flat {
+        @apply py-10;
+      }
+
       &.align-end {
         @apply justify-end items-end;
       }
@@ -165,6 +169,10 @@
 
   .flex-between {
     @apply flex gap-1 items-center justify-between;
+  }
+
+  .inline-flex-center {
+    @apply inline-flex gap-1 items-center justify-center;
   }
 
   .inline-flex-between {

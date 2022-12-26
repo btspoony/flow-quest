@@ -178,23 +178,26 @@ async function completeBounty(): Promise<string | null> {
             :is-completed="isStepCompleted(i - 1)" :is-locked="isLocked(i - 1)" @success="updateQuest" />
         </div>
         <div class="flex flex-col py-2">
-          <button v-if="(isInvalid || isBountyCompleted)" class="rounded-xl flex-center" disabled>
-            <div class="inline-flex-between">
-              <LockClosedIcon v-if="!isBountyCompleted" class="fill-current w-6 h-6" />
-              <span v-if="isBountyCompleted">Completed</span>
-            </div>
-          </button>
-          <FlowSubmitTransaction v-else-if="bountyId" :method="completeBounty"
+          <FlowSubmitTransaction v-if="bountyId" :disabled="isInvalid || isBountyCompleted" :method="completeBounty"
             @success="reloadCurrentUser({ ignoreIdentities: true })">
             Complete
+            <template v-slot:disabled>
+              <div class="inline-flex-between">
+                <LockClosedIcon v-if="!isBountyCompleted" class="fill-current w-6 h-6" />
+                <span v-if="isBountyCompleted">Completed</span>
+              </div>
+            </template>
           </FlowSubmitTransaction>
-          <div role="separator" class="divider my-2" />
+          <div role="separator" class="divider my-4" />
           <div class="flex-between">
-            <div>
-              {{ info?.quest?.participantAmt }} completed
+            <div class="inline-flex-between">
+              Reward
+              <div class="tag">
+                {{ info?.quest?.pointReward?.rewardPoints }} Points
+              </div>
             </div>
             <div>
-              <!-- Participants -->
+              {{ info?.quest?.participantAmt }} completed
             </div>
           </div>
           </div>

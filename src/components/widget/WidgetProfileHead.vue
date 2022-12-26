@@ -47,7 +47,7 @@ function onLogout() {
         </div>
         <div v-if="wallet?.addr" class="tag secondary">
           <template v-if="user?.activeRecord">
-            Points: {{ user?.activeRecord?.points ?? 0 }}
+            {{ user?.activeRecord?.points ?? 0 }} Points
           </template>
           <template v-else>
             Need Register

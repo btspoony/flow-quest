@@ -7,12 +7,14 @@ const props = withDefaults(
     method: () => Promise<string | null>;
     content?: string;
     action?: string;
+    disabled?: boolean;
     hideButton?: boolean
     hideTrx?: boolean
   }>(),
   {
     content: "Submit",
     action: '',
+    disabled: false,
     hideButton: false,
     hideTrx: false,
   }
@@ -77,7 +79,12 @@ defineExpose({
 
 <template>
   <div class="flex flex-col gap-2">
-    <button v-if="!hideButton && !txid" class="rounded-xl flex-center" role="button" :aria-busy="isLoading"
+    <button v-if="disabled" class="rounded-xl flex-center mb-0" disabled>
+      <slot name="disabled">
+        Disabled
+      </slot>
+    </button>
+    <button v-else-if="!hideButton && !txid" class="rounded-xl flex-center mb-0" role="button" :aria-busy="isLoading"
       :disabled="isLoading" :aria-disabled="isLoading"
       @click="startTransaction">
       <slot>
