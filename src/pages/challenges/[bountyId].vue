@@ -120,7 +120,7 @@ async function claimFloat(): Promise<string | null> {
       <div class="w-full h-36 relative overflow-hidden -z-10">
         <div class="absolute -inset-5 blur-lg bg-cover bg-center"
           :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
-        <div class="absolute inset-0 bg-black/50" />
+        <div class="absolute inset-0 bg-black/40" />
       </div>
     </template>
     <div class="h-14" />

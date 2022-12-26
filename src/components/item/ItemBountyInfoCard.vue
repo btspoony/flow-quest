@@ -30,7 +30,7 @@ function onClickCard() {
 </script>
 
 <template>
-  <article :class="['card card-border h-36', { 'w-full': full, 'highlight': highlight, 'cursor-pointer': !locked }]"
+  <article :class="['card card-border h-36', { 'w-full': full, 'bg-highlight': highlight, 'cursor-pointer': !locked }]"
     @click="onClickCard()">
     <ItemChallengeInfoCard v-if="bounty.config.category === 'challenge'" :bounty="bounty" />
     <ItemQuestInfoCard v-else :bounty="bounty" />

@@ -12,3 +12,6 @@ export const useActiveSeason = () =>
 
 export const useCommunityBasics = (communityId: string) =>
   useState<CommunityBasics | null>(`community:${communityId}`, () => ref(null));
+
+export const useCurrentProfile = () =>
+  useState<ProfileData | null>("currentProfile", () => ref(null));

@@ -1,5 +1,5 @@
 <template>
-  <main class="container max-w-3xl py-8">
+  <FrameMain class="max-w-3xl py-8">
     <NuxtPage />
-  </main>
+  </FrameMain>
 </template>
