@@ -202,3 +202,17 @@ export async function apiPostCompleteBounty(
     console.error(e);
   }
 }
+
+export async function apiPostGenerateReferralCode(): Promise<
+  ResponseReferralCodeGenerate | undefined
+> {
+  try {
+    const result = await $fetch("/api/generate-referral-code", {
+      method: "post",
+      body: Object.assign({}, await fetchAccountProof()),
+    });
+    return result;
+  } catch (e) {
+    console.error(e);
+  }
+}

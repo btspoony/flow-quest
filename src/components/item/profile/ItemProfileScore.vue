@@ -24,7 +24,7 @@ const completedBounties = computed<BountyStatus[]>(() => {
 <template>
   <section class="hero card card-border">
     <div class="hero-content flat w-[90%] align-start flex-col !gap-6">
-      <div class="inline-flex-between text-4xl font-semibold !gap-8">
+      <div class="w-full flex-between flex-wrap text-4xl font-semibold">
         <span class="py-2">Score</span>
         <span class="rounded-full bg-secondary text-white px-4 py-2">
           <span class="font-extrabold">{{ profile.activeRecord?.points }}</span>&nbsp;Points

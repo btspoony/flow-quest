@@ -43,7 +43,7 @@ export async function txCtrlerSetupReferralCode(
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-setup-referral-code.cdc"
     ),
-    (arg, t) => [arg(target, t.String)]
+    (arg, t) => [arg(target, t.Address)]
   );
 }
 

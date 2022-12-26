@@ -23,15 +23,29 @@ const { text, copy, copied, isSupported } = useClipboard();
 
 const executable = computed<boolean>(() => season.value ? season.value?.referralThreshold <= (props.profile.activeRecord?.points ?? 0) : false)
 
-async function generateCode(): Promise<string> {
-  return ""
+async function generateCode(): Promise<string | null> {
+  const result = await apiPostGenerateReferralCode()
+  if (result) {
+    if (result.transactionId) {
+      return result.transactionId
+    }
+    if (!result.isAccountValid) {
+      throw new Error("Account verification invalid")
+    }
+    if (!result.isPointsEnough) {
+      throw new Error("Points not enough")
+    }
+  } else {
+    throw new Error("Failed to requeset")
+  }
+  return null
 }
 </script>
 
 <template>
-  <section v-if="isUserSelf" class="hero card card-border">
+  <section v-if="referralCode || isUserSelf" class="hero card card-border">
     <div class="hero-content flat w-[90%] align-start flex-col">
-      <div class="inline-flex-between text-4xl font-semibold !gap-8">
+      <div class="w-full flex-between flex-wrap text-4xl font-semibold">
         <span class="py-2">Referral Code</span>
         <span v-if="referralCode" class="rounded-full bg-secondary text-white px-4 py-2">
           <span class="font-extrabold">{{ referralCode ?? "UNKNOWN" }}</span>
@@ -40,13 +54,13 @@ async function generateCode(): Promise<string> {
       <div class="divider"></div>
       <div class="w-full text-xl flex flex-col gap-2">
         <template v-if="referralCode">
-          <span>Invite others to get more points</span>
+          <span>To obtain more points by inviting friends</span>
           <code class="inline-flex-between text-sm" :data-tooltip="copied ? `${text} copied` : undefined">
             <span>{{ copyURL }}</span>
             <ClipboardDocumentIcon v-if="isSupported" class="fill-current w-5 h-5 cursor-pointer" @click="copy(copyURL)" />
           </code>
         </template>
-        <FlowSubmitTransaction v-else :disabled="!executable" :method="generateCode"
+        <FlowSubmitTransaction v-else-if="isUserSelf" :disabled="!executable" :method="generateCode"
           @success="reloadCurrentUser({ ignoreIdentities: true })">
           Generate Referral Code
           <template v-slot:disabled>
