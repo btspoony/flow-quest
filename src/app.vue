@@ -10,7 +10,7 @@ useHead({
 
 // ----- Data -----
 const description = ref(
-  "A Flow on-chain competition platform."
+  "A Flow on-chain quests platform."
 );
 </script>
 
