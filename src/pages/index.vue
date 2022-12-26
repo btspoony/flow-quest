@@ -4,8 +4,8 @@ const appName = ref(config.public.appName)
 </script>
 
 <template>
-  <main class="container">
-    <div class="hero min-h-[calc(100vh-100px)]">
+  <FrameMain>
+    <div class="hero min-h-[calc(100vh-180px)]">
       <div class="page-container hero-content flex-col lg:flex-row-reverse">
         <img src="~/assets/images/home-flow.png" alt="home flow" class="max-w-xs" />
         <div>
@@ -20,5 +20,5 @@ const appName = ref(config.public.appName)
         </div>
       </div>
     </div>
-  </main>
+  </FrameMain>
 </template>

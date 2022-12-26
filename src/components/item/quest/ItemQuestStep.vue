@@ -15,8 +15,6 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
-const wallet = useFlowAccount();
-
 const submitLoading = ref(false);
 const stepCfg = computed(() => props.stepsCfg[props.step]);
 
@@ -28,6 +26,10 @@ function onOpenDialogue() {
   }
   dialog.value?.openModal()
 }
+
+const isAnswerCompleted = computed(() => {
+  return answers.filter(one => !one).length === 0
+})
 
 async function onSubmitAnswer(): Promise<string | null> {
   submitLoading.value = true
@@ -94,7 +96,8 @@ function resetComp() {
       </div>
     </div>
     <footer class="mt-4">
-      <FlowSubmitTransaction :method="onSubmitAnswer" @sealed="resetComp()" @error="resetComp()" @success="emit('success')">
+      <FlowSubmitTransaction :disabled="!isAnswerCompleted" :method="onSubmitAnswer" @sealed="resetComp()"
+        @error="resetComp()" @success="emit('success')">
         Submit
       </FlowSubmitTransaction>
     </footer>

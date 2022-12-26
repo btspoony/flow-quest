@@ -1,4 +1,4 @@
-export async function apiGetActiveSeason(): Promise<CompetitionSeason> {
+export async function apiGetActiveSeason(): Promise<CompetitionSeason | null> {
   const activeSeason = useActiveSeason();
   if (activeSeason.value) {
     return activeSeason.value;
@@ -12,32 +12,41 @@ export async function apiGetActiveSeason(): Promise<CompetitionSeason> {
 
 export async function apiGetCurrentChallenge(
   defaultBountyId: string
-): Promise<BountyInfo> {
-  const season = await apiGetActiveSeason();
-
+): Promise<BountyInfo | null> {
   const current = useCurrentChallenge();
-  let challenge: BountyInfo;
+  let challenge: BountyInfo | null;
   if (current.value) {
     challenge = current.value;
   } else {
     const { $scripts } = useNuxtApp();
-    challenge = await $scripts.getBountyById(season.seasonId, defaultBountyId);
+    const season = await apiGetActiveSeason();
+    if (season) {
+      challenge = await $scripts.getBountyById(
+        season.seasonId,
+        defaultBountyId
+      );
+    } else {
+      challenge = null;
+    }
   }
   return challenge;
 }
 
 export async function apiGetCurrentQuest(
   defaultQuestKey: string
-): Promise<BountyInfo> {
-  const season = await apiGetActiveSeason();
-
+): Promise<BountyInfo | null> {
   const current = useCurrentQuest();
-  let quest: BountyInfo;
+  let quest: BountyInfo | null;
   if (current.value) {
     quest = current.value;
   } else {
     const { $scripts } = useNuxtApp();
-    quest = await $scripts.getBountyByKey(season.seasonId, defaultQuestKey);
+    const season = await apiGetActiveSeason();
+    if (season) {
+      quest = await $scripts.getBountyByKey(season.seasonId, defaultQuestKey);
+    } else {
+      quest = null;
+    }
   }
   return quest;
 }
@@ -86,19 +95,38 @@ export async function reloadCurrentUser(
   }
 
   const address = wallet.value.addr!;
+  const profile = (await loadUserProfile(address, ignores)) ?? {
+    address,
+    activeRecord: undefined,
+    linkedIdentities: {},
+  };
+
+  if (current.value) {
+    if (ignores.ignoreIdentities) {
+      profile.linkedIdentities = current.value?.linkedIdentities;
+    }
+    if (ignores.ignoreSeason) {
+      profile.activeRecord = current.value?.activeRecord;
+    }
+  }
+
+  current.value = profile;
+  return current.value;
+}
+
+export async function loadUserProfile(
+  address: string,
+  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {}
+): Promise<ProfileData | null> {
+  if (!address) return null;
+
   const { $scripts } = useNuxtApp();
 
   let activeRecord: SeasonRecord | undefined;
-  let linkedIdentities: { [key: string]: ProfileIdentity } = {};
-
-  if (current.value) {
-    activeRecord = current.value?.activeRecord;
-    linkedIdentities = current.value?.linkedIdentities;
-  }
+  const linkedIdentities: { [key: string]: ProfileIdentity } = {};
 
   if (!ignores.ignoreIdentities) {
     const identities = await $scripts.loadProfileGetIdentities(address);
-    linkedIdentities = {};
     for (const identity of identities) {
       linkedIdentities[identity.platform] = identity;
     }
@@ -108,12 +136,11 @@ export async function reloadCurrentUser(
     activeRecord = await $scripts.loadProfileSeasonRecord(address);
   }
 
-  current.value = {
+  return {
     address,
     activeRecord,
     linkedIdentities,
   };
-  return current.value;
 }
 
 export async function fetchAccountProof() {
@@ -169,6 +196,20 @@ export async function apiPostCompleteBounty(
         },
         await fetchAccountProof()
       ),
+    });
+    return result;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function apiPostGenerateReferralCode(): Promise<
+  ResponseReferralCodeGenerate | undefined
+> {
+  try {
+    const result = await $fetch("/api/generate-referral-code", {
+      method: "post",
+      body: Object.assign({}, await fetchAccountProof()),
     });
     return result;
   } catch (e) {

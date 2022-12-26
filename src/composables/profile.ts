@@ -1,7 +1,7 @@
 import type { UserSnapshot } from "@onflow/fcl";
 
 export const useUserProfile = () =>
-  useState<ProfileData | null>("currentProfile", () => ref(null));
+  useState<ProfileData | null>("currentUserProfile", () => ref(null));
 
 export const useGithubProfile = () =>
   useState<GithubProfile>("currentGithubProfile", () =>

@@ -38,6 +38,10 @@
       @apply flex justify-center items-center;
       @apply z-0 gap-4 py-20;
 
+      &.flat {
+        @apply py-10;
+      }
+
       &.align-end {
         @apply justify-end items-end;
       }
@@ -56,16 +60,24 @@
     }
   }
 
+  .bg-highlight {
+    @apply bg-gradient-to-r from-primary to-secondary;
+  }
+
+  .bg-primary {
+    @apply bg-gradient-to-r from-primary to-green-500;
+  }
+
+  .bg-secondary {
+    @apply bg-gradient-to-r from-secondary to-yellow-500;
+  }
+
   .card {
     @apply relative rounded-xl p-[3px] m-0;
     @apply bg-[var(--card-background-color)];
 
     .card {
       @apply rounded-lg p-4;
-    }
-
-    &.highlight {
-      @apply bg-gradient-to-r from-primary to-secondary;
     }
 
     &:active {
@@ -127,6 +139,19 @@
   .divider {
     @apply w-full bg-gray-400 dark:bg-gray-600 h-[1px];
   }
+
+  .tab-link {
+    @apply px-8 border-0 border-x-0 border-t-0 border-solid;
+    @apply text-xl font-semibold;
+
+    &.active {
+      @apply border-[var(--color)] border-b-4 rounded-b-none;
+    }
+
+    &.disabled {
+      @apply text-gray-400;
+    }
+  }
 }
 
 @layer utilities {
@@ -144,6 +169,10 @@
 
   .flex-between {
     @apply flex gap-1 items-center justify-between;
+  }
+
+  .inline-flex-center {
+    @apply inline-flex gap-1 items-center justify-center;
   }
 
   .inline-flex-between {

@@ -7,8 +7,8 @@ const route = useRoute()
 const user = useUserProfile()
 
 interface ChallengeDetail {
-  season: CompetitionSeason,
-  challenge: BountyInfo,
+  season: CompetitionSeason | null,
+  challenge: BountyInfo | null,
   quests: BountyInfo[]
 }
 
@@ -23,13 +23,18 @@ const { data: info, pending, refresh } = useAsyncData<ChallengeDetail>(`challeng
   const challenge = await apiGetCurrentChallenge(bountyId.value);
 
   const { $scripts } = useNuxtApp();
-  const quests: BountyInfo[] = await $scripts.getQuestsDetail(season.seasonId, (challenge.config as ChallengeConfig).quests)
+  let quests: BountyInfo[] = []
+  if (season && challenge) {
+    quests = await $scripts.getQuestsDetail(season.seasonId, (challenge.config as ChallengeConfig).quests)
+  } else {
+    quests = []
+  }
   return { season, challenge, quests }
 }, {
   server: false
 });
 
-const challengeCfg = computed(() => (info.value?.challenge.config as ChallengeConfig));
+const challengeCfg = computed(() => (info.value?.challenge?.config as ChallengeConfig));
 const imageUrl = computed(() => {
   if (challengeCfg.value?.display.thumbnail) {
     return getIPFSUrl(challengeCfg.value?.display.thumbnail)
@@ -115,7 +120,7 @@ async function claimFloat(): Promise<string | null> {
       <div class="w-full h-36 relative overflow-hidden -z-10">
         <div class="absolute -inset-5 blur-lg bg-cover bg-center"
           :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
-        <div class="absolute inset-0 bg-black/50" />
+        <div class="absolute inset-0 bg-black/40" />
       </div>
     </template>
     <div class="h-14" />

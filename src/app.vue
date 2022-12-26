@@ -25,7 +25,6 @@ const description = ref(
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <Header />
-    <div class="h-[90px]"></div>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
