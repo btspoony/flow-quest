@@ -10,7 +10,6 @@ const appName = ref(config.public.appName)
 
 const { width } = useWindowSize()
 const menuHidden = computed(() => width.value < 1024)
-const titleHidden = computed(() => width.value < 1280)
 </script>
 
 <template>
@@ -19,7 +18,7 @@ const titleHidden = computed(() => width.value < 1280)
       <ul>
         <li class="inline-flex-between !gap-2 cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span v-if="!titleHidden" class="font-semibold text-2xl">{{ appName }}</span>
+          <span class="font-semibold text-2xl hidden lg:inline">{{ appName }}</span>
         </li>
       </ul>
       <ul>
