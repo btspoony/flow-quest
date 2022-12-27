@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core'
-import FlowLogo from '~/assets/svgs/flow.svg'
-import { FireIcon, Bars3Icon, ChartBarSquareIcon } from "@heroicons/vue/24/solid";
+import { useWindowSize } from '@vueuse/core';
+import FlowLogo from '~/assets/svgs/flow.svg';
+import { Bars3Icon } from "@heroicons/vue/24/solid";
 
 const router = useRouter()
-const route = useRoute()
 
 const config = useRuntimeConfig();
 const appName = ref(config.public.appName)
-
-function isCurrentInActivePage(pageKey: string): boolean {
-  return !route.path.startsWith(`/${pageKey}`)
-}
 
 const { width } = useWindowSize()
 const menuHidden = computed(() => width.value < 1024)
@@ -27,22 +22,7 @@ const menuHidden = computed(() => width.value < 1024)
         </li>
       </ul>
       <ul>
-        <template v-if="!menuHidden">
-          <li class="flex-center">
-            <NuxtLink :to="geneReferralLink('/active')"
-              :class="['inline-flex-between', { secondary: isCurrentInActivePage('active') }]">
-              <FireIcon class="fill-secondary w-6 h-6" />
-              Competition
-            </NuxtLink>
-          </li>
-          <li class="flex-center">
-            <NuxtLink :to="geneReferralLink('/leaderboard')"
-              :class="['inline-flex-between', { secondary: isCurrentInActivePage('leaderboard') }]">
-              <ChartBarSquareIcon class="fill-current w-6 h-6" />
-              Leaderboard
-            </NuxtLink>
-          </li>
-        </template>
+        <Menus v-if="!menuHidden" />
         <li>
           <WidgetThemeToggle />
         </li>
@@ -50,7 +30,9 @@ const menuHidden = computed(() => width.value < 1024)
           <AuthHeader />
         </li>
         <li class="cursor-pointer" v-if="menuHidden">
-          <Bars3Icon class="fill-current w-6 h-6" />
+          <label for="page-drawer">
+            <Bars3Icon class="fill-current w-6 h-6" />
+          </label>
         </li>
       </ul>
     </nav>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { UserIcon } from "@heroicons/vue/24/solid";
 
 const current = useFlowAccount();
@@ -27,13 +28,16 @@ function login() {
   const { $fcl } = useNuxtApp();
   $fcl.authenticate();
 }
+
+const { width } = useWindowSize()
+const narrow = computed(() => width.value < 1280)
 </script>
 
 <template>
   <button class="flex-center rounded-full mb-0" @click="login">
     <div class="inline-flex-around">
-      <UserIcon class="fill-current h-5 w-5" />
-      <small>Connect Wallet</small>
+      <UserIcon class="fill-current h-4 w-4" />
+      <small>{{ narrow ? "Connect" : "Connect Wallet" }}</small>
     </div>
   </button>
 </template>

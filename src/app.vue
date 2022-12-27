@@ -3,6 +3,7 @@ const route = useRoute();
 const locale = useLocale();
 const isDark = useSharedDark();
 const config = useRuntimeConfig();
+const isDrawerOpened = useAppDrawerOpened();
 
 useHead({
   titleTemplate: `%s - ${config.public.appName}`,
@@ -16,20 +17,26 @@ const description = ref(
 
 <template>
 <Html :lang="locale" :data-theme="isDark ? 'dark' : 'light'">
+  <noscript>You need to enable JavaScript to run this app.</noscript>
 
   <HeadMeta :title="String(route.meta.title ?? 'Home')" :description="description" :url="route.fullPath">
     <Link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
   </HeadMeta>
 
-  <Body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-
-    <Header />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-    <Footer />
-  </Body>
+  <div class="drawer drawer-end">
+    <input id="page-drawer" type="checkbox" class="drawer-toggle" v-model="isDrawerOpened" />
+    <div class="drawer-content">
+      <Header />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+      <Footer />
+    </div>
+    <div class="drawer-side">
+      <label for="page-drawer" class="drawer-overlay"></label>
+      <Aside />
+    </div>
+    </div>
 </Html>
 </template>
 

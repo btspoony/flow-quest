@@ -26,6 +26,10 @@ const defaultSans = [
 
 module.exports = {
   darkMode: ["class", '[data-theme="dark"]'],
+  corePlugins: {
+    /* Avoid pico.css preflight conflict */
+    preflight: false,
+  },
   theme: {
     container: {
       center: true,

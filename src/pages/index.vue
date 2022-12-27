@@ -16,7 +16,9 @@ const appName = ref(config.public.appName)
             Plan to start the web3 journey? The {{ appName }} will be your guide.<br />
             Ready to begin?
           </p>
-          <BtnGoPage next="/active" class="max-w-xs">Start the Competition</BtnGoPage>
+          <div class="flex-center lg:flex-between">
+            <BtnGoPage next="/active" class="max-w-xs">Start the Competition</BtnGoPage>
+          </div>
         </div>
       </div>
     </div>

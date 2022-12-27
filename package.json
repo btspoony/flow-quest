@@ -19,7 +19,7 @@
     "update:testnet": "npx dotenv-cli -e .env.testnet -- flow project deploy --network=testnet -f flow.json -f flow.testnet.json --update"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.1.3",
+    "@nuxtjs/tailwindcss": "^6.2.0",
     "@onflow/transport-grpc": "^1.1.4",
     "@rollup/plugin-inject": "^5.0.2",
     "@tailwindcss/typography": "^0.5.8",
