@@ -79,7 +79,7 @@ defineExpose({
 
 <template>
   <div class="flex flex-col gap-2">
-    <button v-if="disabled" class="rounded-xl flex-center mb-0" disabled>
+    <button v-if="disabled && !txid" class="rounded-xl flex-center mb-0" disabled>
       <slot name="disabled">
         Disabled
       </slot>
