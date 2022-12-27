@@ -10,7 +10,7 @@ const user = useUserProfile();
 
 // load user profile
 watch(wallet, async (newVal, oldVal) => {
-  if (newVal?.loggedIn && newVal.addr === linkedAddress.value || !linkedAddress.value) {
+  if (newVal?.loggedIn && (newVal.addr === linkedAddress.value || !linkedAddress.value)) {
     user.value = await apiGetCurrentUser()
   } else {
     user.value = null
