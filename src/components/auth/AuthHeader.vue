@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const profile = useGithubProfile();
 const wallet = useFlowAccount();
+const user = useUserProfile();
 
 const loading = ref(false);
 
@@ -44,7 +45,7 @@ watchEffect(async () => {
         Loading
       </span>
       <template v-else>
-        <FlowConnect v-if="!wallet?.loggedIn" :hide-trx="true" />
+        <FlowConnect v-if="!wallet?.loggedIn || !user?.activeRecord" :hide-trx="true" />
         <WidgetProfileHead />
       </template>
     </div>

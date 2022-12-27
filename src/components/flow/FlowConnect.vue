@@ -26,7 +26,7 @@ onMounted(() => {
 })
 
 function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
-  if (newVal && !newVal.activeRecord) {
+  if (wallet.value?.loggedIn && newVal && !newVal.activeRecord) {
     if (!submitTx.value?.isLoading && !submitTx.value?.isSealed) {
       submitTx.value?.startTransaction()
     }
@@ -52,6 +52,7 @@ function onConnected(addr: string) {
 }
 
 async function onProfileRegistered() {
+  console.log('User registered:', wallet.value?.addr)
   await reloadCurrentUser()
   emit('registered')
 }

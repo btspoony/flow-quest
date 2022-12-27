@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const wallet = useFlowAccount()
+const user = useUserProfile()
 
-watch(wallet, (newVal, oldVal) => {
+watch(user, (newVal, oldVal) => {
   refresh()
 })
 
@@ -12,8 +13,7 @@ interface DataResult {
 
 const { data: info, pending, refresh } = useAsyncData<DataResult>(`ranking`, async () => {
   const { $scripts } = useNuxtApp();
-  let address = wallet.value && wallet.value?.addr
-  const ranking = await $scripts.getRankingStatus(100, address)
+  const ranking = await $scripts.getRankingStatus(100, user.value?.activeRecord ? user.value.address : null)
   let addrs: string[] = []
   if (ranking?.tops.length && ranking?.tops.length > 0) {
     addrs = ranking.tops.map(one => one.account)
@@ -48,7 +48,7 @@ const { data: info, pending, refresh } = useAsyncData<DataResult>(`ranking`, asy
   </div>
   <template v-else>
     <h2>Leaderboard</h2>
-    <section v-if="wallet?.loggedIn" class="mb-8">
+    <section v-if="wallet?.loggedIn && user?.activeRecord" class="mb-8">
       <h5>Your ranking</h5>
       <div v-if="pending" class="w-full h-20" :aria-busy="true" />
       <template v-else-if="info?.ranking?.account">

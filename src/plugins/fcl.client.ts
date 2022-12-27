@@ -458,13 +458,13 @@ export default defineNuxtPlugin((nuxtApp) => {
                 arg(user.value.data?.avatarUrl, t.Optional(t.String)), // userImage: String?,
               ]
             );
-            console.log(`Registered with user.`);
+            console.log(`Registered with github profile.`);
           } else {
             result = await sendTransaction(
               cadence.transactions.profileRegister,
               (arg, t) => [arg(referredFrom, t.Optional(t.Address))]
             );
-            console.log(`Registered without user info.`);
+            console.log(`Registered without github profile.`);
           }
           return result;
         },

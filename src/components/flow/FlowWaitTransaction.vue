@@ -2,9 +2,12 @@
 <script setup lang="ts">
 import type { TransactionReceipt } from "@onflow/fcl";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   txid: string;
-}>();
+  hidden?: boolean;
+}>(), {
+  hidden: false
+});
 
 const emit = defineEmits<{
   (e: "updated", tx: TransactionReceipt): void;
@@ -93,7 +96,8 @@ onBeforeUnmount(stopSubscribe);
 </script>
 
 <template>
-  <div class="w-full min-w-40 px-3 py-2 rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
+  <div v-if="!hidden"
+    class="w-full min-w-40 px-3 py-2 rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
     <slot></slot>
     <div class="font-semibold text-lg flex items-center gap-2">
       <span class="">{{ txStatusString }}</span>

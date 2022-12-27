@@ -11,12 +11,7 @@ const profileAddr = computed<string>(() => route.params.address as string)
 
 const { data: profile, pending } = useAsyncData<ProfileData | null>(`user:${profileAddr}`, async () => {
   await apiGetActiveSeason()
-  let profile: ProfileData | null
-  if (user.value?.address === profileAddr.value) {
-    profile = user.value
-  } else {
-    profile = await loadUserProfile(profileAddr.value)
-  }
+  const profile = await loadUserProfile(profileAddr.value)
   currentProfile.value = profile
   return profile
 }, {
@@ -44,7 +39,9 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
       </div>
     </template>
     <div class="relative max-w-3xl mx-auto -mt-32">
-      <div v-if="pending" :aria-busy="true"></div>
+      <div v-if="pending" class="hero min-h-[60vh]">
+        <div class="hero-content" :aria-busy="true"></div>
+      </div>
       <template v-else-if="profileIdentity">
         <section class="mb-6 flex flex-col lg:flex-row gap-4 lg:gap-6">
           <div class="flex-none">
@@ -79,6 +76,11 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
           <NuxtPage />
         </section>
       </template>
+      <div class="hero min-h-[60vh]">
+        <div class="hero-content">
+          <h3>Invalid Address or Profile</h3>
+        </div>
+      </div>
     </div>
   </FrameMain>
 </template>
