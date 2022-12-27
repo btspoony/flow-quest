@@ -337,10 +337,11 @@ pub contract UserProfile {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
             let uid = platform.concat("#").concat(identity.uid)
 
-            if UserProfile.platformMapping[uid] == nil {
-                UserProfile.platformMapping[uid] = profileAddr
-            }
-
+            assert(
+                UserProfile.platformMapping[uid] == nil || UserProfile.platformMapping[uid] == profileAddr,
+                message: "Platfrom UID registered"
+            )
+            UserProfile.platformMapping[uid] = profileAddr
             self.linkedIdentities[platform] = identity
 
             emit ProfileUpsertIdentity(
@@ -443,6 +444,11 @@ pub contract UserProfile {
         return getAccount(acct)
             .getCapability<&Profile{Interfaces.ProfilePublic}>(UserProfile.ProfilePublicPath)
             .borrow() ?? panic("Failed to borrow user profile: ".concat(acct.toString()))
+    }
+
+    pub fun getPlatformLinkedAddress(platform: String, uid: String): Address? {
+        let uid = platform.concat("#").concat(uid)
+        return UserProfile.platformMapping[uid]
     }
 
     init() {

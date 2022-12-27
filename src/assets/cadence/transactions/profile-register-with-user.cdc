@@ -28,16 +28,21 @@ transaction(
     execute {
         // update profile identity
         if platform != nil && userId != nil && userName != nil && userBio != nil && userImage != nil {
-            let identity = Interfaces.LinkedIdentity(
-                platform: platform!,
-                uid: userId!,
-                display: MetadataViews.Display(
-                    name: userName!,
-                    description: userBio!,
-                    thumbnail: MetadataViews.HTTPFile(url: userImage!)
+            let linkedAddr = UserProfile.getPlatformLinkedAddress(platform: platform!, uid: userId!)
+            if linkedAddr == nil || linkedAddr == self.profile.owner!.address {
+                let identity = Interfaces.LinkedIdentity(
+                    platform: platform!,
+                    uid: userId!,
+                    display: MetadataViews.Display(
+                        name: userName!,
+                        description: userBio!,
+                        thumbnail: MetadataViews.HTTPFile(url: userImage!)
+                    )
                 )
-            )
-            self.profile.upsertIdentity(platform: platform!, identity: identity)
+                self.profile.upsertIdentity(platform: platform!, identity: identity)
+            } else {
+                panic("Occupied platform identity.")
+            }
         }
 
         // register new season
