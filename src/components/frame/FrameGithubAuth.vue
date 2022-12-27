@@ -11,7 +11,7 @@ const github = useGithubProfile();
   <main class="w-full mx-auto">
     <div v-if="!noTopbar" class="h-[90px]"></div>
     <slot name="header" />
-    <div class="relative container min-h-[calc(100vh-240px)]">
+    <div class="relative container min-h-[calc(100vh-180px)]">
       <div class="hero" v-if="!github.auth">
         <div class="page-container hero-content flex-col">
           <h4>Start Challenges</h4>

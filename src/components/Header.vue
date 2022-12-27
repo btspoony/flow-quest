@@ -8,8 +8,14 @@ const router = useRouter()
 const config = useRuntimeConfig();
 const appName = ref(config.public.appName)
 
-const { width } = useWindowSize()
-const menuHidden = computed(() => width.value < 1024)
+const menuHidden = ref(false)
+
+onMounted(() => {
+  const { width } = useWindowSize()
+  watchEffect(() => {
+    menuHidden.value = width.value < 1024
+  })
+})
 </script>
 
 <template>

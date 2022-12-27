@@ -10,7 +10,7 @@ withDefaults(defineProps<{
   <main class="w-full mx-auto">
     <div v-if="!noTopbar" class="h-[90px]"></div>
     <slot name="header" />
-    <div class="relative container min-h-[calc(100vh-240px)]">
+    <div class="relative container min-h-[calc(100vh-180px)]">
       <slot />
     </div>
   </main>
