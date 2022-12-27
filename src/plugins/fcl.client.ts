@@ -327,8 +327,22 @@ export default defineNuxtPlugin((nuxtApp) => {
             account: acctRankingScore,
             tops: topsScores,
           };
-          // }
-          // return result;
+        },
+        /**
+         * get address
+         */
+        async getPlatformLinkedAddress(
+          platform: string,
+          uid: string,
+        ): Promise<string | null> {
+          return await executeScript(
+            cadence.scripts.getPlatformLinkedAddress,
+            (arg, t) => [
+              arg(platform, t.String),
+              arg(uid, t.String),
+            ],
+            null
+          )
         },
         /**
          * get quest status

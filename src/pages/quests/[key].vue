@@ -9,7 +9,6 @@ definePageMeta({
 const mdRenderer = md()
 const route = useRoute()
 const user = useUserProfile()
-const wallet = useFlowAccount()
 
 interface QuestDetail {
   season: CompetitionSeason | null,
@@ -67,9 +66,8 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
     isRegistered = true
   } else {
     const { $scripts } = useNuxtApp();
-    const address = wallet.value?.addr
-    if (address && season) {
-      isRegistered = await $scripts.isProfileRegistered(address, season.seasonId)
+    if (user.value?.address && season) {
+      isRegistered = await $scripts.isProfileRegistered(user.value?.address, season.seasonId)
     } else {
       isRegistered = false
     }
@@ -82,7 +80,7 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
 const profileStatus = ref<QuestStatus | null>(null)
 const isBountyCompleted = ref(false)
 
-watch(wallet, (newVal, oldVal) => {
+watch(user, (newVal, oldVal) => {
   userRefresh()
 })
 
@@ -120,11 +118,10 @@ const isInvalid = computed(() => {
 
 async function updateQuest() {
   const { $scripts } = useNuxtApp();
-  const address = wallet.value?.addr
   const season = await apiGetActiveSeason();
-  if (address && bountyId.value && season) {
-    profileStatus.value = await $scripts.profileGetQuestStatus(address, season.seasonId, questKey.value)
-    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(address, season.seasonId, bountyId.value)
+  if (user.value?.address && bountyId.value && season) {
+    profileStatus.value = await $scripts.profileGetQuestStatus(user.value?.address, season.seasonId, questKey.value)
+    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(user.value?.address, season.seasonId, bountyId.value)
   } else {
     profileStatus.value = null
     isBountyCompleted.value = false
@@ -170,7 +167,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
         <!-- Quest Prepare -->
         <div class="flex flex-col gap-2">
-          <FlowConnect v-if="!wallet?.loggedIn || !isRegistered" @registered="userRefresh" />
+          <FlowConnect v-if="!user?.activeRecord || !isRegistered" @registered="userRefresh" />
         </div>
         <!-- Quest steps -->
         <div class="flex flex-col gap-2">

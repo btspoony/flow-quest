@@ -76,7 +76,7 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
           <NuxtPage />
         </section>
       </template>
-      <div class="hero min-h-[60vh]">
+      <div v-else class="hero min-h-[60vh]">
         <div class="hero-content">
           <h3>Invalid Address or Profile</h3>
         </div>
