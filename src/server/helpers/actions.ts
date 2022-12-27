@@ -1,4 +1,5 @@
 import Signer from "./signer.mjs";
+import { executeOrLoadFromRedis } from "./redis";
 
 export async function txCtrlerSetQuestAnswer(
   signer: Signer,
@@ -109,7 +110,10 @@ export async function scVerifyQuest(
   stepCfg: QuestStepsConfig,
   params: { [key: string]: string }
 ): Promise<any> {
-  const code = await $fetch(stepCfg.code);
+  const code = await executeOrLoadFromRedis<string>(
+    `QuestVerificationCode:${stepCfg.code}`,
+    $fetch(stepCfg.code)
+  );
   console.log(`[Loaded Code]: ${stepCfg.code}`);
   if (typeof code !== "string") {
     throw new Error("Unknown quests key.");
