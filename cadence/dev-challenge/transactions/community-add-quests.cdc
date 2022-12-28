@@ -39,17 +39,20 @@ transaction(
         let len = keys.length
         var i = 0
         while i < len {
-            let quest = Community.QuestConfig(
-                communityId: communityId,
-                key: keys[i],
-                title: title[i],
-                description: description[i],
-                image: image[i],
-                steps: steps[i],
-                stepsCfg: stepsCfg[i],
-                guideMD: guideMD[i],
-            )
-            community.addQuest(key: keys[i], quest: quest)
+            let exist = community.borrowQuestRef(key: keys[i])
+            if exist == nil {
+                let quest = Community.QuestConfig(
+                    communityId: communityId,
+                    key: keys[i],
+                    title: title[i],
+                    description: description[i],
+                    image: image[i],
+                    steps: steps[i],
+                    stepsCfg: stepsCfg[i],
+                    guideMD: guideMD[i],
+                )
+                community.addQuest(key: keys[i], quest: quest)
+            }
             i = i + 1
         }
     }

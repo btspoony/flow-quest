@@ -26,6 +26,8 @@ transaction(
         assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
         let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
+        let exist = community.borrowQuestRef(key: key)
+        assert(exist == nil, message: "quest exists.")
 
         let quest = Community.QuestConfig(
             communityId: communityId,

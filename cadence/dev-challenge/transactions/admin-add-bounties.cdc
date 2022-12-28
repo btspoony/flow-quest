@@ -31,7 +31,9 @@ transaction(
         assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
         let communityId = comPubRef!.getID()
 
-        let season = CompetitionService.borrowServicePublic().borrowLatestActiveSeason()
+        let service = CompetitionService.borrowServicePublic()
+        let seasonId = service.getActiveSeasonID()
+        let season = service.borrowSeasonDetail(seasonId: seasonId)
 
         let len = keys.length
         var i = 0
@@ -41,16 +43,19 @@ transaction(
                 communityId: communityId,
                 key: keys[i]
             )
-            // ensure exists
-            entityIdentifier.getBountyEntity()
+            let exist = season.borrowBountyInfoByKey(keys[i])
+            if exist == nil {
+                // ensure exists
+                entityIdentifier.getBountyEntity()
 
-            self.admin.addBounty(
-                seasonId: season.getSeasonId(),
-                identifier: entityIdentifier,
-                preconditions: [], // FIXME: no precondition for now
-                reward: Helper.PointReward(rewardPoints[i], referralPoints[i]),
-                primary: primary[i],
-            )
+                self.admin.addBounty(
+                    seasonId: season.getSeasonId(),
+                    identifier: entityIdentifier,
+                    preconditions: [], // FIXME: no precondition for now
+                    reward: Helper.PointReward(rewardPoints[i], referralPoints[i]),
+                    primary: primary[i],
+                )
+            }
             i = i + 1
         }
     }
