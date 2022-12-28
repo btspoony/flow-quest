@@ -4,6 +4,15 @@ import { SHA3 } from "sha3";
 
 const ec = new elliptic.ec("p256");
 
+/**
+ * @param {string} addr
+ * @returns {Promise<fcl.Account>}
+ */
+async function getAccount(addr) {
+  const account = await fcl.send([fcl.getAccount(addr)]).then(fcl.decode);
+  return account;
+}
+
 class FlowSigner {
   /** @type {string} */
   _flowAddress;
@@ -27,15 +36,27 @@ class FlowSigner {
     this._addressMapping = addressMapping ?? {};
   }
 
-  _buildAuthorization() {
-    console.log("Authz Addr:", this._flowAddress);
+  /**
+   * @param {string} [address=undefined]
+   * @param {number} [accountIndex=undefined]
+   * @param {string} [privateKey=undefined]
+   */
+  buildAuthorization(
+    address = undefined,
+    accountIndex = undefined,
+    privateKey = undefined
+  ) {
+    address = address ?? this._flowAddress;
+    accountIndex = accountIndex ?? this._accountIndex;
+    privateKey = privateKey ?? this._privateKeyHex;
+    console.log("Authz Addr:", address);
     /**
      * @param {fcl.Account} account
      * @returns {Promise<fcl.AuthZ>}
      */
     return async (account) => {
-      const user = await this.getAccount(this._flowAddress);
-      const key = user.keys[this._accountIndex];
+      const user = await getAccount(address);
+      const key = user.keys[accountIndex];
 
       return {
         ...account,
@@ -46,7 +67,7 @@ class FlowSigner {
           return {
             addr: fcl.withPrefix(user.address),
             keyId: Number(key.index),
-            signature: this._signWithKey(this._privateKeyHex, signable.message),
+            signature: this._signWithKey(privateKey, signable.message),
           };
         },
       };
@@ -76,23 +97,15 @@ class FlowSigner {
   }
 
   /**
-   * @param {string} addr
-   * @returns {Promise<fcl.Account>}
-   */
-  async getAccount(addr) {
-    const account = await fcl.send([fcl.getAccount(addr)]).then(fcl.decode);
-    return account;
-  }
-
-  /**
    * General method of sending transaction
    *
    * @param {string} code
    * @param {fcl.ArgumentFunction} args
+   * @param {fcl.AuthorizationFunction[]} extraAuthz
    */
-  async sendTransaction(code, args) {
+  async sendTransaction(code, args, extraAuthz = []) {
     let transactionId;
-    const authz = this._buildAuthorization();
+    const authz = this.buildAuthorization();
 
     try {
       transactionId = await fcl.mutate({
@@ -100,7 +113,8 @@ class FlowSigner {
         args: args,
         proposer: authz,
         payer: authz,
-        authorizations: [authz],
+        authorizations:
+          extraAuthz.length === 0 ? [authz] : [authz, ...extraAuthz],
       });
       console.log("Tx Sent:", transactionId);
       return transactionId;
