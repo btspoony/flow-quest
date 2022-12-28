@@ -318,7 +318,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               }
             } // end for
             topsScores.sort((a, b) => b.score - a.score);
-            let rank = 0;
+            let rank = 1;
             topsScores.forEach((one) => {
               one.rank = rank++;
             });
