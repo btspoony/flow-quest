@@ -1,5 +1,6 @@
 import { z, useValidatedBody } from "h3-zod";
 import { flow, actions, utils } from "../helpers";
+import { executeOrLoadFromRedis } from "../helpers/redis";
 
 export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
   const config = useRuntimeConfig();
@@ -53,10 +54,9 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
       flow.switchToTestnet();
     }
 
-    const questDetail = await actions.scGetQuestDetail(
-      signer,
-      body.communityId,
-      body.questKey
+    const questDetail = await executeOrLoadFromRedis<QuestDetail>(
+      `QuestDetail:${body.communityId}:${body.questKey}`,
+      actions.scGetQuestDetail(signer, body.communityId, body.questKey)
     );
 
     if (
@@ -65,9 +65,13 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     ) {
       throw new Error("Invalid quest detail.");
     }
-    const stepsCfg: QuestStepsConfig[] = JSON.parse(
-      (await $fetch(questDetail?.stepsCfg)) ?? {}
+
+    const stepsCfg = await executeOrLoadFromRedis<QuestStepsConfig[]>(
+      `QuestStepsConfig:${questDetail?.stepsCfg}`,
+      (async (): Promise<QuestStepsConfig[]> =>
+        JSON.parse((await $fetch(questDetail?.stepsCfg)) as string))()
     );
+
     const stepCfg = stepsCfg[body.step];
     if (!stepCfg) throw new Error("Missing step Cfg");
     console.log(

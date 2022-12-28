@@ -369,10 +369,6 @@ pub contract CompetitionService {
         }
 
         access(contract) fun setReferralCode(addr: Address, code: String) {
-            pre {
-                self.referralAddrsToCodes[addr] == nil: "Referral code exists"
-                self.referralCodesToAddrs[code] == nil: "Referral code exists"
-            }
             self.referralAddrsToCodes[addr] = code
             self.referralCodesToAddrs[code] = addr
         }
@@ -394,18 +390,23 @@ pub contract CompetitionService {
             }
 
             // search the rank
-            var left = 0
-            var right = oldRank ?? self.leaderboardRanking.length - 1
-            while left <= right {
-                let mid = (left + right) / 2
-                if newPoint > self.leaderboardRanking[mid] {
-                    right = mid - 1
-                } else {
-                    left = mid + 1
+            let firstIndex = self.leaderboardRanking.firstIndex(of: newPoint)
+            if firstIndex == nil {
+                var left = 0
+                var right = oldRank ?? self.leaderboardRanking.length - 1
+                while left <= right {
+                    let mid = (left + right) / 2
+                    if newPoint > self.leaderboardRanking[mid] {
+                        right = mid - 1
+                    } else {
+                        left = mid + 1
+                    }
                 }
+                self.leaderboardRanking.insert(at: left, newPoint)
+                self.leaderboardAddressMap[addr] = left
+            } else {
+                self.leaderboardAddressMap[addr] = firstIndex
             }
-            self.leaderboardRanking.insert(at: left, newPoint)
-            self.leaderboardAddressMap[addr] = left
         }
 
         access(contract) fun updateReferralThreshold(threshold: UInt64) {
@@ -656,6 +657,11 @@ pub contract CompetitionService {
         }
 
         pub fun setupReferralCode(acct: Address, seasonId: UInt64) {
+            // get profile
+            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            let oldCode = profileRef.getReferralCode(seasonId: seasonId)
+            assert(oldCode == nil, message: "Referral Code is already generated.")
+
             let serviceIns = CompetitionService.borrowServiceRef()
             let seasonRef = serviceIns.borrowSeasonPrivateRef(seasonId)
 
@@ -672,8 +678,7 @@ pub contract CompetitionService {
             // set to season
             seasonRef.setReferralCode(addr: acct, code: code)
 
-            // get profile and set code in profile
-            let profileRef = UserProfile.borrowUserProfilePublic(acct)
+            // set code in profile
             profileRef.setupReferralCode(seasonId: seasonId, code: code)
         }
 

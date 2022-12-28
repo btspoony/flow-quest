@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // The private keys which are only available within server-side
     flowAdminAddress: "",
+    flowKeyAmount: "100",
     flowPrivateKey: "",
     flowPublicKey: "",
     oauthGithubClientSecret: "",

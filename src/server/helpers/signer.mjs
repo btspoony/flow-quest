@@ -4,9 +4,18 @@ import { SHA3 } from "sha3";
 
 const ec = new elliptic.ec("p256");
 
+/**
+ * @param {string} addr
+ * @returns {Promise<fcl.Account>}
+ */
+async function getAccount(addr) {
+  const account = await fcl.send([fcl.getAccount(addr)]).then(fcl.decode);
+  return account;
+}
+
 class FlowSigner {
   /** @type {string} */
-  _flowAddress;
+  address;
   /** @type {string} */
   _privateKeyHex;
   /** @type {number} */
@@ -21,21 +30,30 @@ class FlowSigner {
    * @param {{ [key: string]: string }} addressMapping
    */
   constructor(flowAddress, privateKeyHex, accountIndex, addressMapping) {
-    this._flowAddress = flowAddress;
+    this.address = flowAddress;
     this._privateKeyHex = privateKeyHex;
     this._accountIndex = accountIndex;
     this._addressMapping = addressMapping ?? {};
   }
 
-  _buildAuthorization() {
-    console.log("Authz Addr:", this._flowAddress);
+  /**
+   * @param {object} opt
+   * @param {string} [opt.address=undefined]
+   * @param {number} [opt.accountIndex=undefined]
+   * @param {string} [opt.privateKey=undefined]
+   */
+  buildAuthorization({ address, accountIndex, privateKey } = {}) {
+    address = address ?? this.address;
+    accountIndex = accountIndex ?? this._accountIndex;
+    privateKey = privateKey ?? this._privateKeyHex;
+    console.log("Authz Addr:", address, ` - key[${accountIndex}]`);
     /**
      * @param {fcl.Account} account
      * @returns {Promise<fcl.AuthZ>}
      */
     return async (account) => {
-      const user = await this.getAccount(this._flowAddress);
-      const key = user.keys[this._accountIndex];
+      const user = await getAccount(address);
+      const key = user.keys[accountIndex];
 
       return {
         ...account,
@@ -46,7 +64,7 @@ class FlowSigner {
           return {
             addr: fcl.withPrefix(user.address),
             keyId: Number(key.index),
-            signature: this._signWithKey(this._privateKeyHex, signable.message),
+            signature: this._signWithKey(privateKey, signable.message),
           };
         },
       };
@@ -76,31 +94,25 @@ class FlowSigner {
   }
 
   /**
-   * @param {string} addr
-   * @returns {Promise<fcl.Account>}
-   */
-  async getAccount(addr) {
-    const account = await fcl.send([fcl.getAccount(addr)]).then(fcl.decode);
-    return account;
-  }
-
-  /**
    * General method of sending transaction
    *
    * @param {string} code
    * @param {fcl.ArgumentFunction} args
+   * @param {fcl.AuthorizationFunction} [mainAuthz=undefined]
+   * @param {fcl.AuthorizationFunction[]} [extraAuthz=[]]
    */
-  async sendTransaction(code, args) {
-    let transactionId;
-    const authz = this._buildAuthorization();
+  async sendTransaction(code, args, mainAuthz = undefined, extraAuthz = []) {
+    mainAuthz = mainAuthz ?? this.buildAuthorization();
 
+    let transactionId;
     try {
       transactionId = await fcl.mutate({
         cadence: replaceImportAddresses(code, this._addressMapping),
         args: args,
-        proposer: authz,
-        payer: authz,
-        authorizations: [authz],
+        proposer: mainAuthz,
+        payer: mainAuthz,
+        authorizations:
+          extraAuthz.length === 0 ? [mainAuthz] : [mainAuthz, ...extraAuthz],
       });
       console.log("Tx Sent:", transactionId);
       return transactionId;
@@ -136,6 +148,18 @@ class FlowSigner {
         }
       }
     });
+  }
+
+  /**
+   *
+   * @param {string} transactionId
+   * @param {fcl.TxSubCallback} onSealed
+   */
+  async onceTransactionSealed(transactionId, onSealed) {
+    if (typeof onSealed !== "function") {
+      throw new Error("onSealed should be a function");
+    }
+    return fcl.tx(transactionId).onceSealed(onSealed);
   }
 
   /**

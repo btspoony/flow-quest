@@ -1,4 +1,30 @@
 import Signer from "./signer.mjs";
+import * as fcl from "@onflow/fcl";
+import {
+  executeOrLoadFromRedis,
+  acquireKeyIndex,
+  releaseKeyIndex,
+} from "./redis";
+
+/// ------------------------------ Transactions ------------------------------
+
+async function sendTransactionWithKeyPool(
+  signer: Signer,
+  code: string,
+  args: fcl.ArgumentFunction
+): Promise<string | null> {
+  const keyIndex = await acquireKeyIndex(signer.address);
+  const authz = signer.buildAuthorization({
+    accountIndex: keyIndex,
+  });
+  const txid = await signer.sendTransaction(code, args, authz);
+  if (txid) {
+    signer.onceTransactionSealed(txid, (tx) => {
+      return releaseKeyIndex(signer.address, keyIndex);
+    });
+  }
+  return txid;
+}
 
 export async function txCtrlerSetQuestAnswer(
   signer: Signer,
@@ -10,7 +36,8 @@ export async function txCtrlerSetQuestAnswer(
       kvpair.push({ key, value: opts.params[key] });
     }
   }
-  return signer.sendTransaction(
+  return sendTransactionWithKeyPool(
+    signer,
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-set-quest-completed.cdc"
     ),
@@ -27,7 +54,8 @@ export async function txCompleteBounty(
   signer: Signer,
   opts: OptionCtlerCompleteBounty
 ) {
-  return signer.sendTransaction(
+  return sendTransactionWithKeyPool(
+    signer,
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-complete-bounty.cdc"
     ),
@@ -39,13 +67,16 @@ export async function txCtrlerSetupReferralCode(
   signer: Signer,
   target: string
 ) {
-  return signer.sendTransaction(
+  return sendTransactionWithKeyPool(
+    signer,
     await useStorage().getItem(
       "assets/server/cadence/transactions/ctrler-setup-referral-code.cdc"
     ),
     (arg, t) => [arg(target, t.Address)]
   );
 }
+
+/// ------------------------------ Scripts ------------------------------
 
 export async function scGetQuestDetail(
   signer: Signer,
@@ -109,7 +140,10 @@ export async function scVerifyQuest(
   stepCfg: QuestStepsConfig,
   params: { [key: string]: string }
 ): Promise<any> {
-  const code = await $fetch(stepCfg.code);
+  const code = await executeOrLoadFromRedis<string>(
+    `QuestVerificationCode:${stepCfg.code}`,
+    $fetch(stepCfg.code)
+  );
   console.log(`[Loaded Code]: ${stepCfg.code}`);
   if (typeof code !== "string") {
     throw new Error("Unknown quests key.");

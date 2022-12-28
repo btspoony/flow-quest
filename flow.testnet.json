@@ -1,7 +1,7 @@
 {
   "accounts": {
     "testnet-admin": {
-      "address": "${NUXT_FLOW_ADMIN_ADDRESS}",
+      "address": "${NUXT_PUBLIC_FLOW_SERVICE_ADDRESS}",
       "keys": "${NUXT_FLOW_PRIVATE_KEY}"
     }
   },
