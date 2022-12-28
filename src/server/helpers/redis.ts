@@ -69,12 +69,12 @@ export async function acquireKeyIndex(
   const pair = await redis.zpopmin<string>(redisKeyPool, 1);
   if (pair && pair.length === 2) {
     const [key, score] = pair;
+    // set a timeout for key
+    await redis.zadd(redisKeyPool, {
+      member: key,
+      score: timeout,
+    });
     if (now - parseInt(score) >= 0) {
-      // set a timeout for key
-      await redis.zadd(redisKeyPool, {
-        member: key,
-        score: timeout,
-      });
       // return key index
       return parseInt(key);
     }
