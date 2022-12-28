@@ -114,6 +114,18 @@ export async function reloadCurrentUser(
   return current.value;
 }
 
+export async function reloadCurrentProfile(
+  defaultAddress: string
+): Promise<ProfileData | null> {
+  const currentProfile = useCurrentProfile();
+  const address = currentProfile.value
+    ? currentProfile.value?.address
+    : defaultAddress;
+  const profile = await loadUserProfile(address);
+  currentProfile.value = profile;
+  return profile;
+}
+
 export async function loadUserProfile(
   address: string,
   ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {}

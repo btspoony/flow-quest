@@ -40,6 +40,11 @@ async function generateCode(): Promise<string | null> {
   }
   return null
 }
+
+const emit = defineEmits<{
+  (e: 'reload'): void;
+}>();
+
 </script>
 
 <template>
@@ -61,7 +66,7 @@ async function generateCode(): Promise<string | null> {
           </code>
         </template>
         <FlowSubmitTransaction v-else-if="isUserSelf" :disabled="!executable" :method="generateCode"
-          @success="reloadCurrentUser({ ignoreIdentities: true })">
+          @sealed="emit('reload')">
           Generate Referral Code
           <template v-slot:disabled>
             <div class="inline-flex-between">

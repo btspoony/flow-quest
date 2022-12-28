@@ -4,16 +4,12 @@ definePageMeta({
 })
 
 const route = useRoute()
-const user = useUserProfile()
-const currentProfile = useCurrentProfile()
 
 const profileAddr = computed<string>(() => route.params.address as string)
 
 const { data: profile, pending } = useAsyncData<ProfileData | null>(`user:${profileAddr}`, async () => {
   await apiGetActiveSeason()
-  const profile = await loadUserProfile(profileAddr.value)
-  currentProfile.value = profile
-  return profile
+  return await reloadCurrentProfile(profileAddr.value)
 }, {
   server: false
 })
