@@ -301,7 +301,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           ) {
             acctRankingScore = {
               account: address,
-              rank: parseInt(result.accountRank),
+              rank: parseInt(result.accountRank) + 1,
               score: parseInt(result.accountPoint),
             };
           }
