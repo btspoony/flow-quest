@@ -390,18 +390,23 @@ pub contract CompetitionService {
             }
 
             // search the rank
-            var left = 0
-            var right = oldRank ?? self.leaderboardRanking.length - 1
-            while left <= right {
-                let mid = (left + right) / 2
-                if newPoint > self.leaderboardRanking[mid] {
-                    right = mid - 1
-                } else {
-                    left = mid + 1
+            let firstIndex = self.leaderboardRanking.firstIndex(of: newPoint)
+            if firstIndex == nil {
+                var left = 0
+                var right = oldRank ?? self.leaderboardRanking.length - 1
+                while left <= right {
+                    let mid = (left + right) / 2
+                    if newPoint > self.leaderboardRanking[mid] {
+                        right = mid - 1
+                    } else {
+                        left = mid + 1
+                    }
                 }
+                self.leaderboardRanking.insert(at: left, newPoint)
+                self.leaderboardAddressMap[addr] = left
+            } else {
+                self.leaderboardAddressMap[addr] = firstIndex
             }
-            self.leaderboardRanking.insert(at: left, newPoint)
-            self.leaderboardAddressMap[addr] = left
         }
 
         access(contract) fun updateReferralThreshold(threshold: UInt64) {
