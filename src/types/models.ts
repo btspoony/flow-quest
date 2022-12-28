@@ -91,6 +91,28 @@ interface QuestDetail {
 
 interface QuestConfig extends BountyEntity, QuestDetail {}
 
+interface QuizOptionConfig {
+  key: string;
+  description: string;
+}
+
+interface QuizSchema {
+  type: "radio";
+  question: string;
+  options: QuizOptionConfig[];
+  answer: string;
+}
+
+interface QuestStepBasic {
+  title: string;
+  description: string;
+}
+
+interface QuestStepQuiz extends QuestStepBasic {
+  type: "quiz";
+  quiz: QuizSchema[];
+}
+
 interface QuestStepTest {
   network: "testnet" | "mainnet";
   expect: "return" | "error";
@@ -102,12 +124,14 @@ interface QuestSchema {
   type: string;
 }
 
-interface QuestStepsConfig {
-  title: string;
+interface QuestStepOnChain extends QuestStepBasic {
+  type: "onchain";
   code: string;
   schema: QuestSchema[];
   test: QuestStepTest; // All tests should be OK, then quest passed
 }
+
+type QuestStepsConfig = QuestStepQuiz | QuestStepOnChain;
 
 interface ChallengeDetail {
   quests: BountyIdentifier[];

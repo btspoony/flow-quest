@@ -1,3 +1,4 @@
+import * as flow from "./flow.mjs";
 import Signer from "./signer.mjs";
 import * as fcl from "@onflow/fcl";
 import {
@@ -138,73 +139,116 @@ export async function scCheckPointsToGeneReferralCode(
 export async function scVerifyQuest(
   signer: Signer,
   stepCfg: QuestStepsConfig,
-  params: { [key: string]: string }
-): Promise<any> {
-  const code = await executeOrLoadFromRedis<string>(
-    `QuestVerificationCode:${stepCfg.code}`,
-    $fetch(stepCfg.code)
-  );
-  console.log(`[Loaded Code]: ${stepCfg.code}`);
-  if (typeof code !== "string") {
-    throw new Error("Unknown quests key.");
+  params: { key: string; value: string }[]
+): Promise<boolean> {
+  if (stepCfg.type === "onchain") {
+    // Verify the quest result on testnet
+    if (typeof stepCfg.test.network !== "string")
+      throw new Error("Network is missing.");
+    if (typeof stepCfg.test.expect !== "string")
+      throw new Error("Expect is missing.");
+    if (typeof stepCfg.test.result === "undefined")
+      throw new Error("Result is missing.");
+
+    if (stepCfg.test.network === "mainnet") {
+      flow.switchToMainnet();
+    } else {
+      flow.switchToTestnet();
+    }
+
+    const code = await executeOrLoadFromRedis<string>(
+      `QuestVerificationCode:${stepCfg.code}`,
+      $fetch(stepCfg.code)
+    );
+    console.log(`[Loaded Code]: ${stepCfg.code}`);
+    if (typeof code !== "string") {
+      throw new Error("Unknown quests key.");
+    }
+    if (typeof stepCfg.schema !== "object") {
+      throw new Error("Unknown schema.");
+    }
+    const paramsObj = params.reduce((prev, curr) => {
+      prev[curr.key] = curr.value;
+      return prev;
+    }, {} as { [key: string]: string });
+
+    const result = await signer.executeScript(
+      code,
+      (arg, t) => {
+        // simple type mapping
+        const typeMapping: { [key: string]: typeof t } = {
+          // Basic
+          Int: t.Int,
+          UInt8: t.UInt8,
+          UInt64: t.UInt64,
+          UFix64: t.UFix64,
+          Fix64: t.Fix64,
+          Address: t.Address,
+          String: t.String,
+          Bool: t.Bool,
+          // Optional
+          "Optional(Int)": t.Optional(t.Int),
+          "Optional(UInt8)": t.Optional(t.UInt8),
+          "Optional(UInt64)": t.Optional(t.UInt64),
+          "Optional(UFix64)": t.Optional(t.UFix64),
+          "Optional(Fix64)": t.Optional(t.Fix64),
+          "Optional(Address)": t.Optional(t.Address),
+          "Optional(String)": t.Optional(t.String),
+          "Optional(Bool)": t.Optional(t.Bool),
+          // Array
+          "Array(Int)": t.Array(t.Int),
+          "Array(UInt8)": t.Array(t.UInt8),
+          "Array(UInt64)": t.Array(t.UInt64),
+          "Array(UFix64)": t.Array(t.UFix64),
+          "Array(Fix64)": t.Array(t.Fix64),
+          "Array(Address)": t.Array(t.Address),
+          "Array(String)": t.Array(t.String),
+          "Array(Bool)": t.Array(t.Bool),
+          // Array + Optional
+          "Array(Optional(Int))": t.Array(t.Optional(t.Int)),
+          "Array(Optional(UInt8))": t.Array(t.Optional(t.UInt8)),
+          "Array(Optional(UInt64))": t.Array(t.Optional(t.UInt64)),
+          "Array(Optional(UFix64))": t.Array(t.Optional(t.UFix64)),
+          "Array(Optional(Fix64))": t.Array(t.Optional(t.Fix64)),
+          "Array(Optional(Address))": t.Array(t.Optional(t.Address)),
+          "Array(Optional(String))": t.Array(t.Optional(t.String)),
+          "Array(Optional(Bool))": t.Array(t.Optional(t.Bool)),
+        };
+        return stepCfg.schema.map((one) => {
+          if (typeof paramsObj[one.key] === "undefined") {
+            throw new Error(`Missing parameters: ${one.key}`);
+          }
+          if (typeof typeMapping[one.type] === "undefined") {
+            throw new Error(`Missing types: ${one.type}`);
+          }
+          console.log(`Params[${paramsObj[one.key]}] <- ${one.type}`);
+          return arg(paramsObj[one.key], typeMapping[one.type] as typeof t);
+        });
+      },
+      false
+    );
+    console.log(
+      `Request<VerifyQuest> - Step.2-2: Quest result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
+    );
+    return result === stepCfg.test.result;
+  } else {
+    // Verify quiz
+    if (!Array.isArray(stepCfg.quiz)) {
+      throw new Error("Step config: quiz should be an array");
+    }
+    const answers = stepCfg.quiz
+      .map((one) => one.answer)
+      .filter((one) => typeof one === "string");
+    if (answers.length !== params.length) {
+      throw new Error(
+        `Step Answers: answer amount is miss-match: ${answers.length} (expect ${params.length})`
+      );
+    }
+    params.sort((a, b) => parseInt(a.key) - parseInt(b.key));
+    let isValid = true;
+    for (let i = 0; i < answers.length; i++) {
+      isValid = isValid && answers[i] === params[i].value;
+    }
+    return isValid;
   }
-  if (typeof stepCfg.schema !== "object") {
-    throw new Error("Unknown schema.");
-  }
-  const result = await signer.executeScript(
-    code,
-    (arg, t) => {
-      // simple type mapping
-      const typeMapping: { [key: string]: typeof t } = {
-        // Basic
-        Int: t.Int,
-        UInt8: t.UInt8,
-        UInt64: t.UInt64,
-        UFix64: t.UFix64,
-        Fix64: t.Fix64,
-        Address: t.Address,
-        String: t.String,
-        Bool: t.Bool,
-        // Optional
-        "Optional(Int)": t.Optional(t.Int),
-        "Optional(UInt8)": t.Optional(t.UInt8),
-        "Optional(UInt64)": t.Optional(t.UInt64),
-        "Optional(UFix64)": t.Optional(t.UFix64),
-        "Optional(Fix64)": t.Optional(t.Fix64),
-        "Optional(Address)": t.Optional(t.Address),
-        "Optional(String)": t.Optional(t.String),
-        "Optional(Bool)": t.Optional(t.Bool),
-        // Array
-        "Array(Int)": t.Array(t.Int),
-        "Array(UInt8)": t.Array(t.UInt8),
-        "Array(UInt64)": t.Array(t.UInt64),
-        "Array(UFix64)": t.Array(t.UFix64),
-        "Array(Fix64)": t.Array(t.Fix64),
-        "Array(Address)": t.Array(t.Address),
-        "Array(String)": t.Array(t.String),
-        "Array(Bool)": t.Array(t.Bool),
-        // Array + Optional
-        "Array(Optional(Int))": t.Array(t.Optional(t.Int)),
-        "Array(Optional(UInt8))": t.Array(t.Optional(t.UInt8)),
-        "Array(Optional(UInt64))": t.Array(t.Optional(t.UInt64)),
-        "Array(Optional(UFix64))": t.Array(t.Optional(t.UFix64)),
-        "Array(Optional(Fix64))": t.Array(t.Optional(t.Fix64)),
-        "Array(Optional(Address))": t.Array(t.Optional(t.Address)),
-        "Array(Optional(String))": t.Array(t.Optional(t.String)),
-        "Array(Optional(Bool))": t.Array(t.Optional(t.Bool)),
-      };
-      return stepCfg.schema.map((one) => {
-        if (typeof params[one.key] === "undefined") {
-          throw new Error(`Missing parameters: ${one.key}`);
-        }
-        if (typeof typeMapping[one.type] === "undefined") {
-          throw new Error(`Missing types: ${one.type}`);
-        }
-        console.log(`Params[${params[one.key]}] <- ${one.type}`);
-        return arg(params[one.key], typeMapping[one.type] as typeof t);
-      });
-    },
-    false
-  );
-  return result;
 }

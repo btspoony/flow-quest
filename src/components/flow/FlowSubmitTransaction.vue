@@ -24,6 +24,7 @@ const emit = defineEmits<{
   (e: "sealed", tx: TransactionReceipt): void;
   (e: 'success'): void;
   (e: "error", message: string): void;
+  (e: "reset"): void;
 }>();
 
 const txid = ref<string | null>(null);
@@ -63,6 +64,7 @@ function onError(msg: string) {
 }
 
 function resetComponent() {
+  emit("reset")
   txid.value = null;
   errorMessage.value = null;
   isSealed.value = false;
@@ -100,7 +102,7 @@ defineExpose({
       {{ errorMessage }}
     </p>
     <slot v-if="!hideTrx && txid && isSealed" name="next">
-      <button class="mx-0 rounded-xl text-sm" role="button" aria-disabled="true" @click="resetComponent">Close</button>
+      <button class="mx-0 rounded-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
     </slot>
   </div>
 </template>

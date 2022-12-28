@@ -40,7 +40,8 @@ function closeModal() {
 }
 
 defineExpose({
-  openModal: ref(openModal)
+  openModal: ref(openModal),
+  closeModal: ref(closeModal),
 })
 
 function clickCloseModal(event: MouseEvent) {

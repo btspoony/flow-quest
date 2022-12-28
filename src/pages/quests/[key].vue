@@ -104,13 +104,24 @@ const imageUrl = computed(() => {
   }
 })
 
-function isLocked(index: number): boolean {
-  return !isRegistered.value
-}
+const lockingArr = computed<boolean[]>(() => {
+  const stepAmt = questCfg.value?.steps ?? 10
+  const result = Array(stepAmt).fill(true)
 
-function isStepCompleted(index: number) {
-  return profileStatus.value?.steps[index] ?? false
-}
+  // not registered, be locked
+  if (!isRegistered.value) return result
+
+  const doneSteps = profileStatus.value?.steps ?? Array(stepAmt).fill(false)
+  // all step before this should be done.
+  let doneCurrent = true
+  for (let i = 0; i < doneSteps.length; i++) {
+    if (doneCurrent) {
+      result[i] = false
+    }
+    doneCurrent = doneCurrent && doneSteps[i]
+  }
+  return result
+})
 
 const isInvalid = computed(() => {
   return !(profileStatus.value?.completed ?? false)
@@ -172,7 +183,7 @@ async function completeBounty(): Promise<string | null> {
         <!-- Quest steps -->
         <div class="flex flex-col gap-2">
           <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)" :steps-cfg="info?.stepsCfg!"
-            :is-completed="isStepCompleted(i - 1)" :is-locked="isLocked(i - 1)" @success="updateQuest" />
+            :is-completed="profileStatus?.steps[i - 1] ?? false" :is-locked="lockingArr[i - 1] ?? false" @success="updateQuest" />
         </div>
         <div class="flex flex-col py-2">
           <FlowSubmitTransaction v-if="bountyId" :disabled="isInvalid || isBountyCompleted" :method="completeBounty"
