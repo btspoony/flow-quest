@@ -12,7 +12,7 @@ async function main() {
   );
 
   const txid = await signer.sendTransaction(code, (arg, t) => [
-    arg("10", t.Int),
+    arg("99", t.Int),
   ]);
 
   await utils.watchTransaction(signer, txid);
