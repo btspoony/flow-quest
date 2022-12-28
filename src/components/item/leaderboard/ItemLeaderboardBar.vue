@@ -13,17 +13,17 @@ function goAccountPage() {
 <template>
   <div class="card card-border p-4 w-full flex gap-4 items-center justify-around cursor-pointer" @click="goAccountPage">
     <div class="flex-none">
-      <span v-if="score.rank === 0" class="circle-badge border-[#FFF71D] bg-yellow-400 text-white">
-        {{ score.rank + 1 }}
+      <span v-if="score.rank === 1" class="circle-badge border-[#FFF71D] bg-yellow-400 text-white">
+        {{ score.rank }}
       </span>
-      <span v-else-if="score.rank === 1" class="circle-badge border-gray-100 bg-gray-400 text-white">
-        {{ score.rank + 1 }}
+      <span v-else-if="score.rank === 2" class="circle-badge border-gray-100 bg-gray-400 text-white">
+        {{ score.rank }}
       </span>
-      <span v-else-if="score.rank === 2" class="circle-badge border-orange-200 bg-amber-600 text-white">
-        {{ score.rank + 1 }}
+      <span v-else-if="score.rank === 3" class="circle-badge border-orange-200 bg-amber-600 text-white">
+        {{ score.rank }}
       </span>
       <span v-else class="circle-badge !border-none bg-gray-200 dark:bg-gray-800">
-        {{ score.rank + 1 }}
+        {{ score.rank }}
       </span>
     </div>
     <div class="flex-none inline-flex rounded-[50%] overflow-hidden">
