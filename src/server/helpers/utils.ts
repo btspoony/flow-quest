@@ -5,23 +5,16 @@ import { default as Signer } from "./signer.mjs";
 export async function pickOneSigner(): Promise<Signer> {
   const config = useRuntimeConfig();
 
-  // FIXME: using index pool
-  const keyIndex = 0;
-  const signer = new Signer(
-    config.flowAdminAddress,
-    config.flowPrivateKey,
-    keyIndex,
-    {
-      Interfaces: config.public.flowServiceAddress,
-      Helper: config.public.flowServiceAddress,
-      QueryStructs: config.public.flowServiceAddress,
-      UserProfile: config.public.flowServiceAddress,
-      FLOATVerifiers: config.public.flowServiceAddress,
-      Community: config.public.flowServiceAddress,
-      BountyUnlockConditions: config.public.flowServiceAddress,
-      CompetitionService: config.public.flowServiceAddress,
-    }
-  );
+  const signer = new Signer(config.flowAdminAddress, config.flowPrivateKey, 0, {
+    Interfaces: config.public.flowServiceAddress,
+    Helper: config.public.flowServiceAddress,
+    QueryStructs: config.public.flowServiceAddress,
+    UserProfile: config.public.flowServiceAddress,
+    FLOATVerifiers: config.public.flowServiceAddress,
+    Community: config.public.flowServiceAddress,
+    BountyUnlockConditions: config.public.flowServiceAddress,
+    CompetitionService: config.public.flowServiceAddress,
+  });
   return signer;
 }
 

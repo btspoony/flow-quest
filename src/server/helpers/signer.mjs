@@ -15,7 +15,7 @@ async function getAccount(addr) {
 
 class FlowSigner {
   /** @type {string} */
-  _flowAddress;
+  address;
   /** @type {string} */
   _privateKeyHex;
   /** @type {number} */
@@ -30,26 +30,23 @@ class FlowSigner {
    * @param {{ [key: string]: string }} addressMapping
    */
   constructor(flowAddress, privateKeyHex, accountIndex, addressMapping) {
-    this._flowAddress = flowAddress;
+    this.address = flowAddress;
     this._privateKeyHex = privateKeyHex;
     this._accountIndex = accountIndex;
     this._addressMapping = addressMapping ?? {};
   }
 
   /**
-   * @param {string} [address=undefined]
-   * @param {number} [accountIndex=undefined]
-   * @param {string} [privateKey=undefined]
+   * @param {object} opt
+   * @param {string} [opt.address=undefined]
+   * @param {number} [opt.accountIndex=undefined]
+   * @param {string} [opt.privateKey=undefined]
    */
-  buildAuthorization(
-    address = undefined,
-    accountIndex = undefined,
-    privateKey = undefined
-  ) {
-    address = address ?? this._flowAddress;
+  buildAuthorization({ address, accountIndex, privateKey } = {}) {
+    address = address ?? this.address;
     accountIndex = accountIndex ?? this._accountIndex;
     privateKey = privateKey ?? this._privateKeyHex;
-    console.log("Authz Addr:", address);
+    console.log("Authz Addr:", address, ` - key[${accountIndex}]`);
     /**
      * @param {fcl.Account} account
      * @returns {Promise<fcl.AuthZ>}
@@ -101,20 +98,21 @@ class FlowSigner {
    *
    * @param {string} code
    * @param {fcl.ArgumentFunction} args
-   * @param {fcl.AuthorizationFunction[]} extraAuthz
+   * @param {fcl.AuthorizationFunction} [mainAuthz=undefined]
+   * @param {fcl.AuthorizationFunction[]} [extraAuthz=[]]
    */
-  async sendTransaction(code, args, extraAuthz = []) {
-    let transactionId;
-    const authz = this.buildAuthorization();
+  async sendTransaction(code, args, mainAuthz = undefined, extraAuthz = []) {
+    mainAuthz = mainAuthz ?? this.buildAuthorization();
 
+    let transactionId;
     try {
       transactionId = await fcl.mutate({
         cadence: replaceImportAddresses(code, this._addressMapping),
         args: args,
-        proposer: authz,
-        payer: authz,
+        proposer: mainAuthz,
+        payer: mainAuthz,
         authorizations:
-          extraAuthz.length === 0 ? [authz] : [authz, ...extraAuthz],
+          extraAuthz.length === 0 ? [mainAuthz] : [mainAuthz, ...extraAuthz],
       });
       console.log("Tx Sent:", transactionId);
       return transactionId;
@@ -150,6 +148,18 @@ class FlowSigner {
         }
       }
     });
+  }
+
+  /**
+   *
+   * @param {string} transactionId
+   * @param {fcl.TxSubCallback} onSealed
+   */
+  async onceTransactionSealed(transactionId, onSealed) {
+    if (typeof onSealed !== "function") {
+      throw new Error("onSealed should be a function");
+    }
+    return fcl.tx(transactionId).onceSealed(onSealed);
   }
 
   /**

@@ -18,13 +18,18 @@ async function main() {
     process.env.NUXT_FLOW_ADMIN_ADDRESS !==
     process.env.NUXT_PUBLIC_FLOW_SERVICE_ADDRESS
   ) {
-    const txid = await signer.sendTransaction(code, (arg, t) => [], [
-      signer.buildAuthorization(
-        process.env.NUXT_FLOW_ADMIN_ADDRESS,
-        0,
-        process.env.NUXT_FLOW_PRIVATE_KEY
-      ),
-    ]);
+    const txid = await signer.sendTransaction(
+      code,
+      (arg, t) => [],
+      signer.buildAuthorization(),
+      [
+        signer.buildAuthorization({
+          address: process.env.NUXT_FLOW_ADMIN_ADDRESS,
+          accountIndex: 0,
+          privateKey: process.env.NUXT_FLOW_PRIVATE_KEY,
+        }),
+      ]
+    );
 
     await utils.watchTransaction(signer, txid);
   } else {
