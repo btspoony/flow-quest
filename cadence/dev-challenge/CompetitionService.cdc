@@ -270,6 +270,10 @@ pub contract CompetitionService {
             return self.primaryBounties
         }
 
+        pub fun hasBountyByKey(_ key: String): Bool {
+            return self.keyIdMapping[key] != nil
+        }
+
         pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{Interfaces.BountyInfoPublic} {
             return self.borrowBountyPrivateRef(bountyId)
         }

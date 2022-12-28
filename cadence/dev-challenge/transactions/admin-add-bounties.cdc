@@ -33,7 +33,7 @@ transaction(
 
         let service = CompetitionService.borrowServicePublic()
         let seasonId = service.getActiveSeasonID()
-        let season = service.borrowSeasonDetail(seasonId: seasonId)
+        let season = service.borrowSeason(seasonId: seasonId)
 
         let len = keys.length
         var i = 0
@@ -43,8 +43,7 @@ transaction(
                 communityId: communityId,
                 key: keys[i]
             )
-            let exist = season.borrowBountyInfoByKey(keys[i])
-            if exist == nil {
+            if !season.hasBountyByKey(keys[i]) {
                 // ensure exists
                 entityIdentifier.getBountyEntity()
 
