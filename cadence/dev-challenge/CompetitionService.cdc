@@ -385,6 +385,14 @@ pub contract CompetitionService {
             // remove old rank
             if oldRank != nil && self.leaderboardScores[oldPoint] != nil {
                 self.leaderboardScores[oldPoint]!.remove(key: addr)
+
+                if self.leaderboardScores[oldPoint]!.length == 0 {
+                    // Remove oldPoint from ranking
+                    let oldPointFirstIndex = self.leaderboardRanking.firstIndex(of: oldPoint)
+                    if oldPointFirstIndex != nil {
+                        self.leaderboardRanking.remove(at: oldPointFirstIndex!)
+                    }
+                }
             }
             // update current rank
             if self.leaderboardScores[newPoint] != nil {
