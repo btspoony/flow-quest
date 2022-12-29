@@ -7,6 +7,7 @@ const github = useGithubProfile();
 const linkedAddress = useLinkedWalletAddress();
 const wallet = useFlowAccount();
 const user = useUserProfile();
+const isRegistering = useUserProfileInitializing();
 
 // load user profile
 watch(wallet, async (newVal, oldVal) => {
@@ -69,15 +70,12 @@ function onLogout() {
           <span class="font-semibold">{{ github.data.userName }}</span>
           <span class="text-xs">{{ linkedAddressShortString }} </span>
         </div>
-        <div v-if="wallet?.addr" class="tag secondary">
+        <div v-if="wallet?.addr" class="tag secondary" :aria-busy="isMatchedWallet && isRegistering">
           <template v-if="isMatchedWallet && user?.activeRecord">
             {{ user?.activeRecord?.points ?? 0 }} Points
           </template>
-          <template v-else-if="isMatchedWallet">
-            Need Register
-          </template>
           <template v-else>
-            Wrong Wallet
+            {{ isMatchedWallet ? (isRegistering ? ' Initializing' : 'Need Register') : 'Wrong Wallet' }}
           </template>
         </div>
       </div>

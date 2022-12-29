@@ -191,7 +191,9 @@ export async function apiPostVerifyQuest(
       ),
     });
     return result;
-  } catch (e) {
+  } catch (e: any) {
+    console.log(1, e.message);
+    console.log(2, JSON.stringify(e.response));
     console.error(e);
   }
 }

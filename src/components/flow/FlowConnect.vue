@@ -15,6 +15,7 @@ const emit = defineEmits<{
 const user = useUserProfile()
 const wallet = useFlowAccount()
 const linkedAddress = useLinkedWalletAddress();
+const isRegistering = useUserProfileInitializing();
 
 const isMatchedWallet = computed(() => {
   return !linkedAddress.value || linkedAddress.value === wallet.value?.addr
@@ -32,7 +33,8 @@ onMounted(() => {
 
 function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
   if (wallet.value?.loggedIn && newVal && !newVal.activeRecord && isMatchedWallet.value) {
-    if (!submitTx.value?.isLoading && !submitTx.value?.isSealed) {
+    if (!submitTx.value?.isLoading && !submitTx.value?.isSealed && !isRegistering.value) {
+      isRegistering.value = true
       submitTx.value?.startTransaction()
     }
   }
@@ -61,10 +63,17 @@ async function onProfileRegistered() {
   await reloadCurrentUser()
   emit('registered')
 }
+
+function transactionReset() {
+  setTimeout(() => {
+    isRegistering.value = false
+  }, 1000)
+}
 </script>
 
 <template>
   <FlowConnectButton v-if="!wallet?.loggedIn" @connected="onConnected" />
-  <FlowSubmitTransaction ref="submitTx" v-if="wallet?.loggedIn && !user?.activeRecord" action="Registering Profile"
-    :method="sendProfileRegister" :hide-button="true" :hide-trx="hideTrx" @success="onProfileRegistered" />
+  <FlowSubmitTransaction v-if="wallet?.loggedIn && !user?.activeRecord" ref="submitTx" action="Registering Profile"
+    :hide-button="true" :hide-trx="hideTrx" :method="sendProfileRegister" @success="onProfileRegistered"
+    @sealed="transactionReset" @error="transactionReset" />
 </template>
