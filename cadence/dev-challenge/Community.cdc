@@ -519,6 +519,26 @@ pub contract Community {
         }
     }
 
+    pub struct CommunityIdentitier {
+        pub let owner: Address
+        pub let key: String
+        pub let id: UInt64
+
+        init(
+            _ owner: Address,
+            _ key: String,
+            _ id: UInt64,
+        ) {
+            self.owner = owner
+            self.key = key
+            self.id = id
+        }
+
+        pub fun borrowCommunity(): &CommunityIns{CommunityPublic}? {
+            return Community.borrowCommunity(host: self.owner, id: self.id)
+        }
+    }
+
     // ----- public methods -----
 
     pub fun createCommunityBuilder(): @CommunityBuilder {
@@ -526,6 +546,21 @@ pub contract Community {
     }
 
     // Global borrow community
+
+    /**
+     * Get all communities
+     */
+    pub fun getCommunities(): [CommunityIdentitier] {
+        let ret: [CommunityIdentitier] = []
+        for key in self.communityKeyMapping.keys {
+            if let communityId = self.communityKeyMapping[key] {
+                if let owner = self.communityIdMapping[communityId] {
+                    ret.append(CommunityIdentitier(owner, key, communityId))
+                }
+            }
+        }
+        return ret
+    }
 
     pub fun borrowCommunityByKey(key: String): &CommunityIns{CommunityPublic}? {
         if let id = Community.communityKeyMapping[key] {
