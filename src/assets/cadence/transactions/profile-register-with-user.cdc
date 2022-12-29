@@ -27,7 +27,7 @@ transaction(
 
     execute {
         // update profile identity
-        if platform != nil && userId != nil && userName != nil && userBio != nil && userImage != nil {
+        if platform != nil && userId != nil && userName != nil && userImage != nil {
             let linkedAddr = UserProfile.getPlatformLinkedAddress(platform: platform!, uid: userId!)
             if linkedAddr == nil || linkedAddr == self.profile.owner!.address {
                 let identity = Interfaces.LinkedIdentity(
@@ -35,7 +35,7 @@ transaction(
                     uid: userId!,
                     display: MetadataViews.Display(
                         name: userName!,
-                        description: userBio!,
+                        description: userBio ?? "",
                         thumbnail: MetadataViews.HTTPFile(url: userImage!)
                     )
                 )
