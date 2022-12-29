@@ -30,7 +30,7 @@ async function generateCode(): Promise<string | null> {
       return result.transactionId
     }
     if (result.error && result.error.message) {
-      throw new Error(`[CODE:${result.error.code}]${result.error.message}`)
+      throw new Error(`[ErrCode:${result.error.code}] ${result.error.message}`)
     }
     if (!result.isAccountValid) {
       throw new Error("Account verification invalid")

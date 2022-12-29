@@ -173,11 +173,24 @@ export async function fetchAccountProof() {
 }
 
 function handleResponseError(e: any): { code: string; message: string } {
-  if (typeof e.response?.data === "object") {
-    console.warn(`ErrorResponse: `, JSON.stringify(e.response?.data));
+  console.log(e.response);
+  if (
+    typeof e.response?._data === "object" ||
+    typeof e.response?.data === "object"
+  ) {
+    const data = e.response?._data || e.response?.data;
+    console.warn(`ErrorResponse: `, JSON.stringify(data));
     return {
-      code: e.response?.data?.error?.code ?? "500",
-      message: e.response?.data?.error?.message ?? "Unknown Server Error",
+      code:
+        data.error?.code ??
+        String(data.statusCode) ??
+        String(e.response.status) ??
+        "500",
+      message:
+        data.error?.message ??
+        data.message ??
+        e.response.statusText ??
+        "Unknown Error",
     };
   } else {
     console.warn(`ErrorMsg:`, e.message);
