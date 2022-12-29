@@ -24,23 +24,28 @@ interface OptionCtlerCompleteBounty {
   bountyId: string;
 }
 
-interface ResponseVerifyQuest {
+interface ResponseBasics {
   ok: boolean;
-  isAccountValid: boolean;
-  isQuestValid: boolean;
-  transactionId: string | null;
+  error?: {
+    code: string;
+    message: string;
+  };
 }
 
-interface ResponseCompleteBounty {
-  ok: boolean;
-  isAccountValid: boolean;
-  isBountyCompleted: boolean;
-  transactionId: string | null;
+interface ResponseVerifyQuest extends ResponseBasics {
+  isAccountValid?: boolean;
+  isQuestValid?: boolean;
+  transactionId?: string;
 }
 
-interface ResponseReferralCodeGenerate {
-  ok: boolean;
-  isAccountValid: boolean;
-  isPointsEnough: boolean;
-  transactionId: string | null;
+interface ResponseCompleteBounty extends ResponseBasics {
+  isAccountValid?: boolean;
+  isBountyCompleted?: boolean;
+  transactionId?: string;
+}
+
+interface ResponseReferralCodeGenerate extends ResponseBasics {
+  isAccountValid?: boolean;
+  isPointsEnough?: boolean;
+  transactionId?: string;
 }
