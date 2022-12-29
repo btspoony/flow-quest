@@ -41,26 +41,28 @@ const { data: info, pending, refresh } = useAsyncData<DataResult>(`ranking`, asy
 </script>
 
 <template>
-  <div v-if="!pending && !info?.season" class="hero">
-    <div class="hero-content">
-      <h4 class="text-center">No Active Season</h4>
-    </div>
-  </div>
-  <template v-else>
-    <h2>Leaderboard</h2>
-    <section v-if="wallet?.loggedIn && user?.activeRecord" class="mb-8">
-      <h5>Your ranking</h5>
-      <div v-if="pending" class="w-full h-20" :aria-busy="true" />
-      <template v-else-if="info?.ranking?.account">
-        <ItemLeaderboardBar :score="info?.ranking?.account" />
-      </template>
-    </section>
-    <section class="mb-0">
-      <h5>Top 100 of current season</h5>
-      <div v-if="pending" class="w-full h-20" :aria-busy="true" />
-      <div v-else class="flex flex-col gap-4">
-        <ItemLeaderboardBar v-for="(one, index) in info?.ranking?.tops" :key="`item_${index}`" :score="one" />
+  <FrameMain class="max-w-3xl py-8">
+    <div v-if="!pending && !info?.season" class="hero">
+      <div class="hero-content">
+        <h4 class="text-center">No Active Season</h4>
       </div>
-    </section>
-  </template>
+    </div>
+    <template v-else>
+      <h2>Leaderboard</h2>
+      <section v-if="wallet?.loggedIn && user?.activeRecord" class="mb-8">
+        <h5>Your ranking</h5>
+        <div v-if="pending" class="w-full h-20" :aria-busy="true" />
+        <template v-else-if="info?.ranking?.account">
+          <ItemLeaderboardBar :score="info?.ranking?.account" />
+        </template>
+      </section>
+      <section class="mb-0">
+        <h5>Top 100 of current season</h5>
+        <div v-if="pending" class="w-full h-20" :aria-busy="true" />
+        <div v-else class="flex flex-col gap-4">
+          <ItemLeaderboardBar v-for="(one, index) in info?.ranking?.tops" :key="`item_${index}`" :score="one" />
+        </div>
+      </section>
+    </template>
+  </FrameMain>
 </template>
