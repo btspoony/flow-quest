@@ -172,11 +172,24 @@ export async function fetchAccountProof() {
   };
 }
 
+function handleResponseError(e: any): { code: string; message: string } {
+  if (typeof e.response?.data === "object") {
+    console.warn(`ErrorResponse: `, JSON.stringify(e.response?.data));
+    return {
+      code: e.response?.data?.error?.code ?? "500",
+      message: e.response?.data?.error?.message ?? "Unknown Server Error",
+    };
+  } else {
+    console.warn(`ErrorMsg:`, e.message);
+    return { code: "500", message: e.message };
+  }
+}
+
 export async function apiPostVerifyQuest(
   questIdentifier: BountyIdentifier,
   step: number,
   questParams: { key: string; value: string }[]
-): Promise<ResponseVerifyQuest | undefined> {
+): Promise<ResponseVerifyQuest> {
   try {
     const result = await $fetch("/api/verify-quest", {
       method: "post",
@@ -192,15 +205,13 @@ export async function apiPostVerifyQuest(
     });
     return result;
   } catch (e: any) {
-    console.log(1, e.message);
-    console.log(2, JSON.stringify(e.response));
-    console.error(e);
+    return { ok: false, error: handleResponseError(e) };
   }
 }
 
 export async function apiPostCompleteBounty(
   bountyId: string
-): Promise<ResponseCompleteBounty | undefined> {
+): Promise<ResponseCompleteBounty> {
   try {
     const result = await $fetch("/api/complete-bounty", {
       method: "post",
@@ -213,13 +224,11 @@ export async function apiPostCompleteBounty(
     });
     return result;
   } catch (e) {
-    console.error(e);
+    return { ok: false, error: handleResponseError(e) };
   }
 }
 
-export async function apiPostGenerateReferralCode(): Promise<
-  ResponseReferralCodeGenerate | undefined
-> {
+export async function apiPostGenerateReferralCode(): Promise<ResponseReferralCodeGenerate> {
   try {
     const result = await $fetch("/api/generate-referral-code", {
       method: "post",
@@ -227,6 +236,6 @@ export async function apiPostGenerateReferralCode(): Promise<
     });
     return result;
   } catch (e) {
-    console.error(e);
+    return { ok: false, error: handleResponseError(e) };
   }
 }
