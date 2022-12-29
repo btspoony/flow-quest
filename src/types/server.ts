@@ -35,17 +35,17 @@ interface ResponseBasics {
 interface ResponseVerifyQuest extends ResponseBasics {
   isAccountValid?: boolean;
   isQuestValid?: boolean;
-  transactionId?: string;
+  transactionId?: string | null;
 }
 
 interface ResponseCompleteBounty extends ResponseBasics {
   isAccountValid?: boolean;
   isBountyCompleted?: boolean;
-  transactionId?: string;
+  transactionId?: string | null;
 }
 
 interface ResponseReferralCodeGenerate extends ResponseBasics {
   isAccountValid?: boolean;
   isPointsEnough?: boolean;
-  transactionId?: string;
+  transactionId?: string | null;
 }
