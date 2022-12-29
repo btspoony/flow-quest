@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const cfg = useRuntimeConfig()
+const isTestnet = ref(cfg.public.network === 'testnet')
 
 async function onRemoveProfile(): Promise<string> {
   const { $fcl } = useNuxtApp()
@@ -26,7 +28,7 @@ transaction {
 
 <template>
   <main class="mt-20 p-8 flex flex-col gap-4">
-    <section>
+    <section v-if="isTestnet">
       <FlowSubmitTransaction :method="onRemoveProfile" content="Remove Profile" />
     </section>
   </main>
