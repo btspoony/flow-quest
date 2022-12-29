@@ -19,11 +19,12 @@ async function sendTransactionWithKeyPool(
     accountIndex: keyIndex,
   });
   const txid = await signer.sendTransaction(code, args, authz);
-  if (txid) {
-    signer.onceTransactionSealed(txid, (tx) => {
-      return releaseKeyIndex(signer.address, keyIndex);
-    });
-  }
+  // Not to watch
+  // if (txid) {
+  //   signer.onceTransactionSealed(txid, (tx) => {
+  //     return releaseKeyIndex(signer.address, keyIndex);
+  //   });
+  // }
   return txid;
 }
 
