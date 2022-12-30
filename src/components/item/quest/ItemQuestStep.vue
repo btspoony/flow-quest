@@ -120,10 +120,10 @@ function onCloseDialgue() {
         </div>
         <div class="flex flex-col gap-1">
           <template v-for="(param, index) in stepCfg.schema" :key="`key_${index}`">
-            <label :for="`param_${param.key}`">
-              <span class="text-lg font-semibold">Param[{{ index }}]: {{ param.key }}</span>
-              <input type="text" :id="`param_${param.key}`" :name="`param_${param.key}`" :placeholder="param.type"
-                v-model="answers[index]" required>
+            <label :for="`${quest.id}_${step}_param_${param.key}`">
+              <span class="text-lg font-semibold">{{ param.label ?? param.key }}</span>
+              <input type="text" :id="`${quest.id}_${step}_param_${param.key}`" :name="`${quest.id}_${step}_param_${param.key}`"
+                :placeholder="param.type" v-model="answers[index]" required>
             </label>
           </template>
         </div>
