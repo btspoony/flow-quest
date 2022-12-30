@@ -122,6 +122,7 @@ interface QuestStepTest {
 interface QuestSchema {
   key: string;
   type: string;
+  label?: string;
 }
 
 interface QuestStepOnChain extends QuestStepBasic {
