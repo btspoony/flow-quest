@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
-import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/solid'
+import { UserCircleIcon, ArrowRightOnRectangleIcon, RectangleStackIcon } from '@heroicons/vue/24/solid'
 
 const details = ref<HTMLDetailsElement | null>(null);
 const github = useGithubProfile();
@@ -81,14 +81,24 @@ function onLogout() {
       </div>
     </summary>
     <ul role="listbox">
-      <li v-if="wallet?.loggedIn">
-        <NuxtLink :to="geneReferralLink(`/account/${linkedAddressString}`)" @click="closeDropdown()">
-          <div class="flex gap-4 items-center justify-end">
-            <span>Profile</span>
-            <UserCircleIcon class="fill-secondary w-5 h-5" />
-          </div>
-        </NuxtLink>
-      </li>
+      <template v-if="wallet?.loggedIn">
+        <li>
+          <NuxtLink :to="geneReferralLink(`/account/${linkedAddressString}`)" @click="closeDropdown()">
+            <div class="flex gap-4 items-center justify-end">
+              <span>Profile</span>
+              <UserCircleIcon class="fill-secondary w-5 h-5" />
+            </div>
+          </NuxtLink>
+        </li>
+        <li>
+          <NuxtLink :to="geneReferralLink(`/spaces`)" @click="closeDropdown()">
+            <div class="flex gap-4 items-center justify-end">
+              <span>Spaces</span>
+              <RectangleStackIcon class="fill-current w-5 h-5" />
+            </div>
+          </NuxtLink>
+        </li>
+        </template>
       <li>
         <a class="cursor-pointer" @click="onLogout()">
           <div class="flex gap-4 items-center justify-end">

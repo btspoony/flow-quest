@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>
+  <FrameMain>
     Community List
-  </main>
+  </FrameMain>
 </template>

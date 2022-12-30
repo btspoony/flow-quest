@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <main>
-    Community detail
-  </main>
+  <FrameMain>
+    Quest
+  </FrameMain>
 </template>
