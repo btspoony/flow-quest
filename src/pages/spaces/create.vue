@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  key: route => route.path
+  key: route => route.path  
 })
 // TODO
 </script>

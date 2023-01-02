@@ -10,8 +10,10 @@ export const useCurrentQuest = () =>
 export const useActiveSeason = () =>
   useState<CompetitionSeason | null>("activeSeason", () => ref(null));
 
-export const useCommunityBasics = (communityId: string) =>
-  useState<CommunityBasics | null>(`community:${communityId}`, () => ref(null));
+export const useCommunitySpaceBasics = (communityId: string) =>
+  useState<CommunitySpaceBasics | null>(`community:${communityId}`, () =>
+    ref(null)
+  );
 
 export const useCurrentProfile = () =>
   useState<ProfileData | null>("currentProfile", () => ref(null));

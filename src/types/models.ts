@@ -163,7 +163,7 @@ interface CommuntiyBountyBasics {
   createdAt: number;
 }
 
-interface CommunityDisplay {
+interface SpaceDisplay {
   name: string;
   description: string;
   imageUrl?: string;
@@ -175,13 +175,14 @@ interface CommunityDisplay {
   };
 }
 
-interface CommunityBasics {
+interface CommunitySpaceBasics {
   owner: string;
-  communityId: string;
-  display: CommunityDisplay;
+  id: string;
+  key: string;
+  display: SpaceDisplay;
 }
 
-interface Community extends CommunityBasics {
+interface Community extends CommunitySpaceBasics {
   quests: { [key: string]: QuestConfig };
   challenges: { [key: string]: ChallengeConfig };
   bounties: CommuntiyBountyBasics[];

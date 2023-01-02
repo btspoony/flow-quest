@@ -3,8 +3,8 @@ const props = defineProps<{
   communityId: string
 }>()
 
-const { data, pending } = useAsyncData<CommunityBasics | null>(`community:${props.communityId}`, async () => {
-  return await apiGetCommunityBasics(props.communityId)
+const { data, pending } = useAsyncData<CommunitySpaceBasics | null>(`community:${props.communityId}`, async () => {
+  return await apiSpaceGetBasics(props.communityId)
 }, {
   server: false
 })

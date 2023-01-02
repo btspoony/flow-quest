@@ -184,19 +184,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           return !!ret;
         },
         /**
-         * Get community basics
-         * @param communityId
-         */
-        async getCommunityBasics(
-          communityId: string
-        ): Promise<CommunityBasics | null> {
-          return await executeScript(
-            cadence.scripts.getCommunityBasics,
-            (arg, t) => [arg(communityId, t.UInt64)],
-            null
-          );
-        },
-        /**
          * Get quests
          * @param quests
          */
@@ -333,16 +320,13 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async getPlatformLinkedAddress(
           platform: string,
-          uid: string,
+          uid: string
         ): Promise<string | null> {
           return await executeScript(
             cadence.scripts.getPlatformLinkedAddress,
-            (arg, t) => [
-              arg(platform, t.String),
-              arg(uid, t.String),
-            ],
+            (arg, t) => [arg(platform, t.String), arg(uid, t.String)],
             null
-          )
+          );
         },
         /**
          * get quest status
@@ -454,6 +438,31 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
           if (!result) return result;
           return parseProfileSeasonRecord(result);
+        },
+        // Spaces
+        /**
+         * Get community space basics
+         * @param communityId
+         */
+        async spaceGetBasics(
+          communityId: string
+        ): Promise<CommunitySpaceBasics | null> {
+          return await executeScript(
+            cadence.scripts.spaceGetBasics,
+            (arg, t) => [arg(communityId, t.UInt64)],
+            null
+          );
+        },
+        /**
+         * get community space list
+         * @param acct address
+         */
+        async spaceGetList(acct: string): Promise<CommunitySpaceBasics[]> {
+          return await executeScript(
+            cadence.scripts.spaceGetList,
+            (arg, t) => [arg(acct, t.Address)],
+            []
+          );
         },
       },
       transactions: {

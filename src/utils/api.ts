@@ -51,14 +51,15 @@ export async function apiGetCurrentQuest(
   return quest;
 }
 
-const communityPromises: { [key: string]: Promise<CommunityBasics | null> } =
-  {};
+const communityPromises: {
+  [key: string]: Promise<CommunitySpaceBasics | null>;
+} = {};
 
-export async function apiGetCommunityBasics(
+export async function apiSpaceGetBasics(
   communityId: string
-): Promise<CommunityBasics | null> {
-  const community = useCommunityBasics(communityId);
-  let result: CommunityBasics | null;
+): Promise<CommunitySpaceBasics | null> {
+  const community = useCommunitySpaceBasics(communityId);
+  let result: CommunitySpaceBasics | null;
   if (community.value) {
     result = community.value;
   } else {
@@ -67,7 +68,7 @@ export async function apiGetCommunityBasics(
       result = community.value = await existsPromise;
     } else {
       const { $scripts } = useNuxtApp();
-      communityPromises[communityId] = $scripts.getCommunityBasics(communityId);
+      communityPromises[communityId] = $scripts.spaceGetBasics(communityId);
       result = community.value = await communityPromises[communityId];
     }
   }
