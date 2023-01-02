@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <FrameMain>
-    Quest
-  </FrameMain>
+  <div>
+    Create Quest or Challenge
+  </div>
 </template>

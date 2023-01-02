@@ -1,9 +1,11 @@
 <script setup lang="ts">
-// TODO
+// NOTING
 </script>
 
 <template>
-  <FrameMain>
-    Community List
-  </FrameMain>
+  <div class="hero">
+    <div class="hero-content">
+      Select a space or create a new space
+    </div>
+  </div>
 </template>
