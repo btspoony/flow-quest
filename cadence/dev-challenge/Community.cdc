@@ -254,12 +254,13 @@ pub contract Community {
 
     pub resource interface CommunityPublic {
         pub let key: String
-        pub let bounties: [CommuntiyBountyBasics]
 
         pub fun getID(): UInt64
         pub fun getStandardDisplay(): MetadataViews.Display
         pub fun getDetailedDisplay(): CommunityDisplay
 
+        pub fun getQuestKeys(): [String]
+        pub fun getChallengeKeys(): [String]
         pub fun borrowQuestRef(key: String): &QuestConfig?
         pub fun borrowChallengeRef(key: String): &ChallengeConfig?
     }
@@ -361,6 +362,7 @@ pub contract Community {
             // quest keys
             let questKeys: [String] = []
             for one in challenge.quests {
+                assert(Community.entityMapping[one.key] != nil, message: "Failed to find quest:".concat(one.key))
                 questKeys.append(one.key)
             }
 
@@ -401,6 +403,14 @@ pub contract Community {
 
         pub fun getID(): UInt64 {
             return self.uuid
+        }
+
+        pub fun getQuestKeys(): [String] {
+            return self.quests.keys
+        }
+
+        pub fun getChallengeKeys(): [String] {
+            return self.challenges.keys
         }
 
         pub fun borrowQuestRef(key: String): &QuestConfig? {
