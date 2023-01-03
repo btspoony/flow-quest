@@ -9,7 +9,7 @@ const profileAddr = computed<string>(() => route.params.address as string)
 
 const { data: profile, pending } = useAsyncData<ProfileData | null>(`user:${profileAddr.value}`, async () => {
   await apiGetActiveSeason()
-  const currentProfile = useCurrentProfile();
+  const currentProfile = useCurrentAccountProfile();
   const profile = await loadUserProfile(profileAddr.value);
   currentProfile.value = profile;
   return profile

@@ -10,13 +10,16 @@ const emit = defineEmits<{
   (e: 'create'): void,
 }>()
 
-const isCurrentActive = ref(false)
+const currentSpace = useCurrentSpace()
+const isCurrentActive = computed(() => {
+  return props.space && props.space?.id === currentSpace.value?.id
+})
 </script>
 
 <template>
   <div :class="['group cursor-pointer w-14 px-2 relative flex items-center', isCurrentActive ? 'active' : '']">
     <div
-      class="absolute right-0 h-3 w-1 rounded-full transition-all duration-300 group-hover:bg-current group-[.active]:bg-current !group-[.active]:h-5" />
+      class="absolute right-0 h-2 w-1 rounded-full transition-all duration-300 group-hover:bg-current group-[.active]:bg-current !group-[.active]:h-5" />
     <div class="rounded-full flex-center border border-solid border-current w-10 h-10">
       <template v-if="space">
         <img :src="getIPFSUrl(space?.display.imageUrl!)" class="rounded-full w-10 h-10" />

@@ -10,10 +10,13 @@ export const useCurrentQuest = () =>
 export const useActiveSeason = () =>
   useState<CompetitionSeason | null>("activeSeason", () => ref(null));
 
+export const useCurrentAccountProfile = () =>
+  useState<ProfileData | null>("currentAccountProfile", () => ref(null));
+
 export const useCommunitySpaceBasics = (communityId: string) =>
   useState<CommunitySpaceBasics | null>(`community:${communityId}`, () =>
     ref(null)
   );
 
-export const useCurrentProfile = () =>
-  useState<ProfileData | null>("currentProfile", () => ref(null));
+export const useCurrentSpace = () =>
+  useState<CommunitySpaceBasics | null>(`currentSpace`, () => ref(null));

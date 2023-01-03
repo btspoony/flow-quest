@@ -118,7 +118,7 @@ export async function reloadCurrentUser(
 export async function reloadCurrentProfile(
   defaultAddress: string
 ): Promise<ProfileData | null> {
-  const currentProfile = useCurrentProfile();
+  const currentProfile = useCurrentAccountProfile();
   const address = currentProfile.value
     ? currentProfile.value?.address
     : defaultAddress;

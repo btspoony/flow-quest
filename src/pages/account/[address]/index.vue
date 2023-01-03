@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const profile = useCurrentProfile()
+const profile = useCurrentAccountProfile()
 const season = useActiveSeason();
 </script>
 
