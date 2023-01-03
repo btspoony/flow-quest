@@ -1,14 +1,16 @@
-import Community from "../Community.cdc"
+import Interfaces from "../../../../cadence/dev-challenge/Interfaces.cdc"
+import Community from "../../../../cadence/dev-challenge/Community.cdc"
+import Helper from "../../../../cadence/dev-challenge/Helper.cdc"
 
 transaction(
     communityKey: String,
     key: String,
     title: String,
     description: String,
-    image: String?,
-    steps: UInt64,
-    stepsCfg: String,
-    guideMD: String,
+    image: String,
+    questKeys: [String],
+    achievementHost: Address?,
+    achievementId: UInt64?,
 ) {
     let builder: &Community.CommunityBuilder
 
@@ -26,19 +28,32 @@ transaction(
         assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
         let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
-        let exist = community.borrowQuestRef(key: key)
-        assert(exist == nil, message: "quest exists.")
 
-        let quest = Community.QuestConfig(
+        let quests: [Community.BountyEntityIdentifier] = []
+        for questKey in questKeys {
+            quests.append(Community.BountyEntityIdentifier(
+                Interfaces.BountyType.quest,
+                communityId: communityId,
+                key: questKey,
+            ))
+        }
+
+        var achievement: Helper.EventIdentifier? = nil
+        if achievementHost != nil && achievementId != nil {
+            achievement = Helper.EventIdentifier(achievementHost!, achievementId!)
+            // ensure event exists
+            achievement!.getEventPublic()
+        }
+
+        let challenge = Community.ChallengeConfig(
             communityId: communityId,
             key: key,
             title: title,
             description: description,
             image: image,
-            steps: steps,
-            stepsCfg: stepsCfg,
-            guideMD: guideMD,
+            quests: quests,
+            achievement: achievement
         )
-        community.addQuest(key: key, quest: quest)
+        community.addChallenge(key: key, challenge: challenge)
     }
 }

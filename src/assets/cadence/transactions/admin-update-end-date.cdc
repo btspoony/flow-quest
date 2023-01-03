@@ -1,6 +1,4 @@
-// import Interfaces from "../Interfaces.cdc"
-// import UserProfile from "../UserProfile.cdc"
-import CompetitionService from "../CompetitionService.cdc"
+import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
     endDate: UFix64,

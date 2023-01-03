@@ -9,7 +9,7 @@ async function main() {
   const code = fs.readFileSync(
     path.join(
       process.cwd(),
-      "cadence/dev-challenge/transactions/admin-close-season.cdc"
+      "src/assets/cadence/transactions/admin-update-end-date.cdc"
     ),
     "utf8"
   );

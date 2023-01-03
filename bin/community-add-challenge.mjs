@@ -17,7 +17,7 @@ async function main() {
   const code = fs.readFileSync(
     path.join(
       process.cwd(),
-      "cadence/dev-challenge/transactions/community-add-challenge.cdc"
+      "src/assets/cadence/transactions/community-add-challenge.cdc"
     ),
     "utf8"
   );

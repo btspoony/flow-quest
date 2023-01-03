@@ -1,10 +1,8 @@
-// import Interfaces from "../Interfaces.cdc"
-// import UserProfile from "../UserProfile.cdc"
-import CompetitionService from "../CompetitionService.cdc"
+import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
-    seasonId: UInt64,
-    datetime: UFix64,
+    endDate: UFix64,
+    referralThreshold: UInt64
 ) {
     let admin: &CompetitionService.CompetitionAdmin
 
@@ -14,6 +12,9 @@ transaction(
     }
 
     execute {
-        self.admin.updateEndDate(seasonId: seasonId, datetime: datetime)
+        self.admin.startNewSeason(
+            endDate: endDate,
+            referralThreshold: referralThreshold,
+        )
     }
 }

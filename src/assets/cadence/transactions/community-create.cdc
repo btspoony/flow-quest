@@ -1,4 +1,4 @@
-import Community from "../Community.cdc"
+import Community from "../../../../cadence/dev-challenge/Community.cdc"
 
 transaction(
     key: String,

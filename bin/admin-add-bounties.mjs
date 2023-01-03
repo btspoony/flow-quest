@@ -17,7 +17,7 @@ async function main() {
   const code = fs.readFileSync(
     path.join(
       process.cwd(),
-      "cadence/dev-challenge/transactions/admin-add-bounties.cdc"
+      "src/assets/cadence/transactions/admin-add-bounties.cdc"
     ),
     "utf8"
   );
