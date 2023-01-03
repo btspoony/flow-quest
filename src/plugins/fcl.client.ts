@@ -466,6 +466,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       },
       transactions: {
+        /**
+         * User Profile registeration
+         */
         async registerForNewSeason(referredFrom: string | null) {
           const user = useGithubProfile();
           let result;
@@ -498,6 +501,130 @@ export default defineNuxtPlugin((nuxtApp) => {
           return await sendTransaction(
             cadence.transactions.claimFloat,
             (arg, t) => [arg(host, t.Address), arg(eventId, t.UInt64)]
+          );
+        },
+        /**
+         * create a new space
+         */
+        async spaceCreate(
+          key: string,
+          name: string,
+          description: string,
+          image: string,
+          banner?: string,
+          twitter?: string,
+          discord?: string,
+          website?: string
+        ) {
+          return await sendTransaction(
+            cadence.transactions.spaceCreate,
+            (arg, t) => [
+              arg(key, t.String),
+              arg(name, t.String),
+              arg(description, t.String),
+              arg(image, t.String),
+              arg(banner, t.Optional(t.String)),
+              arg(twitter, t.Optional(t.String)),
+              arg(discord, t.Optional(t.String)),
+              arg(website, t.Optional(t.String)),
+            ]
+          );
+        },
+        /**
+         * add quest to a community space
+         */
+        async spaceAddQuests(spaceKey: string, quests: QuestConfigRequest[]) {
+          const data = quests.reduce(
+            (prev, curr) => {
+              prev.keys.push(curr.key);
+              prev.titles.push(curr.name);
+              prev.descs.push(curr.description);
+              prev.images.push(curr.thumbnail ?? null);
+              prev.steps.push(String(curr.steps));
+              prev.stepCfgs.push(curr.stepsCfg);
+              prev.guildMD.push(curr.guideMD);
+              return prev;
+            },
+            {
+              keys: [] as string[],
+              titles: [] as string[],
+              descs: [] as string[],
+              images: [] as (string | null)[],
+              steps: [] as string[],
+              stepCfgs: [] as string[],
+              guildMD: [] as string[],
+            }
+          );
+          return await sendTransaction(
+            cadence.transactions.spaceAddQuests,
+            (arg, t) => [
+              arg(spaceKey, t.String),
+              arg(data.keys, t.Array(t.String)),
+              arg(data.titles, t.Array(t.String)),
+              arg(data.descs, t.Array(t.String)),
+              arg(data.images, t.Array(t.Optional(t.String))),
+              arg(data.steps, t.Array(t.UInt64)),
+              arg(data.stepCfgs, t.Array(t.String)),
+              arg(data.guildMD, t.Array(t.String)),
+            ]
+          );
+        },
+        /**
+         * Add challenge to a community space
+         */
+        async spaceAddChallenge(
+          spaceKey: string,
+          key: string,
+          display: Display,
+          existsQuestKeys: string[],
+          newQuests: QuestConfigRequest[],
+          achievement?: FLOATAchievement
+        ) {
+          const newQuestData = newQuests.reduce(
+            (prev, curr) => {
+              prev.keys.push(curr.key);
+              prev.titles.push(curr.name);
+              prev.descs.push(curr.description);
+              prev.images.push(curr.thumbnail ?? null);
+              prev.steps.push(String(curr.steps));
+              prev.stepCfgs.push(curr.stepsCfg);
+              prev.guildMD.push(curr.guideMD);
+              return prev;
+            },
+            {
+              keys: [] as string[],
+              titles: [] as string[],
+              descs: [] as string[],
+              images: [] as (string | null)[],
+              steps: [] as string[],
+              stepCfgs: [] as string[],
+              guildMD: [] as string[],
+            }
+          );
+          return await sendTransaction(
+            cadence.transactions.spaceAddChallenge,
+            (arg, t) => [
+              arg(spaceKey, t.String),
+              arg(key, t.String),
+              arg(display.name, t.String),
+              arg(display.description, t.String),
+              arg(display.thumbnail, t.String),
+              // Quest
+              arg(existsQuestKeys, t.Array(t.String)),
+              arg(newQuestData.keys, t.Array(t.String)),
+              arg(newQuestData.titles, t.Array(t.String)),
+              arg(newQuestData.descs, t.Array(t.String)),
+              arg(newQuestData.images, t.Array(t.Optional(t.String))),
+              arg(newQuestData.steps, t.Array(t.UInt64)),
+              arg(newQuestData.stepCfgs, t.Array(t.String)),
+              arg(newQuestData.guildMD, t.Array(t.String)),
+              // Achievement
+              arg(achievement ? achievement.host : null, t.Optional(t.Address)),
+              arg(
+                achievement ? achievement.eventId : null,
+                t.Optional(t.UInt64)
+              ),
+            ]
           );
         },
       },

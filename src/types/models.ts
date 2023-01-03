@@ -91,6 +91,10 @@ interface QuestDetail {
 
 interface QuestConfig extends BountyEntity, QuestDetail {}
 
+interface QuestConfigRequest extends Display, QuestDetail {
+  key: string;
+}
+
 interface QuizOptionConfig {
   key: string;
   description: string;
@@ -134,12 +138,14 @@ interface QuestStepOnChain extends QuestStepBasic {
 
 type QuestStepsConfig = QuestStepQuiz | QuestStepOnChain;
 
+interface FLOATAchievement {
+  host: string;
+  eventId: string;
+}
+
 interface ChallengeDetail {
   quests: BountyIdentifier[];
-  achievement?: {
-    host: string;
-    eventId: string;
-  };
+  achievement?: FLOATAchievement;
 }
 
 interface ChallengeConfig extends BountyEntity, ChallengeDetail {}

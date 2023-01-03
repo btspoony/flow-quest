@@ -5,6 +5,8 @@ import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 import claimFloat from "./transactions/claim-float.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
+import spaceAddQuests from "./transactions/community-add-quests.cdc?raw";
+import spaceAddChallenge from "./transactions/community-add-challenge-with-quests.cdc?raw";
 
 /**
  * scripts for quest checking
@@ -34,6 +36,8 @@ export default {
         profileRegisterWithUser,
         claimFloat,
         spaceCreate,
+        spaceAddQuests,
+        spaceAddChallenge,
     },
     scripts: {
         getFLOATEvent,
