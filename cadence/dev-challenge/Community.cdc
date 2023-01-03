@@ -393,6 +393,16 @@ pub contract Community {
             )
         }
 
+        pub fun updateQuestStepsCfg(key: String, stepsCfg: String) {
+            let quest = self.quests[key] ?? panic("Failed to find quest:".concat(key))
+            quest.updateQuestStepsCfg(stepsCfg: stepsCfg)
+        }
+
+        pub fun updateQuestGuideMD(key: String, guideMD: String) {
+            let quest = self.quests[key] ?? panic("Failed to find quest:".concat(key))
+            quest.updateQuestGuideMD(guideMD: guideMD)
+        }
+
         /************* Internals *************/
 
         access(contract) fun getRef(): &CommunityIns {
