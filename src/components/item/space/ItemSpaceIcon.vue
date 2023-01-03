@@ -11,15 +11,35 @@ const emit = defineEmits<{
 }>()
 
 const currentSpace = useCurrentSpace()
+const router = useRouter()
+const route = useRoute()
+
 const isCurrentActive = computed(() => {
-  return props.space && props.space?.id === currentSpace.value?.id
+  return props.space
+    ? props.space?.id === currentSpace.value?.id
+    : route.path === "/spaces/create"
 })
+
+function onSelectCurrent() {
+  if (!props.space) {
+    currentSpace.value = null
+    if (route.path !== '/spaces/create') {
+      router.push(geneReferralLinkObject('/spaces/create'))
+    }
+  } else {
+    currentSpace.value = props.space
+    if (route.params.key !== props.space?.key) {
+      router.push(geneReferralLinkObject(`/spaces/${props.space?.key}`))
+    }
+  }
+}
 </script>
 
 <template>
-  <div :class="['group cursor-pointer w-14 px-2 relative flex items-center', isCurrentActive ? 'active' : '']">
+  <div :class="['group cursor-pointer w-14 px-2 relative flex items-center', isCurrentActive ? 'active' : '']"
+    @click="onSelectCurrent">
     <div
-      class="absolute right-0 h-2 w-1 rounded-full transition-all duration-300 group-hover:bg-current group-[.active]:bg-current !group-[.active]:h-5" />
+      class="absolute right-0 h-2 w-1 rounded-full transition-all duration-300 group-hover:bg-current group-[.active]:bg-current group-[.active]:h-4" />
     <div class="rounded-full flex-center border border-solid border-current w-10 h-10">
       <template v-if="space">
         <img :src="getIPFSUrl(space?.display.imageUrl!)" class="rounded-full w-10 h-10" />
