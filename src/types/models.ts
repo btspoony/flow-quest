@@ -12,6 +12,11 @@ interface Display {
 
 // ---- Service Data ----
 
+interface ListReqOption {
+  page: number;
+  limit: number;
+}
+
 type UnlockConditionTypes =
   | "CompletedAmount"
   | "MinimumLevel"

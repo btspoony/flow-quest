@@ -464,6 +464,89 @@ export default defineNuxtPlugin((nuxtApp) => {
             []
           );
         },
+        /**
+         * get challenge list
+         * @param communityKey
+         */
+        async spaceGetChallengeList(
+          communityKey: string,
+          opt?: ListReqOption
+        ): Promise<ChallengeConfig[]> {
+          const result = await executeScript(
+            cadence.scripts.spaceGetChallengeList,
+            (arg, t) => [
+              arg(communityKey, t.String),
+              arg(opt?.page ? String(opt?.page) : null, t.Int),
+              arg(opt?.limit ? String(opt?.limit) : null, t.Int),
+            ],
+            []
+          );
+          if (!result || result.length === 0) {
+            return [];
+          }
+          return result.map((one: any) => parseChallengeInfo(one));
+        },
+        /**
+         * get challenge detail
+         * @param communityKey
+         * @param challengeKey
+         */
+        async spaceGetChallengeDetail(
+          communityKey: string,
+          challengeKey: string
+        ): Promise<ChallengeConfigDetail | null> {
+          const result = await executeScript(
+            cadence.scripts.spaceGetChallengeDetail,
+            (arg, t) => [
+              arg(communityKey, t.String),
+              arg(challengeKey, t.String),
+            ],
+            null
+          );
+          if (!result) return result;
+          return parseChallengeInfoDetail(result);
+        },
+        /**
+         * get quest list
+         * @param communityKey
+         */
+        async spaceGetQuestList(
+          communityKey: string,
+          opt?: ListReqOption
+        ): Promise<QuestConfig[]> {
+          const result = await executeScript(
+            cadence.scripts.spaceGetQuestList,
+            (arg, t) => [
+              arg(communityKey, t.String),
+              arg(opt?.page ? String(opt?.page) : null, t.Int),
+              arg(opt?.limit ? String(opt?.limit) : null, t.Int),
+            ],
+            []
+          );
+          if (!result || result.length === 0) {
+            return [];
+          }
+          return result.map((one: any) => parseQuestInfo(one));
+        },
+        /**
+         * search quests by key
+         * @param communityKey
+         * @param searchKey
+         */
+        async spaceSearchQuests(
+          communityKey: string,
+          searchKey: string
+        ): Promise<QuestConfig[]> {
+          const result = await executeScript(
+            cadence.scripts.spaceSearchQuests,
+            (arg, t) => [arg(communityKey, t.String), arg(searchKey, t.String)],
+            []
+          );
+          if (!result || result.length === 0) {
+            return [];
+          }
+          return result.map((one: any) => parseQuestInfo(one));
+        },
       },
       transactions: {
         /**

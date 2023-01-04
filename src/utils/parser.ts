@@ -17,26 +17,48 @@ export function parseDisplay(display: any): Display {
   };
 }
 
+export function parseQuestInfo(info: any): QuestConfig {
+  return {
+    category: parseIdentifierCategory(info.identifier.category),
+    communityId: info.identifier.communityId,
+    key: info.identifier.key,
+    display: parseDisplay(info.display),
+    steps: parseInt((info.questDetail ?? info.detail)?.steps ?? 0),
+    stepsCfg: (info.questDetail ?? info.detail)?.stepsCfg,
+    guideMD: (info.questDetail ?? info.detail)?.guideMD,
+  };
+}
+
+export function parseChallengeInfo(info: any): ChallengeConfig {
+  return {
+    category: parseIdentifierCategory(info.identifier.category),
+    communityId: info.identifier.communityId,
+    key: info.identifier.key,
+    display: parseDisplay(info.display),
+    quests:
+      (info.challengeDetail ?? info.detail)?.quests?.map((quest: any) =>
+        parseIdentifier(quest)
+      ) ?? [],
+    achievement: (info.challengeDetail ?? info.detail)?.achievement,
+  };
+}
+
+export function parseChallengeInfoDetail(info: any): ChallengeConfigDetail {
+  return {
+    owner: info.owner,
+    challenge: parseChallengeInfo(info.challenge),
+    quests: (info.quests ?? []).map((quest: any) => parseQuestInfo(quest)),
+  };
+}
+
 export function parseBountyInfo(info: any): BountyInfo {
+  const category = parseIdentifierCategory(info.identifier.category);
   return {
     id: info.id,
-    config: {
-      category: parseIdentifierCategory(info.identifier.category),
-      communityId: info.identifier.communityId,
-      key: info.identifier.key,
-      display: parseDisplay(info.display),
-      steps: parseInt(info.questDetail?.steps ?? 0),
-      stepsCfg: info.questDetail?.stepsCfg,
-      guideMD: info.questDetail?.guideMD,
-      quests: info.challengeDetail
-        ? info.challengeDetail.quests?.map((quest: any) =>
-            parseIdentifier(quest)
-          ) ?? []
-        : [],
-      achievement: info.challengeDetail
-        ? info.challengeDetail.achievement
-        : undefined,
-    },
+    config:
+      category === "challenge"
+        ? parseChallengeInfo(info)
+        : parseQuestInfo(info),
     preconditions: info.preconditions,
     participants: info.participants,
     participantAmt: parseInt(info.participantAmt),
