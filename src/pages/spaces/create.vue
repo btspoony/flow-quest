@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div>
-    Create Community
+  <div class="pt-4">
+    <h4>Create a new community</h4>
   </div>
 </template>

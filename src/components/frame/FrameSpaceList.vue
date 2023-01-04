@@ -39,7 +39,7 @@ watch(user, async (newVal) => {
       </template>
     </aside>
     <main class="flex-auto w-full">
-      <div class="relative mx-auto">
+      <div class="relative mx-auto max-w-3xl">
         <slot />
       </div>
     </main>
@@ -48,7 +48,7 @@ watch(user, async (newVal) => {
 
 <style scoped>
 .aside {
-  @apply h-[calc(100vh-180px)] w-14;
+  @apply h-[calc(100vh-180px)] w-14 pt-4;
   @apply flex flex-col items-center justify-start gap-2;
   @apply border-y-0 border-l-0 border-r border-solid;
 }

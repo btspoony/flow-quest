@@ -19,7 +19,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)]">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)] shadow-sm">
     <nav class="container">
       <ul>
         <li class="inline-flex-between !gap-2 cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
