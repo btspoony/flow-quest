@@ -45,4 +45,36 @@ pub contract QueryStructs {
       self.floatReward = floatReward
     }
   }
+
+  pub struct QuestData {
+    pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
+    pub let display: MetadataViews.Display
+    pub let detail: Interfaces.QuestDetail
+
+    init(
+      identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
+      display: MetadataViews.Display,
+      detail: Interfaces.QuestDetail,
+    ) {
+      self.identifier = identifier
+      self.display = display
+      self.detail = detail
+    }
+  }
+
+  pub struct ChallengeData {
+    pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
+    pub let display: MetadataViews.Display
+    pub let detail: Interfaces.ChallengeDetail
+
+    init(
+      identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
+      display: MetadataViews.Display,
+      detail: Interfaces.ChallengeDetail
+    ) {
+        self.identifier = identifier
+        self.display = display
+        self.detail = detail
+    }
+  }
 }
