@@ -29,6 +29,10 @@ import profileGetIdentities from "./scripts/profile_get_identities.cdc?raw";
 import profilesGetIdentity from "./scripts/profiles_get_identity.cdc?raw";
 import spaceGetBasics from "./scripts/space_get_basics.cdc?raw";
 import spaceGetList from "./scripts/space_get_list.cdc?raw";
+import spaceGetChallengeList from "./scripts/space_get_challenge_list.cdc?raw";
+import spaceGetChallengeDetail from "./scripts/space_get_challenge_detail.cdc?raw";
+import spaceGetQuestList from "./scripts/space_get_quest_list.cdc?raw";
+import spaceSearchQuests from "./scripts/space_search_quests.cdc?raw";
 
 export default {
     transactions: {
@@ -60,5 +64,9 @@ export default {
         // spaces
         spaceGetBasics,
         spaceGetList,
+        spaceGetChallengeList,
+        spaceGetChallengeDetail,
+        spaceGetQuestList,
+        spaceSearchQuests,
     },
 };
