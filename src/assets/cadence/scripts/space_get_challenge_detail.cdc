@@ -26,8 +26,6 @@ pub fun main(
             } // build quest detail
             return ChallengeDetail(
                 community.owner!.address,
-                communityKey,
-                community.getID(),
                 QueryStructs.ChallengeData(
                     identifier: Community.BountyEntityIdentifier(
                         category: Interfaces.BountyType.challenge,
@@ -46,21 +44,15 @@ pub fun main(
 
 pub struct ChallengeDetail {
     pub let owner: Address
-    pub let communityKey: String
-    pub let communityId: UInt64
     pub let challenge: QueryStructs.ChallengeData
     pub let quests: [QueryStructs.QuestData]
 
     init(
         _ owner: Address,
-        _ communityKey: String,
-        _ communityId: UInt64,
         _ challenge: QueryStructs.ChallengeData,
         _ quests: [QueryStructs.QuestData]
     ) {
         self.owner = owner
-        self.communityKey = communityKey
-        self.communityId = communityId
         self.challenge = challenge
         self.quests = quests
     }

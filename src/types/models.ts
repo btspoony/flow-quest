@@ -150,6 +150,12 @@ interface ChallengeDetail {
 
 interface ChallengeConfig extends BountyEntity, ChallengeDetail {}
 
+interface ChallengeConfigDetail {
+  owner: string;
+  challenge: ChallengeConfig;
+  quests: QuestConfig[];
+}
+
 interface FLOATEvent {
   claimable: boolean;
   description: string;
@@ -162,12 +168,6 @@ interface FLOATEvent {
 }
 
 type BountyEntities = QuestConfig | ChallengeConfig;
-
-interface CommuntiyBountyBasics {
-  category: BountyType;
-  key: string;
-  createdAt: number;
-}
 
 interface SpaceDisplay {
   name: string;
@@ -186,12 +186,6 @@ interface CommunitySpaceBasics {
   id: string;
   key: string;
   display: SpaceDisplay;
-}
-
-interface Community extends CommunitySpaceBasics {
-  quests: { [key: string]: QuestConfig };
-  challenges: { [key: string]: ChallengeConfig };
-  bounties: CommuntiyBountyBasics[];
 }
 
 /**
