@@ -39,7 +39,7 @@ watch(user, async (newVal) => {
       </template>
     </aside>
     <main class="flex-auto w-full">
-      <div class="relative mx-auto max-w-3xl">
+      <div class="relative mx-auto max-w-2xl">
         <slot />
       </div>
     </main>

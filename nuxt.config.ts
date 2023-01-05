@@ -23,6 +23,7 @@ export default defineNuxtConfig({
       walletDiscovery: "",
       flowServiceAddress: "",
       oauthGithubClientId: "",
+      nftStorageToken: "",
     },
   },
   // ts config
