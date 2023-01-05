@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { NFTStorage } from "nft.storage";
 
+withDefaults(defineProps<{
+  required?: boolean
+}>(), {
+  required: true
+})
+
 const cfg = useRuntimeConfig()
 
 const client = new NFTStorage({ token: cfg.public.nftStorageToken });
@@ -24,21 +30,21 @@ async function uploadToIPFS(e: Event) {
   uploadedSuccessfully.value = true
   uploading.value = false
 
-  imagePreviewSrc.value = getIPFSUrl(cid)
+  imagePreviewSrc.value = cid
   emit('ipfsAdded', cid);
 }
 </script>
 
 <template>
   <div class="grid">
-    <label for="image">
+    <label v-if="!imagePreviewSrc" for="image">
       <slot>Image</slot>
-      <input :aria-busy="!!uploading" type="file" id="image" name="image" accept="image/png, image/gif, image/jpeg"
-        :disabled="uploading" @change="uploadToIPFS" />
+      <input :aria-busy="!!uploading" type="file" id="image" accept="image/png, image/gif, image/jpeg"
+        :disabled="uploading" @change="uploadToIPFS" :required="required"/>
       <progress v-if="uploading" indeterminate />
     </label>
-    <div>
-      <h3>Preview</h3>
+    <div v-if="imagePreviewSrc">
+      <h5 class="mb-1">Preview</h5>
       <slot name="preview">
         <p>No Preview</p>
       </slot>

@@ -5,6 +5,7 @@ withDefaults(defineProps<{
   noTopbar: false
 });
 const user = useUserProfile()
+const spacesUpdated = useSpacesUpdated()
 
 const { data: list, pending, refresh } = useAsyncData<Array<CommunitySpaceBasics | null>>(`spaces:${user.value?.address ?? 'unknown'}`, async () => {
   let result: Array<CommunitySpaceBasics | null> = []
@@ -26,6 +27,12 @@ const { data: list, pending, refresh } = useAsyncData<Array<CommunitySpaceBasics
 
 watch(user, async (newVal) => {
   refresh()
+})
+watch(spacesUpdated, (newVal) => {
+  if (spacesUpdated.value) {
+    refresh()
+    spacesUpdated.value = false
+  }
 })
 </script>
 

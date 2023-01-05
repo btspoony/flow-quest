@@ -20,3 +20,6 @@ export const useCommunitySpaceBasics = (communityId: string) =>
 
 export const useCurrentSpace = () =>
   useState<CommunitySpaceBasics | null>(`currentSpace`, () => ref(null));
+
+export const useSpacesUpdated = () =>
+  useState<boolean>(`spacesUpdated`, () => ref(false));
