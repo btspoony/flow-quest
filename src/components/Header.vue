@@ -19,12 +19,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)] shadow-sm">
+  <header class="fixed top-0 left-0 right-0 z-50 min-h-[90px] bg-[var(--background-color)] shadow-sm flex items-center">
     <nav class="container">
       <ul>
         <li class="inline-flex-between !gap-2 cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span class="font-semibold text-2xl hidden lg:inline">{{ appName }}</span>
+          <span class="font-semibold hidden lg:text-lg xl:text-xl lg:inline">{{ appName }}</span>
         </li>
       </ul>
       <ul>

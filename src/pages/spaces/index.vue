@@ -1,5 +1,12 @@
 <script setup lang="ts">
-// NOTING
+const currentSpace = useCurrentSpace()
+
+onMounted(() => {
+  if (currentSpace.value) {
+    currentSpace.value = null
+  }
+})
+
 </script>
 
 <template>

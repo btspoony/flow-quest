@@ -28,6 +28,7 @@ import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?
 import profileGetIdentities from "./scripts/profile_get_identities.cdc?raw";
 import profilesGetIdentity from "./scripts/profiles_get_identity.cdc?raw";
 import spaceGetBasics from "./scripts/space_get_basics.cdc?raw";
+import spaceGetBasicsByKey from "./scripts/space_get_basics_by_key.cdc?raw";
 import spaceGetList from "./scripts/space_get_list.cdc?raw";
 import spaceGetChallengeList from "./scripts/space_get_challenge_list.cdc?raw";
 import spaceGetChallengeDetail from "./scripts/space_get_challenge_detail.cdc?raw";
@@ -63,6 +64,7 @@ export default {
         profilesGetIdentity,
         // spaces
         spaceGetBasics,
+        spaceGetBasicsByKey,
         spaceGetList,
         spaceGetChallengeList,
         spaceGetChallengeDetail,

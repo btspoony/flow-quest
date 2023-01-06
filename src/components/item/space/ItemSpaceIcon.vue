@@ -41,11 +41,11 @@ function onSelectCurrent() {
     <div
       class="absolute right-0 h-2 w-1 rounded-full transition-all duration-300 group-hover:bg-current group-[.active]:bg-current group-[.active]:h-4" />
     <div
-      :class="['flex-center rounded-full w-10 h-10 border hover:border-solid hover:border-secondary hover:shadow-md', space ? '' :'border-solid border-current']">
+      :class="['flex-center rounded-full w-10 h-10 border hover:border-solid hover:shadow-md', space ? '' :'border-solid border-current']">
       <template v-if="space">
         <img :src="getIPFSUrl(space?.display.imageUrl!)" class="rounded-full w-10 h-10" />
       </template>
-      <PlusIcon v-else class="fill-current hover:fill-secondary w-6 h-6" />
+      <PlusIcon v-else class="fill-current w-6 h-6" />
     </div>
   </div>
 </template>

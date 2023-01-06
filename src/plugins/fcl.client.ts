@@ -445,13 +445,21 @@ export default defineNuxtPlugin((nuxtApp) => {
          * @param communityId
          */
         async spaceGetBasics(
-          communityId: string
+          key: string
         ): Promise<CommunitySpaceBasics | null> {
-          return await executeScript(
-            cadence.scripts.spaceGetBasics,
-            (arg, t) => [arg(communityId, t.UInt64)],
-            null
-          );
+          if (isNaN(parseInt(key))) {
+            return await executeScript(
+              cadence.scripts.spaceGetBasicsByKey,
+              (arg, t) => [arg(key, t.String)],
+              null
+            )
+          } else {
+            return await executeScript(
+              cadence.scripts.spaceGetBasics,
+              (arg, t) => [arg(key, t.UInt64)],
+              null
+            );
+          }
         },
         /**
          * get community space list

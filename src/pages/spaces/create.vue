@@ -39,11 +39,11 @@ function resetComp() {
   data.website = undefined
 }
 
-const isAllRequired = computed(() => data.key && data.name && data.description && data.image)
+const isAllRequired = computed(() => data.key && data.key !== 'create' && data.name && data.description && data.image)
 
 function onTransactionSuccess() {
   spacesUpdated.value = true
-  router.push(geneReferralLinkObject(`/spaces`))
+  router.push(geneReferralLinkObject(`/spaces/${data.key}`))
 }
 
 async function sendCreateCommunity(): Promise<string> {
