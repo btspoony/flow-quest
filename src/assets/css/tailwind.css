@@ -283,16 +283,20 @@
     @apply w-full bg-gray-400 dark:bg-gray-600 h-[1px];
   }
 
-  .tab-link {
-    @apply px-8 border-0 border-x-0 border-t-0 border-solid;
-    @apply text-xl font-semibold;
+  .tabs {
+    @apply !mx-0;
 
-    &.active {
-      @apply border-[var(--color)] border-b-4 rounded-b-none;
-    }
+    .tab-link {
+      @apply px-8 border-0 border-x-0 border-t-0 border-solid;
+      @apply text-xl font-semibold;
 
-    &.disabled {
-      @apply text-gray-400;
+      &.active {
+        @apply text-[var(--color)] border-[var(--color)] border-b-4 rounded-b-none;
+      }
+
+      &.disabled {
+        @apply text-gray-400;
+      }
     }
   }
 }
