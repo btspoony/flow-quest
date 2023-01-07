@@ -27,9 +27,12 @@ function onSelectCurrent() {
       router.push(geneReferralLinkObject('/spaces/create'))
     }
   } else {
-    currentSpace.value = props.space
     if (route.params.key !== props.space?.key) {
-      router.push(geneReferralLinkObject(`/spaces/${props.space?.key}`))
+      currentSpace.value = props.space
+    }
+    const targetPath = `/spaces/${props.space?.key}`
+    if (route.path !== targetPath) {
+      router.push(geneReferralLinkObject(targetPath))
     }
   }
 }

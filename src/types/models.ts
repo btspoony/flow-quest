@@ -98,6 +98,7 @@ interface QuestConfig extends BountyEntity, QuestDetail {}
 
 interface QuestConfigRequest extends Display, QuestDetail {
   key: string;
+  valid?: boolean;
 }
 
 interface QuizOptionConfig {

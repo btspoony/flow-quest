@@ -5,6 +5,7 @@ import ItemSpaceListQuests from '~/components/item/space/list/ItemSpaceListQuest
 definePageMeta({
   key: route => route.path
 })
+
 const route = useRoute()
 const spaceKey = computed<string>(() => typeof route.params.key === 'string' ? route.params.key : route.params.key[0])
 
