@@ -287,11 +287,16 @@
     @apply !mx-0;
 
     .tab-link {
-      @apply px-8 border-0 border-x-0 border-t-0 border-solid;
-      @apply text-xl font-semibold;
+      @apply border-0 border-x-0 border-t-0 border-solid;
+      @apply px-8 text-xl font-semibold opacity-70 cursor-pointer;
+
+      &:not(.active, .disabled):hover {
+        @apply opacity-80;
+      }
 
       &.active {
-        @apply text-[var(--color)] border-[var(--color)] border-b-4 rounded-b-none;
+        @apply border-[var(--color)] border-b-4 rounded-b-none;
+        @apply opacity-100 text-[var(--color)];
       }
 
       &.disabled {

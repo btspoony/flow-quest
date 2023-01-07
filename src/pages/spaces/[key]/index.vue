@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ItemSpaceListChallenges from '~/components/item/space/list/ItemSpaceListChallenges.vue'
+import ItemSpaceListQuests from '~/components/item/space/list/ItemSpaceListQuests.vue'
+
 definePageMeta({
   key: route => route.path
 })
@@ -20,25 +23,30 @@ const { data, pending, refresh } = useAsyncData(`space:${spaceKey}`, async () =>
   lazy: true
 })
 
-type TabTypes = 'challenges' | 'quests'
-const currentTab = ref<TabTypes>('challenges')
+provide(spaceInjectKey, { space: data, refresh })
+
+const currentTab = ref('Challenges')
+const tabs = [
+  { label: "Challenges", comp: ItemSpaceListChallenges },
+  { label: "Quests", comp: ItemSpaceListQuests },
+]
+const currentComponent = computed(() => tabs.find(tab => tab.label === currentTab.value)?.comp)
 </script>
 
 <template>
   <div class="pt-4">
-<WidgetLoadingCard v-if="pending" />
+    <WidgetLoadingCard v-if="pending" />
 <template v-else-if="data">
-  <ItemSpaceHeader :space="data" class="mb-2" />
-  <nav class="mb-2">
-    <ul class="tabs">
-      <li :class="['tab-link', { 'active': currentTab === 'challenges'}]">Challenges</li>
-      <li :class="['tab-link', { 'active': currentTab === 'quests' }]">Quests</li>
-    </ul>
-  </nav>
-  <div class=" flex flex-col gap-4">
-    <span>1</span>
-    <span>2</span>
-  </div>
+    <ItemSpaceHeader :space="data" class="mb-2" />
+    <nav class="mb-4">
+      <ul class="tabs">
+        <li v-for="tab in tabs" :key="tab.label" :class="['tab-link', { 'active': currentTab === tab.label }]"
+          @click="currentTab = tab.label">
+          {{ tab.label }}
+        </li>
+        </ul>
+        </nav>
+    <component v-if="currentComponent" :is="currentComponent"></component>
 </template>
   </div>
 </template>
