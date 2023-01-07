@@ -484,8 +484,8 @@ export default defineNuxtPlugin((nuxtApp) => {
             cadence.scripts.spaceGetChallengeList,
             (arg, t) => [
               arg(communityKey, t.String),
-              arg(opt?.page ? String(opt?.page) : null, t.Int),
-              arg(opt?.limit ? String(opt?.limit) : null, t.Int),
+              arg(opt?.page ? String(opt?.page) : null, t.Optional(t.Int)),
+              arg(opt?.limit ? String(opt?.limit) : null, t.Optional(t.Int)),
             ],
             []
           );
@@ -526,8 +526,8 @@ export default defineNuxtPlugin((nuxtApp) => {
             cadence.scripts.spaceGetQuestList,
             (arg, t) => [
               arg(communityKey, t.String),
-              arg(opt?.page ? String(opt?.page) : null, t.Int),
-              arg(opt?.limit ? String(opt?.limit) : null, t.Int),
+              arg(opt?.page ? String(opt?.page) : null, t.Optional(t.Int)),
+              arg(opt?.limit ? String(opt?.limit) : null, t.Optional(t.Int)),
             ],
             []
           );
