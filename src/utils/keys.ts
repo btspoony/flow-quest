@@ -8,9 +8,6 @@ interface SpaceInjectType {
 export const spaceInjectKey: InjectionKey<SpaceInjectType> =
   Symbol("app.space");
 
-interface NewQuestsInjectType {
-  [key: number]: UnwrapNestedRefs<QuestConfigRequest>;
-}
-
-export const spaceNewQuestsInjectKey: InjectionKey<NewQuestsInjectType> =
-  Symbol("app.new-quests");
+export const spaceNewQuestsInjectKey: InjectionKey<
+  UnwrapNestedRefs<QuestConfigRequest>[]
+> = Symbol("app.new-quests");

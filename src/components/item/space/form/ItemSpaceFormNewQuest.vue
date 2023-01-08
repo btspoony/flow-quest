@@ -3,16 +3,7 @@ const props = defineProps<{
   index: number
 }>()
 
-const injected = inject(spaceNewQuestsInjectKey, {
-  [props.index]: reactive<QuestConfigRequest>({
-    key: '',
-    name: '',
-    description: '',
-    steps: 0,
-    stepsCfg: '',
-    guideMD: '',
-  })
-})
+const injected = inject(spaceNewQuestsInjectKey, [])
 
 const cfgPreview = ref("")
 const isStepsCfgURLValid = ref(false)

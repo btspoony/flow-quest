@@ -14,7 +14,7 @@ const data = reactive<QuestConfigRequest>({
   stepsCfg: '',
   guideMD: '',
 })
-provide(spaceNewQuestsInjectKey, { 0: data })
+provide(spaceNewQuestsInjectKey, [data])
 
 function resetComp() {
   data.key = ''

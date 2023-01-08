@@ -26,7 +26,7 @@ const { data, pending, refresh } = useAsyncData(`space:${spaceKey}`, async () =>
 
 provide(spaceInjectKey, { space: data, refresh })
 
-const currentTab = ref('Challenges')
+const currentTab = ref(route.query.tab === 'Quests' ? 'Quests' : 'Challenges')
 const tabs = [
   { label: "Challenges", comp: ItemSpaceListChallenges },
   { label: "Quests", comp: ItemSpaceListQuests },
