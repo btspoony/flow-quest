@@ -16,7 +16,8 @@ const guildMDLoading = ref(false)
 watch([isStepsCfgURLValid, isGuideMDURLValid], ([newStepsValidA, newGuideValidB]) => {
   const data = injected[props.index]
   if (
-    data.key
+    data
+    && data.key
     && data.key !== 'create-quest'
     && data.key !== 'create-challenge'
     && data.name
@@ -81,7 +82,7 @@ async function loadAndValidateGuideMD() {
 </script>
 
 <template>
-  <form class="mb-0">
+  <form class="mb-0" v-if="injected[index]">
     <label for="questKey">
       Key
       <input type="text" id="questKey" placeholder="Unique Key" v-model.trim="injected[index].key" required />

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { UnwrapNestedRefs } from "vue";
+import type WidgetDialog from '~/components/widget/WidgetDialog.vue';
+const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
+
 definePageMeta({
   key: route => route.path
 })
@@ -12,7 +16,6 @@ const display = reactive<Display>({
   description: "",
   thumbnail: ""
 })
-const existsQuestKeys = reactive<string[]>([])
 const achievement = ref<FLOATAchievement | undefined>(undefined)
 
 const floatURL = ref('')
@@ -31,11 +34,72 @@ watch(floatURL, (newVal) => {
   }
 })
 
-provide(spaceNewQuestsInjectKey, [])
-const newQuestConfigs = inject(spaceNewQuestsInjectKey, [])
+const existsQuestKeys = reactive<string[]>([])
+
+const newQuests = reactive<UnwrapNestedRefs<QuestConfigRequest>[]>([])
+provide(spaceNewQuestsInjectKey, newQuests)
+
+const allValidQuests = computed(() => newQuests.filter(one => one.valid))
+
+const searchQuestKey = ref('')
+const searchedQuests = reactive<QuestConfig[]>([])
+const searchedSelected = reactive<{ [key: string]: boolean }>({})
+
+const isSearching = ref(false)
+async function onSearchQuests() {
+  if (isSearching.value) return
+  isSearching.value = true
+
+  const { $scripts } = useNuxtApp()
+  const list = await $scripts.spaceSearchQuests(spaceKey.value, searchQuestKey.value)
+  searchedQuests.length = 0
+  for (const one of list) {
+    searchedQuests.push(one)
+  }
+
+  isSearching.value = false
+}
+
+// Dialog
+
+type OpenDialogueType = 'new' | 'search'
+const dialogCategory = ref<OpenDialogueType>('new')
+
+function onOpenDialogue(type: OpenDialogueType) {
+  dialogCategory.value = type
+  if (type === 'new') {
+    newQuests.push(reactive<QuestConfigRequest>({
+      key: '',
+      name: '',
+      description: '',
+      steps: 0,
+      stepsCfg: '',
+      guideMD: '',
+    }))
+  } else {
+    searchQuestKey.value = ""
+    searchedQuests.length = 0
+  }
+  dialog.value?.openModal()
+}
+
+function closeDialog() {
+  dialog.value?.closeModal()
+}
+
+function onCloseDialog() {
+  if (dialogCategory.value === 'new') {
+    const lastNewQuest = newQuests[newQuests.length - 1]
+    if (!lastNewQuest?.valid) {
+      newQuests.pop()
+    }
+  } else {
+    // TODO
+  }
+}
 
 const isValid = computed(() => {
-  return challengeKey.value && display.name && display.description && display.thumbnail && (existsQuestKeys.length > 0 || newQuestConfigs.length > 0)
+  return challengeKey.value && display.name && display.description && display.thumbnail && (existsQuestKeys.length > 0 || newQuests.length > 0)
 })
 
 function onTransactionSuccess() {
@@ -50,7 +114,7 @@ async function sendTransaction(): Promise<string> {
     challengeKey.value,
     toRaw(display),
     toRaw(existsQuestKeys),
-    toRaw(newQuestConfigs),
+    toRaw(newQuests).map(one => toRaw(one)),
     achievement.value
   )
 }
@@ -83,7 +147,12 @@ async function sendTransaction(): Promise<string> {
       </WidgetUploader>
     </form>
     <div class="divider"></div>
-    <h4>Add quests</h4>
+    <h4 class="my-1">Add quests</h4>
+    <div class="grid">
+      <button class="rounded-xl flex-center mb-0" @click="onOpenDialogue('new')">Add a new quest</button>
+      <button class="rounded-xl flex-center mb-0" @click="onOpenDialogue('search')">Search existing quests</button>
+    </div>
+    <ItemSpaceQuestCard v-for="one in allValidQuests" :key="one.key" :quest="one" />
     <div class="divider"></div>
     <div class="grid">
       <label for="achievementFLOAT">
@@ -102,4 +171,36 @@ async function sendTransaction(): Promise<string> {
       </template>
     </FlowSubmitTransaction>
   </div>
+  <WidgetDialog ref="dialog" @closed="onCloseDialog">
+    <template v-if="dialogCategory === 'new'">
+      <header class="mb-4">
+        <h4 class="mb-0">Create a new Quest</h4>
+      </header>
+      <ItemSpaceFormNewQuest :index="newQuests.length - 1" />
+      <footer class="mt-4">
+        <button class="rounded-xl flex-center mb-0" :disabled="!newQuests[newQuests.length - 1]?.valid"
+          @click.stop.prevent="closeDialog">
+          Add
+        </button>
+      </footer>
+    </template>
+    <template v-else>
+      <header class="mb-4">
+        <h4 class="mb-0">Search a existing quest</h4>
+      </header>
+      <input type="search" id="questSearch" placeholder="Search quest" v-model="searchQuestKey" @change="onSearchQuests">
+      <WidgetLoadingCard v-if="isSearching" />
+      <div v-else class="w-full max-h-[520px] flex-center flex-col gap-1">
+        <div v-for="one in searchedQuests" :key="one.key" class="flex items-center gap-2">
+          <input type="checkbox" :id="`select_${one.key}`" class="flex-none" />
+          <ItemSpaceQuestCard :quest="one" class="flex-auto" />
+        </div>
+      </div>
+      <footer class="mt-4">
+        <button class="rounded-xl flex-center mb-0" :disabled="false" @click.stop.prevent="closeDialog">
+          Add
+        </button>
+      </footer>
+    </template>
+  </WidgetDialog>
 </template>
