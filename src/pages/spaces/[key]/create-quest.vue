@@ -27,7 +27,7 @@ function resetComp() {
 
 function onTransactionSuccess() {
   const router = useRouter()
-  router.push(geneReferralLinkObject(`/spaces/${spaceKey.value}`))
+  router.push({ path: `/spaces/${spaceKey.value}`, query: { tab: 'Quests' } })
 }
 
 async function sendTransaction(): Promise<string> {

@@ -2,7 +2,8 @@
 import { ArrowUturnLeftIcon } from '@heroicons/vue/24/solid'
 
 function back() {
-  window.history.back()
+  const router = useRouter()
+  router.back()
 }
 </script>
 

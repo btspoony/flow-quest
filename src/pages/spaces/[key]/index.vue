@@ -32,6 +32,19 @@ const tabs = [
   { label: "Quests", comp: ItemSpaceListQuests },
 ]
 const currentComponent = computed(() => tabs.find(tab => tab.label === currentTab.value)?.comp)
+
+watch(() => route.query, (newQuery) => {
+  if (newQuery.tab === 'Quests') {
+    currentTab.value = 'Quests'
+  } else {
+    currentTab.value = 'Challenges'
+  }
+})
+
+function updateRoute(name: string) {
+  const router = useRouter()
+  router.replace({ path: route.path, query: { tab: name } })
+}
 </script>
 
 <template>
@@ -42,11 +55,11 @@ const currentComponent = computed(() => tabs.find(tab => tab.label === currentTa
     <nav class="mb-4">
       <ul class="tabs">
         <li v-for="tab in tabs" :key="tab.label" :class="['tab-link', { 'active': currentTab === tab.label }]"
-          @click="currentTab = tab.label">
+          @click="updateRoute(tab.label)">
           {{ tab.label }}
         </li>
-        </ul>
-        </nav>
+      </ul>
+      </nav>
     <component v-if="currentComponent" :is="currentComponent"></component>
 </template>
   </div>
