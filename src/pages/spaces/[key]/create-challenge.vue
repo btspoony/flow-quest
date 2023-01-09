@@ -39,7 +39,12 @@ const existsQuestKeys = reactive<string[]>([])
 const newQuests = reactive<UnwrapNestedRefs<QuestConfigRequest>[]>([])
 provide(spaceNewQuestsInjectKey, newQuests)
 
-const allValidQuests = computed(() => newQuests.filter(one => one.valid))
+const cachedQuests = reactive<{ [key: string]: QuestConfig }>({})
+const allValidQuests = computed<(QuestConfig | QuestConfigRequest)[]>(() => {
+  const existQuests = existsQuestKeys.map(key => cachedQuests[key]).filter(one => !!one)
+  const result: (QuestConfig | QuestConfigRequest)[] = newQuests.filter(one => one.valid)
+  return result.concat(existQuests)
+})
 
 const searchQuestKey = ref('')
 const searchedQuests = reactive<QuestConfig[]>([])
@@ -53,10 +58,13 @@ async function onSearchQuests() {
   const { $scripts } = useNuxtApp()
   const list = await $scripts.spaceSearchQuests(spaceKey.value, searchQuestKey.value)
   searchedQuests.length = 0
+  for (const key in searchedSelected) {
+    delete searchedSelected[key]
+  }
   for (const one of list) {
     searchedQuests.push(one)
+    searchedSelected[one.key] = false
   }
-
   isSearching.value = false
 }
 
@@ -94,7 +102,15 @@ function onCloseDialog() {
       newQuests.pop()
     }
   } else {
-    // TODO
+    for (const one of searchedQuests) {
+      const isSelected = searchedSelected[one.key]
+      delete searchedSelected[one.key]
+
+      if (isSelected && !existsQuestKeys.includes(one.key)) {
+        existsQuestKeys.push(one.key)
+        cachedQuests[one.key] = one
+      }
+    }
   }
 }
 
@@ -192,7 +208,7 @@ async function sendTransaction(): Promise<string> {
       <WidgetLoadingCard v-if="isSearching" />
       <div v-else class="w-full max-h-[520px] flex-center flex-col gap-1">
         <div v-for="one in searchedQuests" :key="one.key" class="flex items-center gap-2">
-          <input type="checkbox" :id="`select_${one.key}`" class="flex-none" />
+          <input type="checkbox" :id="`select_${one.key}`" class="flex-none" v-model="searchedSelected[one.key]" />
           <ItemSpaceQuestCard :quest="one" class="flex-auto" />
         </div>
       </div>
