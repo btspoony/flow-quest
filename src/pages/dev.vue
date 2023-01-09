@@ -8,6 +8,7 @@ async function onRemoveProfile(): Promise<string> {
   const txid = $fcl.mutate({
     cadence: `
 import UserProfile from ${config.public.flowServiceAddress}
+import Community from ${config.public.flowServiceAddress}
 
 transaction {
     prepare(acct: AuthAccount) {
@@ -16,6 +17,13 @@ transaction {
             let profile <- acct.load<@UserProfile.Profile>(from: UserProfile.ProfileStoragePath)
             destroy profile
             acct.unlink(UserProfile.ProfilePublicPath)
+        }
+
+        // remove old
+        if acct.borrow<&Community.CommunityBuilder>(from: Community.CommunityStoragePath) != nil {
+            let builder <- acct.load<@Community.CommunityBuilder>(from: Community.CommunityStoragePath)
+            destroy builder
+            acct.unlink(Community.CommunityPublicPath)
         }
     }
 }
