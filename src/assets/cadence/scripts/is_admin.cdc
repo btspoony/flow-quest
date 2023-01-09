@@ -6,10 +6,29 @@
 // import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
-pub fun main(acct: Address): Bool {
+pub fun main(acct: Address): AdminStatus {
+
+    let service = CompetitionService.borrowServicePublic()
+    let isValid: Bool = service.isAdminValid(acct)
+
+    var isEnabled: Bool = false
     let tmpAccount = getAuthAccount(acct)
     if let admin = tmpAccount.borrow<&CompetitionService.CompetitionAdmin>(from: CompetitionService.AdminStoragePath) {
-        return true
+        isEnabled = true
     }
-    return false
+
+    return AdminStatus(valid: isValid, enabled: isEnabled)
+}
+
+pub struct AdminStatus {
+    pub let valid: Bool
+    pub let enabled: Bool
+
+    init(
+        valid: Bool,
+        enabled: Bool,
+    ) {
+        self.valid = valid
+        self.enabled = enabled
+    }
 }
