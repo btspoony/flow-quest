@@ -492,6 +492,10 @@ pub contract CompetitionService {
     }
 
     pub resource interface CompetitionServicePublic {
+        // Admin related
+        pub fun isAdminValid(_ addr: Address): Bool
+        pub fun claim(claimer: &UserProfile.Profile{UserProfile.ProfilePrivate}): @CompetitionAdmin
+        // season related
         pub fun borrowSeasonDetail(seasonId: UInt64): &CompetitionSeason{Interfaces.CompetitionPublic, CompetitionPublic}
     }
 
@@ -500,10 +504,12 @@ pub contract CompetitionService {
         // all seasons in the
         access(self) var latestActiveSeasonId: UInt64
         access(self) var seasons: @{UInt64: CompetitionSeason}
+        access(self) let adminWhitelist: {Address: Bool}
 
         init() {
             self.seasons <- {}
             self.latestActiveSeasonId = 0
+            self.adminWhitelist = {}
         }
 
         destroy() {
@@ -520,7 +526,17 @@ pub contract CompetitionService {
             return <- create SeasonPointsController()
         }
 
+        pub fun claim(claimer: &UserProfile.Profile{UserProfile.ProfilePrivate}): @CompetitionAdmin {
+            let claimerAddr = claimer.owner?.address ?? panic("Failed to load profile")
+            assert(self.isAdminValid(claimerAddr), message: "Admin is invalid")
+            return <- self.createCompetitionAdmin()
+        }
+
         // ---- readonly methods ----
+
+        pub fun isAdminValid(_ addr: Address): Bool {
+            return self.adminWhitelist[addr] ?? false
+        }
 
         pub fun getActiveSeasonID(): UInt64 {
             let season = &self.seasons[self.latestActiveSeasonId] as &CompetitionSeason{Interfaces.CompetitionPublic}?
@@ -547,6 +563,10 @@ pub contract CompetitionService {
         }
 
         // ---- writable methods ----
+
+        pub fun updateWhitelistFlag(addr: Address, flag: Bool) {
+            self.adminWhitelist[addr] = flag
+        }
 
         access(contract) fun startNewSeason(
             endDate: UFix64,
@@ -729,8 +749,9 @@ pub contract CompetitionService {
 
     init() {
         // Admin resource paths
-        self.AdminStoragePath = /storage/DevCompetitionAdminPathV1
-        self.ControllerStoragePath = /storage/DevCompetitionControllerPathV1
+        self.AdminStoragePath = /storage/DevCompetitionAdminPathV2
+        self.ControllerStoragePath = /storage/DevCompetitionControllerPathV2
+
         self.ServiceStoragePath = /storage/DevCompetitionServicePathV1
         self.ServicePublicPath = /public/DevCompetitionServicePathV1
 
