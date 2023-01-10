@@ -192,7 +192,7 @@ async function sendTransaction(): Promise<string> {
       <header class="mb-4">
         <h4 class="mb-0">Create a new Quest</h4>
       </header>
-      <ItemSpaceFormNewQuest :index="newQuests.length - 1" />
+      <FormSpaceNewQuest :index="newQuests.length - 1" />
       <footer class="mt-4">
         <button class="rounded-xl flex-center mb-0" :disabled="!newQuests[newQuests.length - 1]?.valid"
           @click.stop.prevent="closeDialog">

@@ -9,7 +9,7 @@ const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async
 <template>
   <FrameAdmin>
     <WidgetLoadingCard v-if="pending" />
-    <div v-else class="w-full flex flex-col items-center gap-4 pt-8">
+    <div v-else class="w-full flex flex-wrap items-start gap-4 pt-8">
       <template v-if="data">
         <SectionSettingsCurrent />
         <SectionSettingsBounties />

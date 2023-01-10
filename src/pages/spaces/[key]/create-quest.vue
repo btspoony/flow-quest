@@ -47,7 +47,7 @@ async function sendTransaction(): Promise<string> {
   <div class="pt-8 flex flex-col gap-4">
     <BtnBack />
     <h2 class="mb-2">Create a new quest</h2>
-    <ItemSpaceFormNewQuest :index="0" />
+    <FormSpaceNewQuest :index="0" />
     <FlowSubmitTransaction :disabled="!data.valid" :method="sendTransaction"
       @success="onTransactionSuccess()" @sealed="resetComp()" @reset="resetComp()">
       <template v-slot:disabled>
