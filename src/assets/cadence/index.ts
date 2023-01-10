@@ -4,6 +4,7 @@
 import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 import claimFloat from "./transactions/claim-float.cdc?raw";
+import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
 import spaceAddQuests from "./transactions/community-add-quests.cdc?raw";
 import spaceAddChallenge from "./transactions/community-add-challenge-with-quests.cdc?raw";
@@ -20,6 +21,7 @@ import getReferralAddrByCode from "./scripts/get_referral_addr_by_code.cdc?raw";
 import getReferralCodeByAddr from "./scripts/get_referral_code_by_addr.cdc?raw";
 import getRankingStatus from "./scripts/get_ranking_status.cdc?raw";
 import getPlatformLinkedAddress from "./scripts/get_platform_linked_address.cdc?raw";
+import getAdminStatus from "./scripts/is_admin.cdc?raw";
 import profileExists from "./scripts/profile_exists.cdc?raw";
 import profileGetQuestStatus from "./scripts/profile_get_quest_status.cdc?raw";
 import profileIsRegistered from "./scripts/profile_is_registered.cdc?raw";
@@ -40,6 +42,8 @@ export default {
         profileRegister,
         profileRegisterWithUser,
         claimFloat,
+        // Admin related
+        adminInitialize,
         spaceCreate,
         spaceAddQuests,
         spaceAddChallenge,
@@ -54,6 +58,7 @@ export default {
         getReferralCodeByAddr,
         getRankingStatus,
         getPlatformLinkedAddress,
+        getAdminStatus,
         // profile
         profileExists,
         profileIsRegistered,

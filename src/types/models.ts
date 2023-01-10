@@ -228,6 +228,11 @@ interface CompetitionSeason {
 
 // ---- Profile ----
 
+interface AdminStatus {
+  valid: boolean;
+  enabled: boolean;
+}
+
 interface QuestStatus {
   steps: boolean[];
   completed: boolean;
@@ -244,8 +249,9 @@ interface SeasonRecord {
 
 interface ProfileData {
   address: string;
-  activeRecord?: SeasonRecord;
   linkedIdentities: { [key: string]: ProfileIdentity };
+  activeRecord?: SeasonRecord;
+  adminStatus?: AdminStatus;
 }
 
 interface GithubToken {

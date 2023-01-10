@@ -315,6 +315,15 @@ export default defineNuxtPlugin((nuxtApp) => {
             tops: topsScores,
           };
         },
+        async getAdminStatus(
+          address: string
+        ): Promise<AdminStatus | undefined> {
+          return await executeScript(
+            cadence.scripts.getAdminStatus,
+            (arg, t) => [arg(address, t.Address)],
+            undefined
+          );
+        },
         /**
          * get address
          */
@@ -452,7 +461,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               cadence.scripts.spaceGetBasicsByKey,
               (arg, t) => [arg(key, t.String)],
               null
-            )
+            );
           } else {
             return await executeScript(
               cadence.scripts.spaceGetBasics,
@@ -592,6 +601,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           return await sendTransaction(
             cadence.transactions.claimFloat,
             (arg, t) => [arg(host, t.Address), arg(eventId, t.UInt64)]
+          );
+        },
+        /**
+         * init admin for valid address
+         */
+        async adminInitialize() {
+          return await sendTransaction(
+            cadence.transactions.adminInitialize,
+            (arg, t) => []
           );
         },
         /**

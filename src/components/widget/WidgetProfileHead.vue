@@ -82,23 +82,23 @@ function onLogout() {
     </summary>
     <ul role="listbox">
       <template v-if="wallet?.loggedIn">
-        <li>
-          <NuxtLink :to="geneReferralLink(`/account/${linkedAddressString}`)" @click="closeDropdown()">
-            <div class="flex gap-4 items-center justify-end">
-              <span>Profile</span>
-              <UserCircleIcon class="fill-secondary w-5 h-5" />
-            </div>
-          </NuxtLink>
-        </li>
-        <li>
-          <NuxtLink :to="geneReferralLink(`/spaces`)" @click="closeDropdown()">
-            <div class="flex gap-4 items-center justify-end">
-              <span>Spaces</span>
-              <RectangleStackIcon class="fill-current w-5 h-5" />
-            </div>
-          </NuxtLink>
-        </li>
-        </template>
+      <li>
+        <NuxtLink :to="geneReferralLink(`/account/${linkedAddressString}`)" @click="closeDropdown()">
+          <div class="flex gap-4 items-center justify-end">
+            <span>Profile</span>
+            <UserCircleIcon class="fill-secondary w-5 h-5" />
+          </div>
+        </NuxtLink>
+      </li>
+      <li v-if="user?.adminStatus?.valid">
+        <NuxtLink :to="geneReferralLink(`/spaces`)" @click="closeDropdown()">
+          <div class="flex gap-4 items-center justify-end">
+            <span>Spaces</span>
+            <RectangleStackIcon class="fill-current w-5 h-5" />
+          </div>
+        </NuxtLink>
+      </li>
+      </template>
       <li>
         <a class="cursor-pointer" @click="onLogout()">
           <div class="flex gap-4 items-center justify-end">

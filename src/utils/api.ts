@@ -111,6 +111,9 @@ export async function reloadCurrentUser(
     }
   }
 
+  const { $scripts } = useNuxtApp();
+  profile.adminStatus = await $scripts.getAdminStatus(address);
+
   current.value = profile;
   return current.value;
 }
