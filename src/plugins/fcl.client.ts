@@ -613,6 +613,40 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * new season
+         */
+        async adminNewSeason(endDateTimestamp: number, threshold: number) {
+          return await sendTransaction(
+            cadence.transactions.adminStartNewSeason,
+            (arg, t) => [
+              arg((endDateTimestamp / 1000).toFixed(1), t.UFix64),
+              arg(threshold.toFixed(0), t.UInt64),
+            ]
+          );
+        },
+        /**
+         * update end date of current season
+         */
+        async adminUpdateEndDate(endDateTimestamp: number) {
+          return await sendTransaction(
+            cadence.transactions.adminUpdateEndDate,
+            (arg, t) => [arg((endDateTimestamp / 1000).toFixed(1), t.UFix64)]
+          );
+        },
+        /**
+         * add challenges to season
+         */
+        async adminAddChallengeToSeason(
+          challenge: ChallengeConfig,
+          questRewards: PointRewardInfo[]
+        ) {
+          // const data
+          return await sendTransaction(
+            cadence.transactions.adminAddBounties,
+            (arg, t) => []
+          );
+        },
+        /**
          * create a new space
          */
         async spaceCreate(

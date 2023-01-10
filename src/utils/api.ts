@@ -3,11 +3,16 @@ export async function apiGetActiveSeason(): Promise<CompetitionSeason | null> {
   if (activeSeason.value) {
     return activeSeason.value;
   } else {
-    const { $scripts } = useNuxtApp();
-    const result = await $scripts.getActiveSeason();
-    activeSeason.value = result;
-    return result;
+    return refreshActiveSeason();
   }
+}
+
+export async function refreshActiveSeason(): Promise<CompetitionSeason | null> {
+  const activeSeason = useActiveSeason();
+  const { $scripts } = useNuxtApp();
+  const result = await $scripts.getActiveSeason();
+  activeSeason.value = result;
+  return result;
 }
 
 export async function apiGetCurrentChallenge(

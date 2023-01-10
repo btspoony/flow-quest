@@ -4,10 +4,13 @@
 import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 import claimFloat from "./transactions/claim-float.cdc?raw";
-import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
 import spaceAddQuests from "./transactions/community-add-quests.cdc?raw";
 import spaceAddChallenge from "./transactions/community-add-challenge-with-quests.cdc?raw";
+import adminInitialize from "./transactions/admin-initialize.cdc?raw";
+import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
+import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
+import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
 
 /**
  * scripts for quest checking
@@ -44,6 +47,9 @@ export default {
         claimFloat,
         // Admin related
         adminInitialize,
+        adminStartNewSeason,
+        adminUpdateEndDate,
+        adminAddBounties,
         spaceCreate,
         spaceAddQuests,
         spaceAddChallenge,

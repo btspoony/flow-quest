@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
-import { UserCircleIcon, ArrowRightOnRectangleIcon, RectangleStackIcon } from '@heroicons/vue/24/solid'
+import {
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  RectangleStackIcon,
+  Cog6ToothIcon,
+} from '@heroicons/vue/24/solid'
 
 const details = ref<HTMLDetailsElement | null>(null);
 const github = useGithubProfile();
@@ -95,6 +100,14 @@ function onLogout() {
           <div class="flex gap-4 items-center justify-end">
             <span>Spaces</span>
             <RectangleStackIcon class="fill-current w-5 h-5" />
+          </div>
+        </NuxtLink>
+      </li>
+      <li v-if="user?.adminStatus?.valid">
+        <NuxtLink :to="geneReferralLink(`/settings`)" @click="closeDropdown()">
+          <div class="flex gap-4 items-center justify-end">
+            <span>Service Setting</span>
+            <Cog6ToothIcon class="fill-current w-5 h-5" />
           </div>
         </NuxtLink>
       </li>
