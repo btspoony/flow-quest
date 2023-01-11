@@ -36,8 +36,12 @@ function resetEdit() {
       </p>
     </div>
     <div class="flex justify-between gap-6">
-      <div class="min-w-[22rem] flex flex-col">
-        <h5>Bounties List</h5>
+      <div class="min-w-[22rem] flex flex-col gap-2">
+        <h5 class="mb-2">Bounties List</h5>
+        <div v-for="one in currentSeason.bounties" :key="one.id" class="w-full flex gap-2">
+          <span class="tag">{{ one.config.category }}</span>
+          <NuxtLink :to="`/challenges/${one.id}`">{{ one.id }}</NuxtLink>
+        </div>
       </div>
       <div v-if="isEdit" class="card card-border non-interactive p-6 flex-auto flex flex-col">
         <div class="flex items-center justify-start gap-2">
