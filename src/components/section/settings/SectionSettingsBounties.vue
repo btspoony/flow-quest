@@ -40,11 +40,13 @@ function resetEdit() {
         <h5>Bounties List</h5>
       </div>
       <div v-if="isEdit" class="card card-border non-interactive p-6 flex-auto flex flex-col">
-        <h2 class="mb-1">Edit</h2>
-        <div class="flex items-start justify-start gap-2">
-          <button class="rounded-full text-xs max-w-fit" @click="isAddChallenge = true">Add Challenge as bounty</button>
+        <div class="flex items-center justify-start gap-2">
+          <span class="font-bold text-xl">Edit:</span>
+          <button class="mb-0 rounded-full text-xs max-w-fit" @click="isAddChallenge = !isAddChallenge">
+            Add Challenge as bounty
+          </button>
         </div>
-        <div class="divider"></div>
+        <div class="divider my-2"></div>
         <SectionSettingsPartNewBounty v-if="isAddChallenge" @added="isAddChallenge = false" />
       </div>
     </div>

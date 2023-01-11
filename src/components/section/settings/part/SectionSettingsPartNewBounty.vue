@@ -25,9 +25,41 @@ async function onSearch() {
 
   selectedChallenge.value = null
   const { $scripts } = useNuxtApp()
-  selectedChallenge.value = await $scripts.spaceGetChallengeDetail(selectedCommunity.value, searchKey.value)
+  const result = await $scripts.spaceGetChallengeDetail(selectedCommunity.value, searchKey.value)
+  selectedChallenge.value = result
+  rewardPoints.length = 0
+  referralPoints.length = 0
 
   isSearching.value = false
+}
+
+const rewardPoints = reactive<number[]>([]);
+const referralPoints = reactive<number[]>([]);
+
+const isValid = computed(() => {
+  return selectedChallenge.value?.quests.length === rewardPoints.length
+    && rewardPoints.length === referralPoints.length
+    && rewardPoints.filter(p => p <= 0).length === 0;
+})
+
+async function sendTransaction(): Promise<string> {
+  if (!isValid) {
+    throw new Error("Valid")
+  }
+  const { $transactions } = useNuxtApp()
+  const rewards: PointRewardInfo[] = []
+  rewardPoints.forEach((reward, index) => {
+    rewards.push({
+      rewardType: 'Points',
+      rewardPoints: reward,
+      referalPoints: referralPoints[index]
+    })
+  })
+  return $transactions.adminAddChallengeToSeason(toRaw(selectedChallenge.value!.challenge), rewards)
+}
+
+function onSuccess() {
+  emit('added')
 }
 </script>
 
@@ -49,8 +81,35 @@ async function onSearch() {
       </label>
     </div>
     <WidgetLoadingCard v-if="isSearching" />
-    <div v-else class="flex flex-col gap-2">
-      {{ selectedChallenge }}
+    <div v-else-if="selectedChallenge" class="flex flex-col gap-2">
+      <ItemSpaceChallengeCard :challenge="selectedChallenge?.challenge" />
+      <h5 class="mb-1">Set Reward Points of Quests</h5>
+      <div v-for="quest, index in selectedChallenge.quests" :key="quest.key"
+        class="card card-border non-interactive flex items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-100 dark:bg-gray-900">
+            {{ index + 1 }}
+          </span>
+          <span class="tag">{{ quest.key }}</span>
+        </div>
+        <div class="flex-auto grid">
+          <label :for="`rewardPoint_${index}`">
+            Reward Points
+            <input type="number" :id="`rewardPoint_${index}`" placeholder="Reward Points" v-model="rewardPoints[index]"
+              required />
+          </label>
+          <label :for="`referralPoint_${index}`">
+            Referral Points
+            <input type="number" :id="`referralPoint_${index}`" placeholder="Referral Points"
+              v-model="referralPoints[index]" :max="rewardPoints[index]" required />
+          </label>
+        </div>
+      </div>
+      <FlowSubmitTransaction :method="sendTransaction" :disabled="!isValid" @success="onSuccess">
+        <template v-slot:disabled>
+          <span>Missing Parameters</span>
+        </template>
+      </FlowSubmitTransaction>
     </div>
   </div>
 </template>

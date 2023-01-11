@@ -650,10 +650,48 @@ export default defineNuxtPlugin((nuxtApp) => {
           challenge: ChallengeConfig,
           questRewards: PointRewardInfo[]
         ) {
-          // const data
+          // quests
+          const data = challenge.quests.reduce(
+            (prev, curr, index) => {
+              prev.communities.push(curr.communityId);
+              prev.keys.push(curr.key);
+              prev.categories.push("0");
+              prev.rewardPoints.push(
+                questRewards[index].rewardPoints.toFixed(0)
+              );
+              prev.referralPoints.push(
+                questRewards[index].referalPoints.toFixed(0)
+              );
+              prev.primary.push(false);
+              return prev;
+            },
+            {
+              communities: [] as string[],
+              keys: [] as string[],
+              categories: [] as string[],
+              rewardPoints: [] as string[],
+              referralPoints: [] as string[],
+              primary: [] as boolean[],
+            }
+          );
+          // challenge
+          data.communities.push(challenge.communityId);
+          data.keys.push(challenge.key);
+          data.categories.push("1");
+          data.rewardPoints.push("0");
+          data.referralPoints.push("0");
+          data.primary.push(true);
+
           return await sendTransaction(
             cadence.transactions.adminAddBounties,
-            (arg, t) => []
+            (arg, t) => [
+              arg(data.communities, t.Array(t.UInt64)),
+              arg(data.keys, t.Array(t.String)),
+              arg(data.categories, t.Array(t.UInt8)),
+              arg(data.rewardPoints, t.Array(t.UInt64)),
+              arg(data.referralPoints, t.Array(t.UInt64)),
+              arg(data.primary, t.Array(t.Bool)),
+            ]
           );
         },
         /**

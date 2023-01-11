@@ -5,7 +5,7 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 import Helper from "../../../../cadence/dev-challenge/Helper.cdc"
 
 transaction(
-    communityKey: String,
+    communityIds: [UInt64],
     keys: [String],
     categories: [UInt8],
     rewardPoints: [UInt64],
@@ -20,6 +20,7 @@ transaction(
     }
 
     pre {
+        keys.length == communityIds.length: "Miss match"
         keys.length == categories.length: "Miss match"
         keys.length == rewardPoints.length: "Miss match"
         keys.length == referralPoints.length: "Miss match"
@@ -27,10 +28,6 @@ transaction(
     }
 
     execute {
-        let comPubRef= Community.borrowCommunityByKey(key: communityKey)
-        assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
-        let communityId = comPubRef!.getID()
-
         let service = CompetitionService.borrowServicePublic()
         let seasonId = service.getActiveSeasonID()
         let season = service.borrowSeason(seasonId: seasonId)
@@ -38,12 +35,12 @@ transaction(
         let len = keys.length
         var i = 0
         while i < len {
-            let entityIdentifier = Community.BountyEntityIdentifier(
-                category: Interfaces.BountyType(rawValue: categories[i]) ?? panic("Wrong category value"),
-                communityId: communityId,
-                key: keys[i]
-            )
             if !season.hasBountyByKey(keys[i]) {
+                let entityIdentifier = Community.BountyEntityIdentifier(
+                    category: Interfaces.BountyType(rawValue: categories[i]) ?? panic("Wrong category value"),
+                    communityId: communityIds[i],
+                    key: keys[i]
+                )
                 // ensure exists
                 entityIdentifier.getBountyEntity()
 
