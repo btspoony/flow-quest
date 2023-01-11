@@ -11,33 +11,46 @@ pub fun main(
     challengeKey: String,
 ): ChallengeDetail? {
     if let community = Community.borrowCommunityByKey(key: communityKey) {
-        if let challenge = community.borrowChallengeRef(key: challengeKey) {
-            let quests: [QueryStructs.QuestData] = []
-            for qid in challenge.quests {
-                if let questCommunity = Community.borrowCommunityById(id: qid.communityId) {
-                    if let quest = questCommunity.borrowQuestRef(key: qid.key) {
-                        quests.append(QueryStructs.QuestData(
-                            identifier: qid,
-                            display: quest.getStandardDisplay(),
-                            detail: quest.getDetail()
-                        ))
-                    }
+        var challenge = community.borrowChallengeRef(key: challengeKey)
+        if challenge == nil {
+            let challengeKeys = community.getChallengeKeys()
+            let searchKeyLen = challengeKey.length
+            for key in challengeKeys {
+                if searchKeyLen <= key.length && key.slice(from: 0, upTo: searchKeyLen) == challengeKey {
+                    challenge = community.borrowChallengeRef(key: key)
+                    break
                 }
-            } // build quest detail
-            return ChallengeDetail(
-                community.owner!.address,
-                QueryStructs.ChallengeData(
-                    identifier: Community.BountyEntityIdentifier(
-                        category: Interfaces.BountyType.challenge,
-                        communityId: community.getID(),
-                        key: challengeKey
-                    ),
-                    display: challenge.getStandardDisplay(),
-                    detail: challenge.getDetail()
-                ),
-                quests
-            )
+            }
         }
+        if challenge == nil {
+            return nil
+        }
+
+        let quests: [QueryStructs.QuestData] = []
+        for qid in challenge!.quests {
+            if let questCommunity = Community.borrowCommunityById(id: qid.communityId) {
+                if let quest = questCommunity.borrowQuestRef(key: qid.key) {
+                    quests.append(QueryStructs.QuestData(
+                        identifier: qid,
+                        display: quest.getStandardDisplay(),
+                        detail: quest.getDetail()
+                    ))
+                }
+            }
+        } // build quest detail
+        return ChallengeDetail(
+            community.owner!.address,
+            QueryStructs.ChallengeData(
+                identifier: Community.BountyEntityIdentifier(
+                    category: Interfaces.BountyType.challenge,
+                    communityId: community.getID(),
+                    key: challenge!.key
+                ),
+                display: challenge!.getStandardDisplay(),
+                detail: challenge!.getDetail()
+            ),
+            quests
+        )
     }
     return nil
 }

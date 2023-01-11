@@ -450,6 +450,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
         // Spaces
         /**
+         * get all community
+         */
+        async spaceGetAll(): Promise<CommunitySpaceBasics[]> {
+          return await executeScript(
+            cadence.scripts.spaceGetAll,
+            (arg, t) => [],
+            []
+          );
+        },
+        /**
          * Get community space basics
          * @param communityId
          */

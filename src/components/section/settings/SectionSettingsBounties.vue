@@ -14,15 +14,14 @@ const activeBounties = computed<BountyInfo[]>(() => {
 })
 
 const isEdit = ref(false)
-function resetEditable() {
-// TODO
+const isAddChallenge = ref(false)
+
+function resetEdit() {
+  if (isEdit.value) {
+    isAddChallenge.value = false
+  }
 }
 
-const isSearching = ref(false)
-const searchKey = ref("")
-async function onSearch() {
-  // TODO
-}
 </script>
 
 <template>
@@ -30,7 +29,7 @@ async function onSearch() {
     <div class="headings mb-4">
       <label class="w-full text-xl font-bold inline-flex-between" for="editSwicth">
         Available Bounties
-        <input type="checkbox" id="editSwicth" role="switch" v-model="isEdit" @change="resetEditable()">
+        <input type="checkbox" id="editSwicth" role="switch" v-model="isEdit" @change="resetEdit">
       </label>
       <p class="flex flex-col">
         <span>Amount: {{ activeBounties.length }}</span>
@@ -41,20 +40,12 @@ async function onSearch() {
         <h5>Bounties List</h5>
       </div>
       <div v-if="isEdit" class="card card-border non-interactive p-6 flex-auto flex flex-col">
-        <h5>New Bounty</h5>
-        <div class="flex gap-4">
-          <label for="selectCommunity">
-            Space
-            <select id="selectCommunity" required>
-              <option value="" selected>Select a space</option>
-            </select>
-          </label>
-          <label for="search">
-            Search Challenge
-            <input type="search" id="challengeSearch" placeholder="Search Challenge" v-model="searchKey" @change="onSearch">
-          </label>
+        <h2 class="mb-1">Edit</h2>
+        <div class="flex items-start justify-start gap-2">
+          <button class="rounded-full text-xs max-w-fit" @click="isAddChallenge = true">Add Challenge as bounty</button>
         </div>
-        <WidgetLoadingCard v-if="isSearching" />
+        <div class="divider"></div>
+        <SectionSettingsPartNewBounty v-if="isAddChallenge" @added="isAddChallenge = false" />
       </div>
     </div>
   </section>
