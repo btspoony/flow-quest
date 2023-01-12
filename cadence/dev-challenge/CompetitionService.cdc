@@ -601,6 +601,7 @@ pub contract CompetitionService {
             referralThreshold: UInt64
         ): UInt64 {
             let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             return serviceIns.startNewSeason(endDate: endDate, referralThreshold: referralThreshold)
         }
 
@@ -612,6 +613,7 @@ pub contract CompetitionService {
             primary: Bool
         ) {
             let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.addBounty(identifier: identifier, preconditions: preconditions, reward: reward, primary: primary)
         }
@@ -621,6 +623,7 @@ pub contract CompetitionService {
             datetime: UFix64
         ) {
             let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateEndDate(datetime: datetime)
         }
@@ -630,6 +633,7 @@ pub contract CompetitionService {
             threshold: UInt64
         ) {
             let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateReferralThreshold(threshold: threshold)
         }
