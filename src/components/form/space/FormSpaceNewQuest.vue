@@ -93,7 +93,8 @@ async function loadAndValidateGuideMD() {
     </label>
     <label for="questDesc">
       Description
-      <input type="text" id="questDesc" placeholder="Description" v-model.trim="injected[index].description" required />
+      <textarea id="questDesc" placeholder="Description" class="resize-y h-28 max-h-60"
+        v-model.trim="injected[index].description" required />
     </label>
     <div class="grid mb-2">
       <label for="questStepsCfg">
