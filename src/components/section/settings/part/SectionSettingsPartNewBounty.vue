@@ -70,7 +70,9 @@ function onSuccess() {
       <label for="selectCommunity">
         Space
         <select id="selectCommunity" v-model="selectedCommunity" required>
-          <option value="" selected>{{ isLoadingCommunities? "Loading...": "Select a space" }}</option>
+          <option value="" disabled selected>
+            {{ isLoadingCommunities? "Loading...": "Select a space" }}
+          </option>
           <option v-for="one in communities" :key="one.key">{{ one.key }}</option>
         </select>
       </label>
