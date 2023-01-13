@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ClipboardDocumentIcon } from '@heroicons/vue/20/solid'
 import { useClipboard } from '@vueuse/core'
+import { Icon } from '@iconify/vue';
 
 const user = useUserProfile()
 const props = defineProps<{
@@ -65,7 +65,7 @@ const emit = defineEmits<{
           <span>To obtain more points by inviting friends</span>
           <code class="inline-flex-between text-sm" :data-tooltip="copied ? `${text} copied` : undefined">
             <span>{{ copyURL }}</span>
-            <ClipboardDocumentIcon v-if="isSupported" class="fill-current w-5 h-5 cursor-pointer" @click="copy(copyURL)" />
+            <Icon icon="heroicons:clipboard-document" v-if="isSupported" class="w-5 h-5 cursor-pointer" @click="copy(copyURL)" />
           </code>
         </template>
         <FlowSubmitTransaction v-else-if="isUserSelf" :disabled="!executable" :method="generateCode"

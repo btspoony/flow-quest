@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import TwitterIcon from '~/assets/svgs/twitter.svg'
-import DiscordIcon from '~/assets/svgs/discord.svg'
-import { GlobeAltIcon } from "@heroicons/vue/24/outline"
+import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
   space: CommunitySpaceBasics
@@ -22,15 +20,15 @@ const props = defineProps<{
         <div class="flex items-center justify-end gap-3">
           <NuxtLink v-if="space.display?.socials?.twitter" :to="space.display?.socials?.twitter" target="_blank"
             rel="noopener noreferrer">
-            <TwitterIcon class="w-5 h-5" />
+            <Icon icon="logos:twitter" class="w-5 h-5" />
           </NuxtLink>
           <NuxtLink v-if="space.display?.socials?.discord" :to="space.display?.socials?.discord" target="_blank"
             rel="noopener noreferrer">
-            <DiscordIcon class="w-5 h-5" />
+            <Icon icon="logos:discord-icon" class="w-5 h-5" />
           </NuxtLink>
           <NuxtLink v-if="space.display?.socials?.website" :to="space.display?.socials?.website" target="_blank"
             rel="noopener noreferrer">
-            <GlobeAltIcon class="stroke-current w-5 h-5" />
+            <Icon icon="heroicons:globe-alt" class="w-5 h-5" />
           </NuxtLink>
         </div>
       </div>

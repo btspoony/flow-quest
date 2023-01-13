@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlusIcon } from '@heroicons/vue/24/solid';
+import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
   space: CommunitySpaceBasics | null
@@ -48,7 +48,7 @@ function onSelectCurrent() {
       <template v-if="space">
         <img :src="getIPFSUrl(space?.display.imageUrl!)" class="rounded-full w-10 h-10" />
       </template>
-      <PlusIcon v-else class="fill-current w-6 h-6" />
+      <Icon icon="heroicons:plus-solid" v-else class="w-6 h-6" />
     </div>
   </div>
 </template>

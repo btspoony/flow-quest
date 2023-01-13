@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { StorageSerializers, RemovableRef, useLocalStorage } from '@vueuse/core';
-import GithubIcon from '~/assets/svgs/github.svg'
+import { Icon } from '@iconify/vue';
 
 const profile = useGithubProfile();
 const loading = ref(false)
@@ -68,7 +68,7 @@ function login() {
 <template>
   <button :aria-busy="loading" class="flex-center rounded-full max-w-[10rem]" @click="login">
     <div class="inline-flex-around">
-      <GithubIcon v-if="!loading" class="fill-current w-5 h-5" />
+      <Icon icon="uil:github-icon" v-if="!loading" class="w-5 h-5" />
       <span v-if="loading" />
       <span>Participate</span>
     </div>

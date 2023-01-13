@@ -64,7 +64,7 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
   ],
   build: {
-    transpile: ["@heroicons/vue"],
+    transpile: [],
   },
   // vite configure
   vite: {

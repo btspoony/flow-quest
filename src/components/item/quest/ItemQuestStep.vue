@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircleIcon } from '@heroicons/vue/24/solid';
+import { Icon } from '@iconify/vue';
 import type WidgetDialog from '../../widget/WidgetDialog.vue';
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 
@@ -95,7 +95,7 @@ function onCloseDialgue() {
       <span v-if="!isCompleted" class="rounded-full inline-block w-8 h-8 flex-center bg-gray-200 dark:bg-gray-800">
         {{ step + 1 }}
       </span>
-      <CheckCircleIcon v-else class="fill-success w-8 h-8" />
+      <Icon icon="heroicons:check-circle-20-solid" v-else class="text-success w-8 h-8" inline />
     </div>
   <div :class="['flex-auto', isCompleted ? 'line-through' : 'font-semibold', isLocked ? 'opacity-50' : '']">
       {{ stepCfg?.title ?? "" }}

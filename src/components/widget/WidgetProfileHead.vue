@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
-import {
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon,
-  RectangleStackIcon,
-  Cog6ToothIcon,
-} from '@heroicons/vue/24/solid'
+import { Icon } from '@iconify/vue';
 
 const details = ref<HTMLDetailsElement | null>(null);
 const github = useGithubProfile();
@@ -91,7 +86,7 @@ function onLogout() {
         <NuxtLink :to="geneReferralLink(`/account/${linkedAddressString}`)" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-end">
             <span>Profile</span>
-            <UserCircleIcon class="fill-secondary w-5 h-5" />
+            <Icon icon="heroicons:user-circle-solid" class="text-secondary w-5 h-5" inline />
           </div>
         </NuxtLink>
       </li>
@@ -99,7 +94,7 @@ function onLogout() {
         <NuxtLink :to="geneReferralLink(`/spaces`)" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-end">
             <span>Spaces</span>
-            <RectangleStackIcon class="fill-current w-5 h-5" />
+            <Icon icon="heroicons:rectangle-stack-solid" class="w-5 h-5" />
           </div>
         </NuxtLink>
       </li>
@@ -107,7 +102,7 @@ function onLogout() {
         <NuxtLink :to="geneReferralLink(`/settings`)" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-end">
             <span>Service Setting</span>
-            <Cog6ToothIcon class="fill-current w-5 h-5" />
+            <Icon icon="heroicons:cog-6-tooth-solid" class="w-5 h-5" />
           </div>
         </NuxtLink>
       </li>
@@ -116,7 +111,7 @@ function onLogout() {
         <a class="cursor-pointer" @click="onLogout()">
           <div class="flex gap-4 items-center justify-end">
             <span>Logout</span>
-            <ArrowRightOnRectangleIcon class="fill-current w-5 h-5" />
+            <Icon icon="heroicons:arrow-right-on-rectangle-solid" class="w-5 h-5" />
           </div>
         </a>
       </li>

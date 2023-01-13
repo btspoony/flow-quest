@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GithubIcon from '~/assets/svgs/github.svg'
+import { Icon } from '@iconify/vue';
 </script>
 
 <template>
@@ -8,7 +8,7 @@ import GithubIcon from '~/assets/svgs/github.svg'
       <small>Copyright © {{ new Date().getFullYear() }} Flow</small>
       <div class="flex-center gap-2">
         <NuxtLink to="https://github.com/btspoony/flow-challenge-tour" target="_blank" class="secondary">
-          <GithubIcon class="fill-current w-6 h-6" />
+          <Icon icon="uil:github" class="w-6 h-6" />
         </NuxtLink>
       </div>
     </div>

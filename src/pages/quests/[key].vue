@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import md from 'markdown-it';
-import { LockClosedIcon } from '@heroicons/vue/24/solid';
+import { Icon } from '@iconify/vue';
 
 definePageMeta({
   key: route => route.path
@@ -194,7 +194,7 @@ async function completeBounty(): Promise<string | null> {
             Complete
             <template v-slot:disabled>
               <div class="inline-flex-between">
-                <LockClosedIcon v-if="!isBountyCompleted" class="fill-current w-6 h-6" />
+                <Icon icon="heroicons:lock-closed-solid" v-if="!isBountyCompleted" class="w-6 h-6" />
                 <span v-if="isBountyCompleted">Completed</span>
               </div>
             </template>
