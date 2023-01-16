@@ -8,7 +8,6 @@ async function onRemoveProfile(): Promise<string> {
   const txid = $fcl.mutate({
     cadence: `
 import UserProfile from ${config.public.flowServiceAddress}
-import Community from ${config.public.flowServiceAddress}
 
 transaction {
     prepare(acct: AuthAccount) {
@@ -18,7 +17,22 @@ transaction {
             destroy profile
             acct.unlink(UserProfile.ProfilePublicPath)
         }
+    }
+}
+    `
+  })
+  return txid
+}
 
+async function onRemoveCommunity(): Promise<string> {
+  const { $fcl } = useNuxtApp()
+  const config = useRuntimeConfig()
+  const txid = $fcl.mutate({
+    cadence: `
+import Community from ${config.public.flowServiceAddress}
+
+transaction {
+    prepare(acct: AuthAccount) {
         // remove old
         if acct.borrow<&Community.CommunityBuilder>(from: Community.CommunityStoragePath) != nil {
             let builder <- acct.load<@Community.CommunityBuilder>(from: Community.CommunityStoragePath)
@@ -56,7 +70,8 @@ transaction {
 
 <template>
   <main v-if="isTestnet" class="mt-20 p-8 flex flex-col gap-4">
-    <FlowSubmitTransaction :method="onRemoveProfile" content="Remove Profile" />
-    <FlowSubmitTransaction :method="onRemoveAdmin" content="Remove Admin" />
+    <FlowSubmitTransaction :method="onRemoveProfile" content="Remove My Profile" />
+    <FlowSubmitTransaction :method="onRemoveCommunity" content="Remove My Community" />
+    <FlowSubmitTransaction :method="onRemoveAdmin" content="Remove My Admin Resource" />
   </main>
 </template>
