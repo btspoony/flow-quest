@@ -7,10 +7,12 @@ export async function apiGetActiveSeason(): Promise<CompetitionSeason | null> {
   }
 }
 
-export async function refreshActiveSeason(): Promise<CompetitionSeason | null> {
+export async function refreshActiveSeason(
+  includeUnlaunched = false
+): Promise<CompetitionSeason | null> {
   const activeSeason = useActiveSeason();
   const { $scripts } = useNuxtApp();
-  const result = await $scripts.getActiveSeason();
+  const result = await $scripts.getActiveSeason(includeUnlaunched);
   activeSeason.value = result;
   return result;
 }

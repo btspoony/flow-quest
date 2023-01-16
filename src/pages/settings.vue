@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async () => {
-  return await apiGetActiveSeason()
+  return refreshActiveSeason(true)
 }, {
   server: false
 });

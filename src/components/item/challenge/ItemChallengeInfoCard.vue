@@ -45,8 +45,11 @@ watchEffect(() => {
         <progress :value="progress" max="100" class="mb-0" />
       </div>
     </div>
-    <div v-if="props.bounty.config?.display.thumbnail" class="flex-none rounded-xl overflow-hidden">
-      <img class="w-24 h-24" :src="getIPFSUrl(props.bounty.config?.display.thumbnail)" alt="Challenge alt">
+    <div v-if="props.bounty.config?.display.thumbnail" class="flex-none">
+      <div class="w-24 h-24 rounded-xl bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden">
+        <img class="object-contain w-full h-full" :src="getIPFSUrl(props.bounty.config?.display.thumbnail)"
+          alt="Challenge icon">
+      </div>
     </div>
   </div>
 </template>

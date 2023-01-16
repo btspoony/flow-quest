@@ -127,8 +127,9 @@ async function claimFloat(): Promise<string | null> {
     <section class="container max-w-2xl px-4">
       <div class=" -mt-36 mb-4 flex gap-4 items-center flex-col sm:flex-row justify-between sm:justify-center">
         <div class="flex-none" :aria-busy="pending">
-          <div class="w-32 h-32 bg-cover rounded-lg"
-            :style="{ 'background-image': imageUrl ? `url(${imageUrl})` : undefined }" />
+          <div class="w-32 h-32 rounded-lg bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden">
+            <img v-if="imageUrl" class="object-contain w-full h-full" :src="imageUrl" alt="Challenge Icon">
+          </div>
         </div>
         <div v-if="challengeCfg" class="flex-1 flex gap-1 flex-col justify-between min-w-[360px]">
           <div class="flex items-center justify-center sm:justify-start min-h-[1.5rem]">
