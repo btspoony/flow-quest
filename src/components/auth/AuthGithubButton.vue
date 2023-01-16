@@ -68,7 +68,7 @@ function login() {
 <template>
   <button :aria-busy="loading" class="flex-center rounded-full max-w-[10rem]" @click="login">
     <div class="inline-flex-around">
-      <Icon icon="uil:github-icon" v-if="!loading" class="w-5 h-5" />
+      <Icon icon="uil:github" v-if="!loading" class="w-5 h-5" />
       <span v-if="loading" />
       <span>Participate</span>
     </div>
