@@ -21,6 +21,7 @@ pub fun main(
     bounties.append(QueryStructs.BountyInfo(
       id: bounty.getID(),
       identifier: identifier,
+      properties: bounty.getProperties(),
       display: identifier.getBountyEntity().getStandardDisplay(),
       questDetail: identifier.category == Interfaces.BountyType.quest ? identifier.getQuestConfig().getDetail() : nil,
       challengeDetail: identifier.category == Interfaces.BountyType.challenge ? identifier.getChallengeConfig().getDetail() : nil,

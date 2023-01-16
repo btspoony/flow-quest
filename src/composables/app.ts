@@ -13,6 +13,9 @@ export const useActiveSeason = () =>
 export const useCurrentAccountProfile = () =>
   useState<ProfileData | null>("currentAccountProfile", () => ref(null));
 
+export const useAppStatusInAdmin = () =>
+  useState<boolean>("currentAppStatusInAdminFrame", () => ref(false));
+
 export const useCommunitySpaceBasics = (communityId: string) =>
   useState<CommunitySpaceBasics | null>(`community:${communityId}`, () =>
     ref(null)

@@ -7,6 +7,7 @@ pub contract QueryStructs {
   pub struct BountyInfo {
     pub let id: UInt64
     pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
+    pub let properties: {UInt8: Bool}
     pub let display: MetadataViews.Display
     pub let questDetail: Interfaces.QuestDetail?
     pub let challengeDetail: Interfaces.ChallengeDetail?
@@ -22,6 +23,7 @@ pub contract QueryStructs {
     init(
       id: UInt64,
       identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
+      properties: {UInt8: Bool},
       display: MetadataViews.Display,
       questDetail: Interfaces.QuestDetail?,
       challengeDetail: Interfaces.ChallengeDetail?,
@@ -34,6 +36,7 @@ pub contract QueryStructs {
     ) {
       self.id = id
       self.identifier = identifier
+      self.properties = properties
       self.display = display
       self.questDetail = questDetail
       self.challengeDetail = challengeDetail

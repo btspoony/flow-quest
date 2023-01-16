@@ -14,6 +14,7 @@ const emit = defineEmits<{
 
 const user = useUserProfile()
 const wallet = useFlowAccount()
+const inAdmin = useAppStatusInAdmin()
 const linkedAddress = useLinkedWalletAddress();
 const isRegistering = useUserProfileInitializing();
 
@@ -33,7 +34,7 @@ onMounted(() => {
 
 function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
   if (wallet.value?.loggedIn && newVal && !newVal.activeRecord && isMatchedWallet.value) {
-    if (!submitTx.value?.isLoading && !submitTx.value?.isSealed && !isRegistering.value) {
+    if (!inAdmin.value && !submitTx.value?.isLoading && !submitTx.value?.isSealed && !isRegistering.value) {
       isRegistering.value = true
       submitTx.value?.startTransaction()
     }

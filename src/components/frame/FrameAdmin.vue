@@ -6,6 +6,16 @@ withDefaults(defineProps<{
 });
 const user = useUserProfile()
 
+const inAdmin = useAppStatusInAdmin()
+
+onMounted(() => {
+  inAdmin.value = true
+})
+
+onUnmounted(() => {
+  inAdmin.value = false
+})
+
 function sendClaimAdminResource(): Promise<string> {
   const { $transactions } = useNuxtApp();
   return $transactions.adminInitialize()

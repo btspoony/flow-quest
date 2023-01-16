@@ -130,10 +130,12 @@ export default defineNuxtPlugin((nuxtApp) => {
          * Get Bounties in the active season
          * @returns
          */
-        async getActiveSeason(): Promise<CompetitionSeason | null> {
+        async getActiveSeason(
+          includeUnlaunched = false
+        ): Promise<CompetitionSeason | null> {
           const ret = await executeScript(
             cadence.scripts.getActiveSeason,
-            (arg, t) => [],
+            (arg, t) => [arg(includeUnlaunched, t.Optional(t.Bool))],
             null
           );
           if (!ret) return null;

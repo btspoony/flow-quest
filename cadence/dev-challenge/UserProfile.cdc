@@ -455,8 +455,8 @@ pub contract UserProfile {
         self.totalProfiles = 0
         self.platformMapping = {}
 
-        self.ProfileStoragePath = /storage/DevCompetitionProfilePathV3
-        self.ProfilePublicPath = /public/DevCompetitionProfilePathV3
+        self.ProfileStoragePath = /storage/DevCompetitionProfilePathV4
+        self.ProfilePublicPath = /public/DevCompetitionProfilePathV4
 
         emit ContractInitialized()
     }

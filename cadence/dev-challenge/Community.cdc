@@ -606,8 +606,8 @@ pub contract Community {
     }
 
     init() {
-        self.CommunityStoragePath = /storage/DevCompetitionCommunityPathV1
-        self.CommunityPublicPath = /public/DevCompetitionCommunityPathV1
+        self.CommunityStoragePath = /storage/DevCompetitionCommunityPathV2
+        self.CommunityPublicPath = /public/DevCompetitionCommunityPathV2
 
         self.entityMapping = {}
         self.communityIdMapping = {}
