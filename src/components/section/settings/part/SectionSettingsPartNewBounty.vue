@@ -60,6 +60,7 @@ async function sendTransaction(): Promise<string> {
 
 function onSuccess() {
   emit('added')
+  refreshActiveSeason(true)
 }
 </script>
 

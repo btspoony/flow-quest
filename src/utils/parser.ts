@@ -60,6 +60,7 @@ export function parseBountyInfo(info: any): BountyInfo {
         ? parseChallengeInfo(info)
         : parseQuestInfo(info),
     preconditions: info.preconditions,
+    properties: parseBountyProperties(info.properties),
     participants: info.participants,
     participantAmt: parseInt(info.participantAmt),
     rewardType: parseRewardType(info.rewardType),
@@ -77,6 +78,13 @@ export function parseBountyInfo(info: any): BountyInfo {
           eventId: info.floatReward.eventIdentifier.eventId,
         }
       : undefined,
+  };
+}
+
+export function parseBountyProperties(properties: any): BountyProperties {
+  return {
+    Launched: !!properties["0"],
+    Featured: !!properties["1"],
   };
 }
 

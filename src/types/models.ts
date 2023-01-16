@@ -208,9 +208,15 @@ interface ParticipantRecord {
   [key: string]: any;
 }
 
+interface BountyProperties {
+  Launched: boolean;
+  Featured: boolean;
+}
+
 interface BountyInfo {
   id: string;
   config: BountyEntities; // load dynamic by identifier
+  properties: BountyProperties;
   preconditions: UnlockConditions[];
   participants: { [key: string]: ParticipantRecord };
   participantAmt: number;

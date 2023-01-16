@@ -8,9 +8,10 @@ import spaceCreate from "./transactions/community-create.cdc?raw";
 import spaceAddQuests from "./transactions/community-add-quests.cdc?raw";
 import spaceAddChallenge from "./transactions/community-add-challenge-with-quests.cdc?raw";
 import adminInitialize from "./transactions/admin-initialize.cdc?raw";
-import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
 import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
+import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
+import adminBountyUpdateProperty from "./transactions/admin-update-bounty-property.cdc?raw";
 
 /**
  * scripts for quest checking
@@ -51,6 +52,7 @@ export default {
         adminStartNewSeason,
         adminUpdateEndDate,
         adminAddBounties,
+        adminBountyUpdateProperty,
         spaceCreate,
         spaceAddQuests,
         spaceAddChallenge,

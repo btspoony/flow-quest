@@ -697,6 +697,23 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * Update bounty property
+         */
+        async adminBountyUpdateProperty(
+          bountyId: string,
+          property: string,
+          value: boolean
+        ) {
+          return await sendTransaction(
+            cadence.transactions.adminBountyUpdateProperty,
+            (arg, t) => [
+              arg(bountyId, t.UInt64),
+              arg(property, t.UInt8),
+              arg(value, t.Bool),
+            ]
+          );
+        },
+        /**
          * create a new space
          */
         async spaceCreate(
