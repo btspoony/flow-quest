@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const config = useRuntimeConfig();
-const appName = ref(config.public.appName)
+const appConfig = useAppConfig();
 </script>
 
 <template>
@@ -13,7 +12,7 @@ const appName = ref(config.public.appName)
             Learn and earn rewards by completing <strong class="text-primary">#onFlow</strong> Challenges
           </h3>
           <p class="py-6">
-            Plan to start the web3 journey? The {{ appName }} will be your guide.<br />
+            Plan to start the web3 journey? The {{ appConfig.title }} will be your guide.<br />
             Ready to begin?
           </p>
           <div class="flex-center lg:flex-between">

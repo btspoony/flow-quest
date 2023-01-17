@@ -3,6 +3,7 @@ import { send as grpcSend } from "@onflow/transport-grpc";
 import cadence from "../assets/cadence";
 
 export default defineNuxtPlugin((nuxtApp) => {
+  const appConfig = useAppConfig();
   const config = useRuntimeConfig();
 
   const isMainnet = config.public.network === "mainnet";
@@ -14,7 +15,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     .put("accessNode.api", config.public.accessApi)
     .put("discovery.wallet", config.public.walletDiscovery)
     .put("sdk.transport", grpcSend)
-    .put("app.detail.title", config.public.appName)
+    .put("app.detail.title", appConfig.title)
     .put(
       "app.detail.icon",
       window.location.origin + config.app.baseURL + "apple-touch-icon.png"
@@ -123,7 +124,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      appName: () => config.public.appName,
       fcl,
       scripts: {
         /**

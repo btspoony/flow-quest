@@ -6,6 +6,10 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineNuxtConfig({
   // set source dir
   srcDir: "src/",
+  // App Variables
+  appConfig: {
+    title: "Flow Challenge Tour",
+  },
   // Environment Variables
   runtimeConfig: {
     // The private keys which are only available within server-side
@@ -17,7 +21,6 @@ export default defineNuxtConfig({
     oauthHost: "",
     // Keys within public, will be also exposed to the client-side
     public: {
-      appName: "Flow Challenge Tour",
       network: "",
       accessApi: "",
       walletDiscovery: "",

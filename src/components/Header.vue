@@ -5,8 +5,7 @@ import FlowLogo from '~/assets/svgs/flow.svg';
 
 const router = useRouter()
 
-const config = useRuntimeConfig();
-const appName = ref(config.public.appName)
+const appConfig = useAppConfig()
 
 const menuHidden = ref(false)
 
@@ -24,7 +23,7 @@ onMounted(() => {
       <ul>
         <li class="inline-flex-between !gap-2  cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span class="font-semibold hidden lg:text-lg xl:text-xl lg:inline">{{ appName }}</span>
+          <span class="font-semibold hidden lg:text-lg xl:text-xl lg:inline">{{ appConfig.title }}</span>
         </li>
       </ul>
       <ul>

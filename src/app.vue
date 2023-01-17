@@ -2,11 +2,11 @@
 const route = useRoute();
 const locale = useLocale();
 const isDark = useSharedDark();
-const config = useRuntimeConfig();
+const appConfig = useAppConfig();
 const isDrawerOpened = useAppDrawerOpened();
 
 useHead({
-  titleTemplate: `%s - ${config.public.appName}`,
+  titleTemplate: `%s - ${appConfig.title}`,
 });
 
 // ----- Data -----
