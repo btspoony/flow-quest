@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   srcDir: "src/",
   // App Variables
   appConfig: {
-    title: "Flow Challenge Tour",
+    title: "Flow Challenges",
   },
   // Environment Variables
   runtimeConfig: {
