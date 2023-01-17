@@ -66,13 +66,21 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
       throw new Error("Invalid quest detail.");
     }
 
-    const stepsCfg = await executeOrLoadFromRedis<QuestStepsConfig[]>(
+    const stepsCfg = await executeOrLoadFromRedis<QuestDetailConfig>(
       `QuestStepsConfig:${questDetail?.stepsCfg}`,
-      (async (): Promise<QuestStepsConfig[]> =>
-        JSON.parse((await $fetch(questDetail?.stepsCfg)) as string))()
+      (async (): Promise<QuestDetailConfig> => {
+        const data = JSON.parse(
+          (await $fetch(questDetail?.stepsCfg)) as string
+        );
+        if (Array.isArray(data)) {
+          return { steps: data };
+        } else {
+          return Object.assign({ steps: [] }, data);
+        }
+      })()
     );
 
-    const stepCfg = stepsCfg[body.step];
+    const stepCfg = stepsCfg.steps[body.step];
     if (!stepCfg) throw new Error("Missing step Cfg");
     console.log(
       `Request<VerifyQuest>[${body.address}] - Step.2-1: loaded cfg from ${questDetail?.stepsCfg}`

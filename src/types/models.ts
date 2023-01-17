@@ -145,6 +145,11 @@ interface QuestStepOnChain extends QuestStepBasic {
 
 type QuestStepsConfig = QuestStepQuiz | QuestStepOnChain;
 
+interface QuestDetailConfig {
+  guide?: string;
+  steps: QuestStepsConfig[];
+}
+
 interface FLOATAchievement {
   host: string;
   eventId: string;
