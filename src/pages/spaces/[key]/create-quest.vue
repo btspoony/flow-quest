@@ -12,7 +12,6 @@ const data = reactive<QuestConfigRequest>({
   description: '',
   steps: 0,
   stepsCfg: '',
-  guideMD: '',
 })
 provide(spaceNewQuestsInjectKey, [data])
 
@@ -22,7 +21,6 @@ function resetComp() {
   data.description = ''
   data.steps = 0
   data.stepsCfg = ''
-  data.guideMD = ''
 }
 
 function onTransactionSuccess() {
@@ -38,7 +36,6 @@ async function sendTransaction(): Promise<string> {
     description: data.description,
     steps: data.steps,
     stepsCfg: data.stepsCfg,
-    guideMD: data.guideMD
   }])
 }
 </script>

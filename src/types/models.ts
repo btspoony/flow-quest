@@ -91,7 +91,6 @@ interface BountyEntity extends BountyIdentifier {
 interface QuestDetail {
   steps: number;
   stepsCfg: string;
-  guideMD: string;
 }
 
 interface QuestConfig extends BountyEntity, QuestDetail {}

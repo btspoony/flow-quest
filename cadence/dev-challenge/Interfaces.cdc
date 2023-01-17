@@ -103,16 +103,13 @@ pub contract Interfaces {
     pub struct QuestDetail {
         pub let steps: UInt64
         pub let stepsCfg: String
-        pub let guideMD: String
 
         init(
             steps: UInt64,
             stepsCfg: String,
-            guideMD: String,
         ) {
             self.steps = steps
             self.stepsCfg = stepsCfg
-            self.guideMD = guideMD
         }
     }
 

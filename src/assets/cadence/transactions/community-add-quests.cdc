@@ -8,7 +8,6 @@ transaction(
     image: [String?],
     steps: [UInt64],
     stepsCfg: [String],
-    guideMD: [String],
 ) {
     let builder: &Community.CommunityBuilder
 
@@ -27,7 +26,6 @@ transaction(
         keys.length == image.length: "Miss match"
         keys.length == steps.length: "Miss match"
         keys.length == stepsCfg.length: "Miss match"
-        keys.length == guideMD.length: "Miss match"
     }
 
     execute {
@@ -49,7 +47,6 @@ transaction(
                     image: image[i],
                     steps: steps[i],
                     stepsCfg: stepsCfg[i],
-                    guideMD: guideMD[i],
                 )
                 community.addQuest(key: keys[i], quest: quest)
             }

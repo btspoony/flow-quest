@@ -752,7 +752,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               prev.images.push(curr.thumbnail ?? null);
               prev.steps.push(String(curr.steps));
               prev.stepCfgs.push(curr.stepsCfg);
-              prev.guildMD.push(curr.guideMD);
               return prev;
             },
             {
@@ -798,7 +797,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               prev.images.push(curr.thumbnail ?? null);
               prev.steps.push(String(curr.steps));
               prev.stepCfgs.push(curr.stepsCfg);
-              prev.guildMD.push(curr.guideMD);
               return prev;
             },
             {

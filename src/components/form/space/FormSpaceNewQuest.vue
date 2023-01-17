@@ -8,12 +8,9 @@ const injected = inject(spaceNewQuestsInjectKey, [])
 const cfgPreview = ref("")
 const isStepsCfgURLValid = ref(false)
 const stepsCfgLoading = ref(false)
+const cfgGuideURL = ref("")
 
-const mdPreview = ref("")
-const isGuideMDURLValid = ref(false)
-const guildMDLoading = ref(false)
-
-watch([isStepsCfgURLValid, isGuideMDURLValid], ([newStepsValidA, newGuideValidB]) => {
+watch([isStepsCfgURLValid], ([newStepsValidA]) => {
   const data = injected[props.index]
   if (
     data
@@ -23,7 +20,6 @@ watch([isStepsCfgURLValid, isGuideMDURLValid], ([newStepsValidA, newGuideValidB]
     && data.name
     && data.description
     && newStepsValidA
-    && newGuideValidB
   ) {
     injected[props.index].valid = true
   } else {
@@ -38,16 +34,18 @@ async function loadAndValidateCfg() {
     const cfgJson = await $fetch(injected[props.index].stepsCfg)
     stepsCfgLoading.value = false
     const cfg = JSON.parse(cfgJson as string)
-    if (Array.isArray(cfg)) {
-      valid = cfg.filter(one => {
+    cfgGuideURL.value = typeof cfg.guide === 'string' ? cfg.guide : ""
+    const stepsJson: any[] = Array.isArray(cfg) ? cfg : Array.isArray(cfg.steps) ? cfg.steps : []
+    if (stepsJson.length > 0) {
+      valid = stepsJson.filter(one => {
         const stepCfg = one as QuestStepsConfig
         return typeof stepCfg.type === 'string'
           && typeof stepCfg.title === 'string'
           && (stepCfg.type === 'onchain' ? typeof stepCfg.code === 'string' && Array.isArray(stepCfg.schema) : Array.isArray(stepCfg.quiz))
-      }).length === cfg.length
+      }).length === stepsJson.length
 
       if (valid) {
-        injected[props.index].steps = cfg.length
+        injected[props.index].steps = stepsJson.length
         cfgPreview.value = JSON.stringify(cfg, null, '\t')
       } else {
         cfgPreview.value = "Invalid JSON."
@@ -57,26 +55,6 @@ async function loadAndValidateCfg() {
     cfgPreview.value = "Unknown"
   }
   isStepsCfgURLValid.value = valid
-}
-
-async function loadAndValidateGuideMD() {
-  let valid = false
-  const mdURL = injected[props.index].guideMD
-  if (mdURL.endsWith('.md')) {
-    try {
-      guildMDLoading.value = true
-      const md = await $fetch(mdURL)
-      guildMDLoading.value = false
-      if (typeof md === 'string') {
-        valid = true
-        mdPreview.value = md
-      }
-    } catch (e) { }
-  }
-  if (!valid) {
-    mdPreview.value = ""
-  }
-  isGuideMDURLValid.value = valid
 }
 
 </script>
@@ -108,17 +86,11 @@ async function loadAndValidateGuideMD() {
       </label>
       <code class="overflow-scroll max-h-28" :aria-busy="stepsCfgLoading">{{ cfgPreview }}</code>
     </div>
-    <div class="grid">
-      <label for="questGuideMD">
-        URL of guild markdown
-        <input type="url" id="questGuideMD" placeholder="https://raw.githubusercontent.com/.../README.md"
-          v-model.trim="injected[index].guideMD"
-          :aria-invalid="!injected[index].guideMD ? undefined : !isGuideMDURLValid"
-          :aria-busy="guildMDLoading"
-          @change="loadAndValidateGuideMD"
-          required />
-      </label>
-      <code class="overflow-scroll max-h-28" :aria-busy="guildMDLoading">{{ mdPreview }}</code>
-      </div>
+    <div v-if="isStepsCfgURLValid && cfgGuideURL">
+      <h6 class="mb-1">Quest Guide:</h6>
+      <NuxtLink :to="cfgGuideURL" target="_blank">
+        {{ cfgGuideURL }}
+      </NuxtLink>
+    </div>
   </form>
 </template>

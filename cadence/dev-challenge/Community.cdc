@@ -99,7 +99,6 @@ pub contract Community {
         pub let extra: {String: String}
         // changable
         pub var stepsCfg: MetadataViews.HTTPFile
-        pub var guideMD: MetadataViews.HTTPFile
 
         init(
             communityId: UInt64,
@@ -109,7 +108,6 @@ pub contract Community {
             image: String?,
             steps: UInt64,
             stepsCfg: String,
-            guideMD: String,
         ) {
             self.category = Interfaces.BountyType.quest
             self.communityId = communityId
@@ -122,7 +120,6 @@ pub contract Community {
             // changable
             self.extra = {}
             self.stepsCfg = MetadataViews.HTTPFile(stepsCfg)
-            self.guideMD = MetadataViews.HTTPFile(guideMD)
         }
 
         // display
@@ -146,7 +143,6 @@ pub contract Community {
             return Interfaces.QuestDetail(
                 steps: self.steps,
                 stepsCfg: self.stepsCfg.uri(),
-                guideMD: self.guideMD.uri()
             )
         }
 
@@ -159,10 +155,6 @@ pub contract Community {
 
         access(contract) fun updateQuestStepsCfg(stepsCfg: String) {
             self.stepsCfg = MetadataViews.HTTPFile(stepsCfg)
-        }
-
-        access(contract) fun updateQuestGuideMD(guideMD: String) {
-            self.guideMD = MetadataViews.HTTPFile(guideMD)
         }
     }
 
@@ -396,11 +388,6 @@ pub contract Community {
         pub fun updateQuestStepsCfg(key: String, stepsCfg: String) {
             let quest = self.quests[key] ?? panic("Failed to find quest:".concat(key))
             quest.updateQuestStepsCfg(stepsCfg: stepsCfg)
-        }
-
-        pub fun updateQuestGuideMD(key: String, guideMD: String) {
-            let quest = self.quests[key] ?? panic("Failed to find quest:".concat(key))
-            quest.updateQuestGuideMD(guideMD: guideMD)
         }
 
         /************* Internals *************/

@@ -25,7 +25,6 @@ export function parseQuestInfo(info: any): QuestConfig {
     display: parseDisplay(info.display),
     steps: parseInt((info.questDetail ?? info.detail)?.steps ?? 0),
     stepsCfg: (info.questDetail ?? info.detail)?.stepsCfg,
-    guideMD: (info.questDetail ?? info.detail)?.guideMD,
   };
 }
 

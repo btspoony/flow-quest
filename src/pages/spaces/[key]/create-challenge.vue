@@ -82,7 +82,6 @@ function onOpenDialogue(type: OpenDialogueType) {
       description: '',
       steps: 0,
       stepsCfg: '',
-      guideMD: '',
     }))
   } else {
     searchQuestKey.value = ""

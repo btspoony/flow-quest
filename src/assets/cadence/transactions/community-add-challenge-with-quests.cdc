@@ -16,7 +16,6 @@ transaction(
     newQuestImages: [String?],
     newQuestSteps: [UInt64],
     newQuestStepsCfg: [String],
-    newQuestGuideMD: [String],
     // Achievement
     achievementHost: Address?,
     achievementId: UInt64?,
@@ -38,7 +37,6 @@ transaction(
         newQuestKeys.length == newQuestImages.length: "Miss match"
         newQuestKeys.length == newQuestSteps.length: "Miss match"
         newQuestKeys.length == newQuestStepsCfg.length: "Miss match"
-        newQuestKeys.length == newQuestGuideMD.length: "Miss match"
     }
 
     execute {
@@ -61,7 +59,6 @@ transaction(
                     image: newQuestImages[i],
                     steps: newQuestSteps[i],
                     stepsCfg: newQuestStepsCfg[i],
-                    guideMD: newQuestGuideMD[i],
                 )
                 community.addQuest(key: newQuestKeys[i], quest: quest)
             }
