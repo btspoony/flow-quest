@@ -107,7 +107,7 @@ interface QuizOptionConfig {
 }
 
 interface QuizSchema {
-  type: "radio";
+  type: "radio" | "checkbox";
   question: string;
   options: QuizOptionConfig[];
   answer: string;

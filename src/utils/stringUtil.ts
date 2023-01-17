@@ -42,3 +42,7 @@ export function geneReferralLinkObject(uri: string): RouteLocationRaw {
 export function shorten(str: string, max = 10): string {
   return str.length <= max ? str : `${str.slice(0, max)}...`;
 }
+
+export function isSameArray(strA: string[], strB: string[]) {
+  return strA.sort().join(",") === strB.sort().join(",");
+}

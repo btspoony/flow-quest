@@ -16,19 +16,35 @@ const emit = defineEmits<{
 }>()
 
 const submitLoading = ref(false);
-const answers = reactive<string[]>([]);
-
 const stepCfg = computed(() => props.stepsCfg[props.step]);
+const maxAnswerLength = computed(() => stepCfg.value.type === 'onchain'
+  ? stepCfg.value.schema.length
+  : stepCfg.value.quiz.length
+)
+const answers = reactive<string[][]>(Array(maxAnswerLength.value).fill([]));
 
 const currentQuestIdx = ref(0);
-const currentQuestCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentQuestIdx.value] : undefined)
-const isAnswerCorrect = computed(() => answers[currentQuestIdx.value] === currentQuestCfg.value?.answer)
+const currentQuestCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentQuestIdx.value] : undefined);
 const isLastQuizQuestion = computed(() => stepCfg.value.type === 'quiz' ? currentQuestIdx.value === stepCfg.value.quiz.length - 1 : false)
+const isAnswerTotallyCorrect = computed(() => {
+  if (!currentQuestCfg.value) return false
+  return currentQuestCfg.value.type === 'radio'
+    ? answers[currentQuestIdx.value][0] === currentQuestCfg.value.answer
+    : isSameArray(toRaw(answers[currentQuestIdx.value]).filter(o => !!o), currentQuestCfg.value.answer.split(','))
+});
 
 function isSelectedQuizAnswer(index: number) {
   const option = currentQuestCfg.value?.options[index]
   if (!option) return false
-  return answers[currentQuestIdx.value] === option.key
+  return answers[currentQuestIdx.value]?.indexOf(option.key) > -1
+}
+
+function isTheQuizAnswerCorrect(index: number) {
+  if (!currentQuestCfg.value) return false
+  const option = currentQuestCfg.value.options[index]
+  return currentQuestCfg.value.type === 'radio'
+    ? currentQuestCfg.value.answer === option.key
+    : currentQuestCfg.value.answer.split(',').indexOf(option.key) > -1
 }
 
 function onOpenDialogue() {
@@ -40,13 +56,13 @@ function onOpenDialogue() {
     currentQuestIdx.value = 0
   }
   for (let i = 0; i < len; i++) {
-    answers[i] = ""
+    answers[i] = [""]
   }
   dialog.value?.openModal()
 }
 
 const isAnswerCompleted = computed(() => {
-  return answers.filter(one => !one).length === 0
+  return answers.filter(one => one.filter(a => !!a).length === 0).length === 0
 })
 
 async function onSubmitAnswer(): Promise<string | null> {
@@ -56,9 +72,9 @@ async function onSubmitAnswer(): Promise<string | null> {
     props.step,
     stepCfg.value.type === 'onchain'
       ? stepCfg.value.schema.map((param, index) => {
-        return { key: param.key, value: answers[index] }
+        return { key: param.key, value: answers[index][0] }
       })
-      : answers.map((val, i) => ({ key: `${i}`, value: val }))
+      : answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
   )
   if (result) {
     if (result.transactionId) {
@@ -123,7 +139,7 @@ function onCloseDialgue() {
             <label :for="`${quest.id}_${step}_param_${param.key}`">
               <span class="text-lg font-semibold">{{ param.label ?? param.key }}</span>
               <input type="text" :id="`${quest.id}_${step}_param_${param.key}`" :name="`${quest.id}_${step}_param_${param.key}`"
-                :placeholder="param.type" v-model="answers[index]" required>
+                :placeholder="param.type" v-model="answers[index][0]" required>
             </label>
           </template>
         </div>
@@ -134,11 +150,15 @@ function onCloseDialgue() {
         <div class="w-full px-4 py-2 flex flex-col gap-2">
           <template v-for="option, i in currentQuestCfg.options" :key="`quiz_${currentQuestIdx}_${i}`">
             <label :for="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`"
-              :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(i) && isAnswerCorrect, '!border-failure bg-failure/10': isSelectedQuizAnswer(i) && !isAnswerCorrect}]">
-              <input type="radio" :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`" :value="option.key"
-                v-model="answers[currentQuestIdx]"
-                :aria-invalid="answers[currentQuestIdx] === option.key ? option.key !== currentQuestCfg.answer : undefined"
-                :disabled="submitLoading">
+              :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(i) && isTheQuizAnswerCorrect(i), '!border-failure bg-failure/10': isSelectedQuizAnswer(i) && !isTheQuizAnswerCorrect(i)}]">
+              <input v-if="currentQuestCfg.type === 'radio'" type="radio" :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`"
+                :value="option.key" v-model="answers[currentQuestIdx][0]"
+                :aria-invalid="isSelectedQuizAnswer(i) ? !isTheQuizAnswerCorrect(i) : undefined"
+                :disabled="submitLoading" />
+              <input v-else type="checkbox"
+                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`" :value="option.key" v-model="answers[currentQuestIdx]"
+                :aria-invalid="isSelectedQuizAnswer(i) ? !isTheQuizAnswerCorrect(i) : undefined"
+                :disabled="submitLoading" />
               {{ option.description }}
             </label>
           </template>
@@ -147,11 +167,11 @@ function onCloseDialgue() {
     </div>
     <footer class="mt-4">
       <button v-if="stepCfg.type === 'quiz' && !isLastQuizQuestion" class="rounded-xl flex-center mb-0"
-        :disabled="!isAnswerCorrect" @click.stop.prevent="() => currentQuestIdx++">
-        {{ isAnswerCorrect ? 'Next Question' : 'Incorrect 🙅‍♀️' }}
+        :disabled="!isAnswerTotallyCorrect" @click.stop.prevent="() => currentQuestIdx++">
+        {{ isAnswerTotallyCorrect ? 'Next Question' : 'Incorrect 🙅‍♀️' }}
       </button>
       <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizQuestion"
-        :disabled="!isAnswerCompleted || (stepCfg.type === 'quiz' && !isAnswerCorrect)" :method="onSubmitAnswer"
+        :disabled="!isAnswerCompleted || (stepCfg.type === 'quiz' && !isAnswerTotallyCorrect)" :method="onSubmitAnswer"
         @sealed="resetComp()"
         @error="resetComp()"
         @success="emit('success')"
