@@ -761,7 +761,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               images: [] as (string | null)[],
               steps: [] as string[],
               stepCfgs: [] as string[],
-              guildMD: [] as string[],
             }
           );
           return await sendTransaction(
@@ -774,7 +773,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               arg(data.images, t.Array(t.Optional(t.String))),
               arg(data.steps, t.Array(t.UInt64)),
               arg(data.stepCfgs, t.Array(t.String)),
-              arg(data.guildMD, t.Array(t.String)),
             ]
           );
         },
@@ -806,7 +804,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               images: [] as (string | null)[],
               steps: [] as string[],
               stepCfgs: [] as string[],
-              guildMD: [] as string[],
             }
           );
           return await sendTransaction(
@@ -825,7 +822,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               arg(newQuestData.images, t.Array(t.Optional(t.String))),
               arg(newQuestData.steps, t.Array(t.UInt64)),
               arg(newQuestData.stepCfgs, t.Array(t.String)),
-              arg(newQuestData.guildMD, t.Array(t.String)),
               // Achievement
               arg(achievement ? achievement.host : null, t.Optional(t.Address)),
               arg(
