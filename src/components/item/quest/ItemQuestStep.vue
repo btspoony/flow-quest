@@ -146,8 +146,10 @@ function onCloseDialgue() {
       </template>
       <template v-else-if="currentQuestCfg">
         <small>Question {{ currentQuestIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
-        <h4 class="w-full text-center">{{ currentQuestCfg.question }}</h4>
+        <h4 class="w-full text-center mb-4">{{ currentQuestCfg.question }}</h4>
         <div class="w-full px-4 py-2 flex flex-col gap-2">
+          <img v-if="currentQuestCfg.image" class="object-contain justify-items-center max-h-32"
+            :src="getIPFSUrl(currentQuestCfg.image)" alt="question alt" />
           <template v-for="option, i in currentQuestCfg.options" :key="`quiz_${currentQuestIdx}_${i}`">
             <label :for="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`"
               :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(i) && isTheQuizAnswerCorrect(i), '!border-failure bg-failure/10': isSelectedQuizAnswer(i) && !isTheQuizAnswerCorrect(i)}]">
