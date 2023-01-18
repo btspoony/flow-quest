@@ -132,17 +132,8 @@ pub contract Interfaces {
 
     // =================== Competition ====================
 
-    pub enum UnlockConditionTypes: UInt8 {
-        pub case CompletedAmount
-        pub case MinimumLevel
-        pub case TimeLimited
-        pub case AchievementRequired
-        pub case ChallengeIndex
-    }
-
     pub struct interface UnlockCondition {
-        pub let type: UnlockConditionTypes
-        pub let display: MetadataViews.Display?
+        pub let type: UInt8;
 
         pub fun isUnlocked(_ params: {String: AnyStruct}): Bool;
     }

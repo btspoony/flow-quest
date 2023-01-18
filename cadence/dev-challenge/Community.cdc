@@ -32,6 +32,8 @@ pub contract Community {
     pub event CommunityUpdateBasics(id: UInt64, owner: Address, name: String, description: String, image: String, banner: String?)
     pub event CommunityUpdateSocial(id: UInt64, owner: Address, key: String, value: String)
 
+    pub event CommunityTransfered(id: UInt64, from: Address, to: Address)
+
     /**    ____ ___ ____ ___ ____
        *   [__   |  |__|  |  |___
         *  ___]  |  |  |  |  |___
@@ -205,9 +207,6 @@ pub contract Community {
         }
 
         access(contract) fun updateAchievement(achi: Helper.EventIdentifier) {
-            pre {
-                self.achievement == nil: "Ensure achievement is nil"
-            }
             self.achievement = achi
         }
     }
@@ -455,6 +454,8 @@ pub contract Community {
         pub fun getIDs(): [UInt64]
         pub fun borrowCommunity(id: UInt64): &CommunityIns{CommunityPublic}
         pub fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver}
+
+        access(contract) fun takeover(ins: @CommunityIns)
     }
 
     pub resource CommunityBuilder: CommunityBuilderPublic {
@@ -509,6 +510,26 @@ pub contract Community {
 
         pub fun borrowCommunityPrivateRef(id: UInt64): &CommunityIns {
             return &self.communities[id] as &CommunityIns? ?? panic("Failed to borrow community.")
+        }
+
+        pub fun transferCommunity(id: UInt64, recipient: &CommunityBuilder{CommunityBuilderPublic}) {
+            let community <- self.communities.remove(key: id) ?? panic("Failed to transfer community")
+            recipient.takeover(ins: <- community)
+
+            emit CommunityTransfered(
+                id: id,
+                from: self.owner!.address,
+                to: recipient.owner!.address
+            )
+        }
+
+        /************* Internal *************/
+
+        access(contract) fun takeover(ins: @CommunityIns) {
+            let id = ins.getID()
+            self.communities[id] <-! ins
+
+            Community.communityIdMapping[id] = self.owner!.address
         }
 
         /************* Getters (for anyone) *************/
@@ -593,8 +614,8 @@ pub contract Community {
     }
 
     init() {
-        self.CommunityStoragePath = /storage/DevCompetitionCommunityPathV2
-        self.CommunityPublicPath = /public/DevCompetitionCommunityPathV2
+        self.CommunityStoragePath = /storage/DevCompetitionCommunityPathV3
+        self.CommunityPublicPath = /public/DevCompetitionCommunityPathV3
 
         self.entityMapping = {}
         self.communityIdMapping = {}

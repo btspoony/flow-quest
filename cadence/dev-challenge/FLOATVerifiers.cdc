@@ -1,6 +1,7 @@
 import FLOAT from "../deps/FLOAT.cdc"
-import UserProfile from "./UserProfile.cdc"
 import Interfaces from "./Interfaces.cdc"
+import UserProfile from "./UserProfile.cdc"
+import CompetitionService from "./CompetitionService.cdc"
 
 pub contract FLOATVerifiers {
 
@@ -22,7 +23,7 @@ pub contract FLOATVerifiers {
             }
         }
 
-        init(eventHost: Address, eventId: UInt64) {
+        init(eventId: UInt64) {
             self.eventId = eventId
         }
     }
@@ -52,4 +53,29 @@ pub contract FLOATVerifiers {
         }
     }
 
+    pub struct QuestCompletedInActiveSeason: FLOAT.IVerifier {
+        pub let questKey: String
+
+        pub fun verify(_ params: {String: AnyStruct}) {
+            let claimee: Address = params["claimee"]! as! Address
+
+            if let profile = getAccount(claimee)
+                .getCapability(UserProfile.ProfilePublicPath)
+                .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
+                let service = CompetitionService.borrowServicePublic()
+                let seasonId = service.getActiveSeasonID()
+                let questStatus = profile.getQuestStatus(seasonId: seasonId, questKey: self.questKey)
+                assert(
+                    questStatus.completed,
+                    message: "You didn't complete the quest #:".concat(self.questKey)
+                )
+            } else {
+                panic("You do not have Profile resource")
+            }
+        }
+
+        init(questKey: String) {
+            self.questKey = questKey
+        }
+    }
 }

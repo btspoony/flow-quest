@@ -17,47 +17,38 @@ interface ListReqOption {
   limit: number;
 }
 
-type UnlockConditionTypes =
-  | "CompletedAmount"
-  | "MinimumLevel"
-  | "TimeLimited"
-  | "AchievementRequired"
-  | "ChallengeIndex";
+enum UnlockConditionTypes {
+  MinimumPoint = 0,
+  FLOATRequired,
+  CompletedBountyAmount,
+}
 
 interface UnlockCondition {
   type: UnlockConditionTypes;
-  display: Display;
 }
 
-interface CompletedAmountUnlockCondition extends UnlockCondition {
-  limit: number;
+interface MinimumPointRequired extends UnlockCondition {
+  type: UnlockConditionTypes.MinimumPoint;
+  seasonId: string;
+  amount: number;
 }
 
-interface MinimumLevelUnlockCondition extends UnlockCondition {
-  level: number;
-  points: number;
+interface FLOATRequired extends UnlockCondition {
+  type: UnlockConditionTypes.FLOATRequired;
+  host: string;
+  eventId: string;
 }
 
-interface AchievementRequiredCondition extends UnlockCondition {
-  achievementId: number;
-  achievementUrl: string;
-}
-
-interface ChallengeIndexCondition extends UnlockCondition {
-  challengeKey: string;
-  index: number;
-}
-
-interface TimeLimitedUnlockCondition extends UnlockCondition {
-  endDate: number;
+interface CompletedBountyAmount extends UnlockCondition {
+  type: UnlockConditionTypes.CompletedBountyAmount;
+  seasonId: string;
+  amount: number;
 }
 
 type UnlockConditions =
-  | TimeLimitedUnlockCondition
-  | CompletedAmountUnlockCondition
-  | MinimumLevelUnlockCondition
-  | AchievementRequiredCondition
-  | ChallengeIndexCondition;
+  | MinimumPointRequired
+  | FLOATRequired
+  | CompletedBountyAmount;
 
 type QuestRewardType = "Points" | "FLOAT" | "None";
 

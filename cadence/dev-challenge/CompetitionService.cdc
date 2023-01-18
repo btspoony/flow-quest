@@ -27,20 +27,29 @@ pub contract CompetitionService {
        *   |___ |  | |___ |\ |  |  [__
         *  |___  \/  |___ | \|  |  ___]
          ******************************/
+    // participant events
+    pub event ProfileRegistered(seasonId: UInt64, participant: Address)
+    pub event BountyCompleted(seasonId: UInt64, bountyId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
 
-    pub event ContractInitialized()
-
-    pub event SeasonCreated(seasonId: UInt64)
+    // season bounty events
     pub event SeasonBountyAdded(seasonId: UInt64, communityId: UInt64, key: String, category: UInt8, bountyId: UInt64)
     pub event BountyPropertyUpdated(seasonId: UInt64, bountyId: UInt64, property: UInt8, value: Bool)
-    pub event BountyCompleted(seasonId: UInt64, bountyId: UInt64, communityId: UInt64, key: String, category: UInt8, participant: Address)
-    pub event ProfileRegistered(seasonId: UInt64, participant: Address)
+    pub event BountyRewardUpdatedAsNone(seasonId: UInt64, bountyId: UInt64)
+    pub event BountyRewardUpdatedAsPoints(seasonId: UInt64, bountyId: UInt64, points: UInt64, referralPoints: UInt64)
+    pub event BountyRewardUpdatedAsFLOAT(seasonId: UInt64, bountyId: UInt64, host: Address, eventId: UInt64)
+    pub event BountyPreconditionAdded(seasonId: UInt64, bountyId: UInt64, unlockCondType: UInt8)
+    pub event BountyPreconditionRemoved(seasonId: UInt64, bountyId: UInt64, unlockCondType: UInt8, index:Int)
 
+    // season events
+    pub event SeasonCreated(seasonId: UInt64)
     pub event SeasonPropertyEndDateUpdated(seasonId: UInt64, key: UInt8, value: UFix64)
     pub event SeasonPropertyReferralThresholdUpdated(seasonId: UInt64, key: UInt8, value: UInt64)
 
+    // service events
     pub event ServiceWhitelistUpdated(target: Address, flag: Bool)
     pub event ServiceAdminResourceClaimed(claimer: Address, uuid: UInt64)
+
+    pub event ContractInitialized()
 
     /**    ____ ___ ____ ___ ____
        *   [__   |  |__|  |  |___
@@ -76,8 +85,8 @@ pub contract CompetitionService {
         access(contract) let properties: {BountyProperty: Bool}
         access(contract) let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
         access(contract) let participants: {Address: {String: AnyStruct}}
-        access(contract) let rewardInfo: AnyStruct{Helper.RewardInfo}
-        access(contract) let rewardType: Helper.QuestRewardType
+        access(contract) var rewardInfo: AnyStruct{Helper.RewardInfo}
+        access(contract) var rewardType: Helper.QuestRewardType
 
         init(
             seasonId: UInt64,
@@ -211,6 +220,66 @@ pub contract CompetitionService {
                     value: value
                 )
             }
+        }
+
+        access(contract) fun updateRewardInfo(
+            reward: AnyStruct{Helper.RewardInfo}
+        ) {
+            if self.rewardType == reward.type {
+                return
+            }
+            self.rewardType = reward.type
+            self.rewardInfo = reward
+
+            // emit event by type
+            if reward.type == Helper.QuestRewardType.Points {
+                let pointsReward = reward as! Helper.PointReward
+                emit BountyRewardUpdatedAsPoints(
+                    seasonId: self.seasonId,
+                    bountyId: self.getID(),
+                    points: pointsReward.rewardPoints,
+                    referralPoints: pointsReward.referralPoints,
+                )
+            } else if reward.type == Helper.QuestRewardType.FLOAT {
+                let floatReward = reward as! Helper.FLOATReward
+                emit BountyRewardUpdatedAsFLOAT(
+                    seasonId: self.seasonId,
+                    bountyId: self.getID(),
+                    host: floatReward.eventIdentifier.host,
+                    eventId: floatReward.eventIdentifier.eventId,
+                )
+            } else {
+                emit BountyRewardUpdatedAsNone(
+                    seasonId: self.seasonId,
+                    bountyId: self.getID()
+                )
+            }
+        }
+
+        access(contract) fun addPrecondition(
+            cond: AnyStruct{Interfaces.UnlockCondition}
+        ) {
+            self.preconditions.append(cond)
+
+            emit BountyPreconditionAdded(
+                seasonId: self.seasonId,
+                bountyId: self.getID(),
+                unlockCondType: cond.type
+            )
+        }
+
+        access(contract) fun removePrecondition(idx: Int) {
+            pre {
+                idx < self.preconditions.length: "Out of bound"
+            }
+            let cond = self.preconditions.remove(at: idx)
+
+            emit BountyPreconditionRemoved(
+                seasonId: self.seasonId,
+                bountyId: self.getID(),
+                unlockCondType: cond.type,
+                index: idx
+            )
         }
 
         // ---- internal methods ----
@@ -678,11 +747,35 @@ pub contract CompetitionService {
             property: BountyProperty,
             value: Bool
         ) {
-            let serviceIns = CompetitionService.borrowServiceRef()
-            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
-            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
-            let bounty = season.borrowBountyPrivateRef(bountyId)
+            let bounty = self.borrowBountyPrivRef(seasonId: seasonId, bountyId: bountyId)
             bounty.updateBountyProperty(property: property, value: value)
+        }
+
+        pub fun updateBountyReward(
+            seasonId: UInt64,
+            bountyId: UInt64,
+            reward: AnyStruct{Helper.RewardInfo}
+        ) {
+            let bounty = self.borrowBountyPrivRef(seasonId: seasonId, bountyId: bountyId)
+            bounty.updateRewardInfo(reward: reward)
+        }
+
+        pub fun addBountyPrecondition(
+            seasonId: UInt64,
+            bountyId: UInt64,
+            cond: AnyStruct{Interfaces.UnlockCondition}
+        ) {
+            let bounty = self.borrowBountyPrivRef(seasonId: seasonId, bountyId: bountyId)
+            bounty.addPrecondition(cond: cond)
+        }
+
+        pub fun removeBountyPrecondition(
+            seasonId: UInt64,
+            bountyId: UInt64,
+            idx: Int
+        ) {
+            let bounty = self.borrowBountyPrivRef(seasonId: seasonId, bountyId: bountyId)
+            bounty.removePrecondition(idx: idx)
         }
 
         pub fun updateEndDate(
@@ -703,6 +796,18 @@ pub contract CompetitionService {
             assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateReferralThreshold(threshold: threshold)
+        }
+
+        // Internal use
+
+        access(self) fun borrowBountyPrivRef(
+            seasonId: UInt64,
+            bountyId: UInt64
+        ): &BountyInfo {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            return season.borrowBountyPrivateRef(bountyId)
         }
     }
 
@@ -752,7 +857,7 @@ pub contract CompetitionService {
                 if referralFrom != nil && reward.referralPoints > 0 {
                     self.addPoints(acct: referralFrom!, seasonId: seasonId, points: reward.referralPoints)
                 }
-            } else {
+            } else if bounty.rewardType == Helper.QuestRewardType.FLOAT {
                 // NOTHING for now
             }
 
@@ -820,8 +925,8 @@ pub contract CompetitionService {
 
     init() {
         // Admin resource paths
-        self.AdminStoragePath = /storage/DevCompetitionAdminPathV3
-        self.ControllerStoragePath = /storage/DevCompetitionControllerPathV3
+        self.AdminStoragePath = /storage/DevCompetitionAdminPathV4
+        self.ControllerStoragePath = /storage/DevCompetitionControllerPathV4
 
         self.ServiceStoragePath = /storage/DevCompetitionServicePath
         self.ServicePublicPath = /public/DevCompetitionServicePath

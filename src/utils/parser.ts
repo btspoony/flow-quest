@@ -58,7 +58,14 @@ export function parseBountyInfo(info: any): BountyInfo {
       category === "challenge"
         ? parseChallengeInfo(info)
         : parseQuestInfo(info),
-    preconditions: info.preconditions,
+    preconditions: (info.preconditions ?? []).map((one: any) => {
+      const cloned = Object.assign({}, one);
+      if (typeof cloned.amount === "string")
+        cloned.amount = parseInt(cloned.amount);
+      if (typeof cloned.type === "string")
+        cloned.type = parseInt(cloned.type) as UnlockConditionTypes;
+      return cloned;
+    }),
     properties: parseBountyProperties(info.properties),
     participants: info.participants,
     participantAmt: parseInt(info.participantAmt),
