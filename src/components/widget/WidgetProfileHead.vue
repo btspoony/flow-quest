@@ -3,6 +3,8 @@ import { StorageSerializers, useLocalStorage } from '@vueuse/core';
 import { Icon } from '@iconify/vue';
 
 const details = ref<HTMLDetailsElement | null>(null);
+
+const appConfig = useAppConfig();
 const github = useGithubProfile();
 const linkedAddress = useLinkedWalletAddress();
 const wallet = useFlowAccount();
@@ -38,6 +40,11 @@ const linkedAddressShortString = computed(() => {
 })
 const linkedAddressString = computed(() => {
   return linkedAddress.value ?? (wallet.value?.loggedIn ? wallet.value?.addr : "No wallet")
+})
+const isInSpacePageWhiteList = computed(() => {
+  return !user.value?.address
+    ? false
+    : appConfig.spacesWhitelist.indexOf(user.value.address) > -1
 })
 
 function closeDropdown() {
@@ -90,7 +97,7 @@ function onLogout() {
           </div>
         </NuxtLink>
       </li>
-      <li v-if="user?.adminStatus?.valid">
+      <li v-if="isInSpacePageWhiteList">
         <NuxtLink :to="geneReferralLink(`/spaces`)" @click="closeDropdown()">
           <div class="flex gap-4 items-center justify-end">
             <span>Spaces</span>

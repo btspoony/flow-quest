@@ -9,6 +9,10 @@ export default defineNuxtConfig({
   // App Variables
   appConfig: {
     title: "Flow Challenges",
+    spacesWhitelist:
+      process.env.NUXT_PUBLIC_NETWORK === "mainnet"
+        ? ["0xa2de93114bae3e73"]
+        : ["0xa51d7fe9e0080662"],
   },
   // Environment Variables
   runtimeConfig: {
