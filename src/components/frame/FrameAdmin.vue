@@ -23,8 +23,7 @@ function sendClaimAdminResource(): Promise<string> {
 </script>
 
 <template>
-  <div v-if="!noTopbar" class="h-[90px]"></div>
-  <div class="container min-h-[calc(100vh-180px)] flex gap-4">
+  <FrameMain :no-topbar="noTopbar">
     <div v-if="!user?.adminStatus?.valid || !user?.adminStatus?.enabled" class="hero">
       <div class="hero-content flex-col text-center">
         <span v-if="!user?.adminStatus?.valid">Cannot access to the admin page</span>
@@ -43,5 +42,5 @@ function sendClaimAdminResource(): Promise<string> {
     <template v-else>
       <slot />
     </template>
-  </div>
+  </FrameMain>
 </template>

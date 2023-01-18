@@ -4,8 +4,10 @@ withDefaults(defineProps<{
 }>(), {
   noTopbar: false
 });
-const user = useUserProfile()
-const spacesUpdated = useSpacesUpdated()
+
+const appConfig = useAppConfig();
+const user = useUserProfile();
+const spacesUpdated = useSpacesUpdated();
 
 const { data: list, pending, refresh } = useAsyncData<Array<CommunitySpaceBasics | null>>(`spaces:${user.value?.address ?? 'unknown'}`, async () => {
   let result: Array<CommunitySpaceBasics | null> = [];
@@ -35,10 +37,22 @@ watch(spacesUpdated, (newVal) => {
   }
 })
 
+const isInSpacePageWhiteList = computed(() => {
+  return !user.value?.address
+    ? false
+    : appConfig.spacesWhitelist.indexOf(user.value.address) > -1
+})
+
 </script>
 
 <template>
-  <FrameAdmin :no-topbar="noTopbar">
+<FrameMain :no-topbar="noTopbar">
+  <div v-if="!isInSpacePageWhiteList" class="hero">
+    <div class="hero-content flex-col text-center">
+      <h4>Cannot access to the spaces page</h4>
+    </div>
+  </div>
+  <div v-else class="flex gap-4">
     <aside class="flex-none aside border-gray-300 dark:border-gray-700">
       <div v-if="pending" :aria-busy="true" />
       <template v-else>
@@ -50,7 +64,8 @@ watch(spacesUpdated, (newVal) => {
         <slot />
       </div>
     </main>
-  </FrameAdmin>
+  </div>
+  </FrameMain>
 </template>
 
 <style scoped>
