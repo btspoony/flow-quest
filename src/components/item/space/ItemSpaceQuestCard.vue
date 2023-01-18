@@ -14,7 +14,13 @@ defineProps<{
           <span><b>Steps: </b>{{ quest.steps }}</span>
         </div>
       </summary>
-      <div><b>Config JSON: </b><br />{{ quest.stepsCfg }}</div>
+      <div>
+        <b>Description: </b><br />
+        {{ (quest as QuestConfigRequest).description ?? (quest as QuestConfig).display.description }}
+      </div>
+      <div>
+        <b>Config JSON: </b><br />{{ quest.stepsCfg }}
+      </div>
     </details>
   </div>
 </template>
