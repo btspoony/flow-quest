@@ -25,6 +25,10 @@ const answers = reactive<string[][]>(Array(maxAnswerLength.value).fill([]));
 
 const currentQuestIdx = ref(0);
 const currentQuestCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentQuestIdx.value] : undefined);
+const currentQuestOptions = computed(() => {
+  if (!currentQuestCfg.value) return []
+  return shuffleArray(currentQuestCfg.value.options.map((one, i) => Object.assign({}, one, { i })))
+});
 const isLastQuizQuestion = computed(() => stepCfg.value.type === 'quiz' ? currentQuestIdx.value === stepCfg.value.quiz.length - 1 : false)
 const isAnswerTotallyCorrect = computed(() => {
   if (!currentQuestCfg.value) return false
@@ -150,16 +154,17 @@ function onCloseDialgue() {
         <div class="w-full px-4 py-2 flex flex-col gap-2">
           <img v-if="currentQuestCfg.image" class="object-contain justify-items-center max-h-32"
             :src="getIPFSUrl(currentQuestCfg.image)" alt="question alt" />
-          <template v-for="option, i in currentQuestCfg.options" :key="`quiz_${currentQuestIdx}_${i}`">
-            <label :for="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`"
-              :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(i) && isTheQuizAnswerCorrect(i), '!border-failure bg-failure/10': isSelectedQuizAnswer(i) && !isTheQuizAnswerCorrect(i)}]">
-              <input v-if="currentQuestCfg.type === 'radio'" type="radio" :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`"
+          <template v-for="option in currentQuestOptions" :key="`quiz_${currentQuestIdx}_${option.i}`">
+            <label :for="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`"
+              :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(option.i) && isTheQuizAnswerCorrect(option.i), '!border-failure bg-failure/10': isSelectedQuizAnswer(option.i) && !isTheQuizAnswerCorrect(option.i)}]">
+              <input v-if="currentQuestCfg.type === 'radio'" type="radio"
+                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`"
                 :value="option.key" v-model="answers[currentQuestIdx][0]"
-                :aria-invalid="isSelectedQuizAnswer(i) ? !isTheQuizAnswerCorrect(i) : undefined"
+                :aria-invalid="isSelectedQuizAnswer(option.i) ? !isTheQuizAnswerCorrect(option.i) : undefined"
                 :disabled="submitLoading" />
               <input v-else type="checkbox"
-                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${i}`" :value="option.key" v-model="answers[currentQuestIdx]"
-                :aria-invalid="isSelectedQuizAnswer(i) ? !isTheQuizAnswerCorrect(i) : undefined"
+                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`" :value="option.key" v-model="answers[currentQuestIdx]"
+                :aria-invalid="isSelectedQuizAnswer(option.i) ? !isTheQuizAnswerCorrect(option.i) : undefined"
                 :disabled="submitLoading" />
               {{ option.description }}
             </label>
