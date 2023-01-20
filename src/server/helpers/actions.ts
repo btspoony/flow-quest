@@ -174,7 +174,9 @@ export async function scVerifyQuest(
     }, {} as { [key: string]: string });
 
     const result = await signer.executeScript(
-      code,
+      params.reduce((prev, curr) => {
+        return prev.replaceAll(`\{${curr.key}\}`, curr.value);
+      }, code),
       (arg, t) => {
         // simple type mapping
         const typeMapping: { [key: string]: typeof t } = {
