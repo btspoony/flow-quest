@@ -107,6 +107,7 @@ interface QuizSchema {
 interface QuestStepBasic {
   title: string;
   description: string;
+  external?: string;
 }
 
 interface QuestStepQuiz extends QuestStepBasic {

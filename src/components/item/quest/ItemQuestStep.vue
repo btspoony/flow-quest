@@ -117,17 +117,21 @@ function onCloseDialgue() {
       </span>
       <Icon icon="heroicons:check-circle-20-solid" v-else class="text-success w-8 h-8" inline />
     </div>
-  <div :class="['flex-auto', isCompleted ? 'line-through' : 'font-semibold', isLocked ? 'opacity-50' : '']">
+    <div :class="['flex-auto', isCompleted ? 'line-through' : 'font-semibold', isLocked ? 'opacity-50' : '']">
       {{ stepCfg?.title ?? "" }}
     </div>
-  <div class="flex-none min-w-[120px]">
-      <template v-if="(!isLocked || isCompleted)">
-        <button v-if="!isCompleted" class="mb-0 rounded-full" data-target="modal-dialog"
+    <div class="flex-none min-w-[120px] flex gap-2">
+      <template v-if="(!isLocked && !isCompleted)">
+        <button class="mb-0 rounded-full" data-target="modal-dialog"
           @click.stop.prevent="onOpenDialogue">
           <span class="font-semibold">
             {{ stepCfg.type === 'onchain' ? 'Verify' : 'Quiz' }}
           </span>
         </button>
+        <a v-if="typeof stepCfg.external === 'string'" :href="stepCfg.external" role="button" class="mb-0 rounded-full outline"
+          target="_blank">
+          ⇱ View
+        </a>
       </template>
     </div>
   </div>
