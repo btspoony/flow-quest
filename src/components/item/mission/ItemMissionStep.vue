@@ -4,9 +4,9 @@ import type WidgetDialog from '../../widget/WidgetDialog.vue';
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 
 const props = defineProps<{
-  quest: BountyInfo,
+  mission: BountyInfo,
   step: number,
-  stepsCfg: QuestStepsConfig[]
+  stepsCfg: MissionStepsConfig[]
   isCompleted: boolean,
   isLocked: boolean,
 }>()
@@ -23,32 +23,32 @@ const maxAnswerLength = computed(() => stepCfg.value.type === 'onchain'
 )
 const answers = reactive<string[][]>(Array(maxAnswerLength.value).fill([]));
 
-const currentQuestIdx = ref(0);
-const currentQuestCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentQuestIdx.value] : undefined);
-const currentQuestOptions = computed(() => {
-  if (!currentQuestCfg.value) return []
-  return shuffleArray(currentQuestCfg.value.options.map((one, i) => Object.assign({}, one, { i })))
+const currentMissionIdx = ref(0);
+const currentMissionCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentMissionIdx.value] : undefined);
+const currentMissionOptions = computed(() => {
+  if (!currentMissionCfg.value) return []
+  return shuffleArray(currentMissionCfg.value.options.map((one, i) => Object.assign({}, one, { i })))
 });
-const isLastQuizQuestion = computed(() => stepCfg.value.type === 'quiz' ? currentQuestIdx.value === stepCfg.value.quiz.length - 1 : false)
+const isLastQuizMissionion = computed(() => stepCfg.value.type === 'quiz' ? currentMissionIdx.value === stepCfg.value.quiz.length - 1 : false)
 const isAnswerTotallyCorrect = computed(() => {
-  if (!currentQuestCfg.value) return false
-  return currentQuestCfg.value.type === 'radio'
-    ? answers[currentQuestIdx.value][0] === currentQuestCfg.value.answer
-    : isSameArray(toRaw(answers[currentQuestIdx.value]).filter(o => !!o), currentQuestCfg.value.answer.split(','))
+  if (!currentMissionCfg.value) return false
+  return currentMissionCfg.value.type === 'radio'
+    ? answers[currentMissionIdx.value][0] === currentMissionCfg.value.answer
+    : isSameArray(toRaw(answers[currentMissionIdx.value]).filter(o => !!o), currentMissionCfg.value.answer.split(','))
 });
 
 function isSelectedQuizAnswer(index: number) {
-  const option = currentQuestCfg.value?.options[index]
+  const option = currentMissionCfg.value?.options[index]
   if (!option) return false
-  return answers[currentQuestIdx.value]?.indexOf(option.key) > -1
+  return answers[currentMissionIdx.value]?.indexOf(option.key) > -1
 }
 
 function isTheQuizAnswerCorrect(index: number) {
-  if (!currentQuestCfg.value) return false
-  const option = currentQuestCfg.value.options[index]
-  return currentQuestCfg.value.type === 'radio'
-    ? currentQuestCfg.value.answer === option.key
-    : currentQuestCfg.value.answer.split(',').indexOf(option.key) > -1
+  if (!currentMissionCfg.value) return false
+  const option = currentMissionCfg.value.options[index]
+  return currentMissionCfg.value.type === 'radio'
+    ? currentMissionCfg.value.answer === option.key
+    : currentMissionCfg.value.answer.split(',').indexOf(option.key) > -1
 }
 
 function onOpenDialogue() {
@@ -57,7 +57,7 @@ function onOpenDialogue() {
     len = stepCfg.value.schema.length
   } else {
     len = stepCfg.value.quiz.length
-    currentQuestIdx.value = 0
+    currentMissionIdx.value = 0
   }
   for (let i = 0; i < len; i++) {
     answers[i] = [""]
@@ -71,8 +71,8 @@ const isAnswerCompleted = computed(() => {
 
 async function onSubmitAnswer(): Promise<string | null> {
   submitLoading.value = true
-  const result = await apiPostVerifyQuest(
-    props.quest.config,
+  const result = await apiPostVerifyMission(
+    props.mission.config,
     props.step,
     stepCfg.value.type === 'onchain'
       ? stepCfg.value.schema.map((param, index) => {
@@ -90,8 +90,8 @@ async function onSubmitAnswer(): Promise<string | null> {
     if (!result.isAccountValid) {
       throw new Error("Account verification invalid")
     }
-    if (!result.isQuestValid) {
-      throw new Error("Quest verification invalid")
+    if (!result.isMissionValid) {
+      throw new Error("Mission verification invalid")
     }
   } else {
     throw new Error("Failed to requeset")
@@ -144,30 +144,30 @@ function onCloseDialgue() {
         </div>
         <div class="flex flex-col gap-1">
           <template v-for="(param, index) in stepCfg.schema" :key="`key_${index}`">
-            <label :for="`${quest.id}_${step}_param_${param.key}`">
+            <label :for="`${mission.id}_${step}_param_${param.key}`">
               <span class="text-lg font-semibold">{{ param.label ?? param.key }}</span>
-              <input type="text" :id="`${quest.id}_${step}_param_${param.key}`" :name="`${quest.id}_${step}_param_${param.key}`"
+              <input type="text" :id="`${mission.id}_${step}_param_${param.key}`" :name="`${mission.id}_${step}_param_${param.key}`"
                 :placeholder="param.type" v-model="answers[index][0]" required>
             </label>
           </template>
         </div>
       </template>
-      <template v-else-if="currentQuestCfg">
-        <small>Question {{ currentQuestIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
-        <h4 class="w-full text-center mb-4">{{ currentQuestCfg.question }}</h4>
+      <template v-else-if="currentMissionCfg">
+        <small>Missionion {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
+        <h4 class="w-full text-center mb-4">{{ currentMissionCfg.question }}</h4>
         <div class="w-full px-4 py-2 flex flex-col gap-2">
-          <img v-if="currentQuestCfg.image" class="object-contain justify-items-center max-h-32"
-            :src="getIPFSUrl(currentQuestCfg.image)" alt="question alt" />
-          <template v-for="option in currentQuestOptions" :key="`quiz_${currentQuestIdx}_${option.i}`">
-            <label :for="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`"
+          <img v-if="currentMissionCfg.image" class="object-contain justify-items-center max-h-32"
+            :src="getIPFSUrl(currentMissionCfg.image)" alt="question alt" />
+          <template v-for="option in currentMissionOptions" :key="`quiz_${currentMissionIdx}_${option.i}`">
+            <label :for="`${mission.id}_${step}_quiz_${currentMissionIdx}_${option.i}`"
               :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(option.i) && isTheQuizAnswerCorrect(option.i), '!border-failure bg-failure/10': isSelectedQuizAnswer(option.i) && !isTheQuizAnswerCorrect(option.i)}]">
-              <input v-if="currentQuestCfg.type === 'radio'" type="radio"
-                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`"
-                :value="option.key" v-model="answers[currentQuestIdx][0]"
+              <input v-if="currentMissionCfg.type === 'radio'" type="radio"
+                :id="`${mission.id}_${step}_quiz_${currentMissionIdx}_${option.i}`" :value="option.key"
+                v-model="answers[currentMissionIdx][0]"
                 :aria-invalid="isSelectedQuizAnswer(option.i) ? !isTheQuizAnswerCorrect(option.i) : undefined"
                 :disabled="submitLoading" />
               <input v-else type="checkbox"
-                :id="`${quest.id}_${step}_quiz_${currentQuestIdx}_${option.i}`" :value="option.key" v-model="answers[currentQuestIdx]"
+                :id="`${mission.id}_${step}_quiz_${currentMissionIdx}_${option.i}`" :value="option.key" v-model="answers[currentMissionIdx]"
                 :aria-invalid="isSelectedQuizAnswer(option.i) ? !isTheQuizAnswerCorrect(option.i) : undefined"
                 :disabled="submitLoading" />
               {{ option.description }}
@@ -177,11 +177,11 @@ function onCloseDialgue() {
       </template>
     </div>
     <footer class="mt-4">
-      <button v-if="stepCfg.type === 'quiz' && !isLastQuizQuestion" class="rounded-xl flex-center mb-0"
-        :disabled="!isAnswerTotallyCorrect" @click.stop.prevent="() => currentQuestIdx++">
-        {{ isAnswerTotallyCorrect ? 'Next Question' : 'Incorrect 🙅‍♀️' }}
+      <button v-if="stepCfg.type === 'quiz' && !isLastQuizMissionion" class="rounded-xl flex-center mb-0"
+        :disabled="!isAnswerTotallyCorrect" @click.stop.prevent="() => currentMissionIdx++">
+        {{ isAnswerTotallyCorrect ? 'Next Missionion' : 'Incorrect 🙅‍♀️' }}
       </button>
-      <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizQuestion"
+      <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizMissionion"
         :disabled="!isAnswerCompleted || (stepCfg.type === 'quiz' && !isAnswerTotallyCorrect)" :method="onSubmitAnswer"
         @sealed="resetComp()"
         @error="resetComp()"

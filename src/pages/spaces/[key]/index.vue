@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ItemSpaceListChallenges from '~/components/item/space/list/ItemSpaceListChallenges.vue'
-import ItemSpaceListQuests from '~/components/item/space/list/ItemSpaceListQuests.vue'
+import ItemSpaceListMissions from '~/components/item/space/list/ItemSpaceListMissions.vue'
 
 definePageMeta({
   key: route => route.path
@@ -26,16 +26,16 @@ const { data, pending, refresh } = useAsyncData(`space:${spaceKey}`, async () =>
 
 provide(spaceInjectKey, { space: data, refresh })
 
-const currentTab = ref(route.query.tab === 'Quests' ? 'Quests' : 'Challenges')
+const currentTab = ref(route.query.tab === 'Missions' ? 'Missions' : 'Challenges')
 const tabs = [
   { label: "Challenges", comp: ItemSpaceListChallenges },
-  { label: "Quests", comp: ItemSpaceListQuests },
+  { label: "Missions", comp: ItemSpaceListMissions },
 ]
 const currentComponent = computed(() => tabs.find(tab => tab.label === currentTab.value)?.comp)
 
 watch(() => route.query, (newQuery) => {
-  if (newQuery.tab === 'Quests') {
-    currentTab.value = 'Quests'
+  if (newQuery.tab === 'Missions') {
+    currentTab.value = 'Missions'
   } else {
     currentTab.value = 'Challenges'
   }

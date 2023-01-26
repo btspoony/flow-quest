@@ -28,9 +28,9 @@ async function sendTransactionWithKeyPool(
   return txid;
 }
 
-export async function txCtrlerSetQuestAnswer(
+export async function txCtrlerSetMissionAnswer(
   signer: Signer,
-  opts: OptionCtrlerSetQuestAnswer
+  opts: OptionCtrlerSetMissionAnswer
 ) {
   const kvpair: { key: string; value: string }[] = [];
   if (opts.params) {
@@ -41,11 +41,11 @@ export async function txCtrlerSetQuestAnswer(
   return sendTransactionWithKeyPool(
     signer,
     await useStorage().getItem(
-      "assets/server/cadence/transactions/ctrler-set-quest-completed.cdc"
+      "assets/server/cadence/transactions/ctrler-set-mission-completed.cdc"
     ),
     (arg, t) => [
       arg(opts.target, t.Address),
-      arg(opts.questKey, t.String),
+      arg(opts.missionKey, t.String),
       arg(String(opts.step), t.Int),
       arg(kvpair, t.Dictionary({ key: t.String, value: t.String })),
     ]
@@ -80,20 +80,20 @@ export async function txCtrlerSetupReferralCode(
 
 /// ------------------------------ Scripts ------------------------------
 
-export async function scGetQuestDetail(
+export async function scGetMissionDetail(
   signer: Signer,
   communityId: string,
-  questKey: string
-): Promise<QuestDetail> {
+  missionKey: string
+): Promise<MissionDetail> {
   const code = await useStorage().getItem(
-    `assets/server/cadence/scripts/get-quest-detail.cdc`
+    `assets/server/cadence/scripts/get-mission-detail.cdc`
   );
   if (typeof code !== "string") {
     throw new Error("Unknown script.");
   }
   const result = await signer.executeScript(
     code,
-    (arg, t) => [arg(communityId, t.UInt64), arg(questKey, t.String)],
+    (arg, t) => [arg(communityId, t.UInt64), arg(missionKey, t.String)],
     undefined
   );
   if (!result) {
@@ -137,13 +137,13 @@ export async function scCheckPointsToGeneReferralCode(
   );
 }
 
-export async function scVerifyQuest(
+export async function scVerifyMission(
   signer: Signer,
-  stepCfg: QuestStepsConfig,
+  stepCfg: MissionStepsConfig,
   params: { key: string; value: string }[]
 ): Promise<boolean> {
   if (stepCfg.type === "onchain") {
-    // Verify the quest result on testnet
+    // Verify the mission result on testnet
     if (typeof stepCfg.test.network !== "string")
       throw new Error("Network is missing.");
     if (typeof stepCfg.test.expect !== "string")
@@ -158,12 +158,12 @@ export async function scVerifyQuest(
     }
 
     const code = await executeOrLoadFromRedis<string>(
-      `QuestVerificationCode:${stepCfg.code}`,
+      `MissionVerificationCode:${stepCfg.code}`,
       $fetch(stepCfg.code)
     );
     console.log(`[Loaded Code]: ${stepCfg.code}`);
     if (typeof code !== "string") {
-      throw new Error("Unknown quests key.");
+      throw new Error("Unknown missions key.");
     }
     if (typeof stepCfg.schema !== "object") {
       throw new Error("Unknown schema.");
@@ -231,7 +231,7 @@ export async function scVerifyQuest(
       false
     );
     console.log(
-      `Request<VerifyQuest> - Step.2-2: Quest result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
+      `Request<VerifyMission> - Step.2-2: Mission result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
     );
     return result === stepCfg.test.result;
   } else {

@@ -9,22 +9,22 @@ import Community from "../../../../cadence/dev-challenge/Community.cdc"
 pub fun main(
     communityKey: String,
     searchKey: String,
-): [QueryStructs.QuestData] {
+): [QueryStructs.MissionData] {
     if let community = Community.borrowCommunityByKey(key: communityKey) {
-        let ret: [QueryStructs.QuestData] = []
+        let ret: [QueryStructs.MissionData] = []
         let searchKeyLen = searchKey.length
-        let keys = community.getQuestKeys()
+        let keys = community.getMissionKeys()
         for key in keys {
             if searchKeyLen <= key.length && key.slice(from: 0, upTo: searchKeyLen) == searchKey {
-                if let quest = community.borrowQuestRef(key: key) {
-                    ret.append(QueryStructs.QuestData(
+                if let mission = community.borrowMissionRef(key: key) {
+                    ret.append(QueryStructs.MissionData(
                         identifier: Community.BountyEntityIdentifier(
-                            category: Interfaces.BountyType.quest,
+                            category: Interfaces.BountyType.mission,
                             communityId: community.getID(),
                             key: key
                         ),
-                        display: quest.getStandardDisplay(),
-                        detail: quest.getDetail()
+                        display: mission.getStandardDisplay(),
+                        detail: mission.getDetail()
                     ))
                 }
             }

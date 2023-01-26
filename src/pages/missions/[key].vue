@@ -10,36 +10,36 @@ const mdRenderer = md()
 const route = useRoute()
 const user = useUserProfile()
 
-interface QuestDetail {
+interface MissionDetail {
   season: CompetitionSeason | null,
-  quest: BountyInfo | null,
+  mission: BountyInfo | null,
   guideMD?: string,
-  stepsCfg: QuestStepsConfig[],
+  stepsCfg: MissionStepsConfig[],
 }
 
-const questKey = computed(() => route.params.key as string)
+const missionKey = computed(() => route.params.key as string)
 
-watch(questKey, (newVal) => {
+watch(missionKey, (newVal) => {
   refresh();
 });
 
-const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${questKey.value}`, async () => {
+const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${missionKey.value}`, async () => {
   const season = await apiGetActiveSeason();
-  const quest = await apiGetCurrentQuest(questKey.value)
+  const mission = await apiGetCurrentMission(missionKey.value)
   let guideMD: string | undefined
-  let questDetail: QuestDetailConfig | undefined
+  let missionDetail: MissionDetailConfig | undefined
 
-  if (quest) {
-    const stepsCfgStr = await $fetch((quest?.config as QuestConfig).stepsCfg)
+  if (mission) {
+    const stepsCfgStr = await $fetch((mission?.config as MissionConfig).stepsCfg)
     if (stepsCfgStr) {
       try {
         const json = JSON.parse(stepsCfgStr as string)
         if (Array.isArray(json)) {
-          questDetail = { steps: json }
+          missionDetail = { steps: json }
         } else {
-          questDetail = json as QuestDetailConfig
+          missionDetail = json as MissionDetailConfig
         }
-        const guideURL = questDetail.guide ?? (quest?.config as QuestConfig).guideMD
+        const guideURL = missionDetail.guide ?? (mission?.config as MissionConfig).guideMD
         if (typeof guideURL === 'string') {
           guideMD = await $fetch(guideURL)
         }
@@ -51,15 +51,15 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${ques
 
   return {
     season,
-    quest,
+    mission,
     guideMD,
-    stepsCfg: questDetail?.steps ?? []
+    stepsCfg: missionDetail?.steps ?? []
   }
 }, {
   server: false
 });
 
-const bountyId = computed(() => info.value?.quest?.id)
+const bountyId = computed(() => info.value?.mission?.id)
 
 const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUserRegistered', async () => {
   const season = await apiGetActiveSeason();
@@ -81,7 +81,7 @@ const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUs
   server: false
 })
 
-const profileStatus = ref<QuestStatus | null>(null)
+const profileStatus = ref<MissionStatus | null>(null)
 const isBountyCompleted = ref(false)
 
 watch(user, (newVal, oldVal) => {
@@ -90,26 +90,26 @@ watch(user, (newVal, oldVal) => {
 
 watchEffect(async () => {
   if (user.value && user.value.activeRecord && bountyId.value) {
-    profileStatus.value = user.value.activeRecord.questScores[questKey.value]
+    profileStatus.value = user.value.activeRecord.missionScores[missionKey.value]
     isBountyCompleted.value = user.value.activeRecord.bountiesCompleted[bountyId.value] !== undefined
   } else if (isRegistered.value) {
-    await updateQuest()
+    await updateMission()
   }
 }, {
   flush: 'post'
 })
 
-const questCfg = computed(() => (info.value?.quest?.config as QuestConfig));
+const missionCfg = computed(() => (info.value?.mission?.config as MissionConfig));
 const imageUrl = computed(() => {
-  if (questCfg.value?.display.thumbnail) {
-    return getIPFSUrl(questCfg.value?.display.thumbnail)
+  if (missionCfg.value?.display.thumbnail) {
+    return getIPFSUrl(missionCfg.value?.display.thumbnail)
   } else {
     return undefined
   }
 })
 
 const lockingArr = computed<boolean[]>(() => {
-  const stepAmt = questCfg.value?.steps ?? 10
+  const stepAmt = missionCfg.value?.steps ?? 10
   const result = Array(stepAmt).fill(true)
 
   // not registered, be locked
@@ -131,11 +131,11 @@ const isInvalid = computed(() => {
   return !(profileStatus.value?.completed ?? false)
 })
 
-async function updateQuest() {
+async function updateMission() {
   const { $scripts } = useNuxtApp();
   const season = await apiGetActiveSeason();
   if (user.value?.address && bountyId.value && season) {
-    profileStatus.value = await $scripts.profileGetQuestStatus(user.value?.address, season.seasonId, questKey.value)
+    profileStatus.value = await $scripts.profileGetMissionStatus(user.value?.address, season.seasonId, missionKey.value)
     isBountyCompleted.value = await $scripts.profileIsBountyCompleted(user.value?.address, season.seasonId, bountyId.value)
   } else {
     profileStatus.value = null
@@ -166,7 +166,7 @@ async function completeBounty(): Promise<string | null> {
 </script>
 
 <template>
-  <main v-if="pending || !questCfg" class="min-h-[80vh] flex-center">
+  <main v-if="pending || !missionCfg" class="min-h-[80vh] flex-center">
     <div :aria-busy="true" />
   </main>
   <FrameGithubAuth v-else>
@@ -174,22 +174,23 @@ async function completeBounty(): Promise<string | null> {
       <div class="pt-10 flex-none w-full lg:w-5/12 flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
           <div class="flex-none flex-center">
-            <img class="rounded-full w-20 h-20" :src="imageUrl" alt="Quest Image">
+            <img class="rounded-full w-20 h-20" :src="imageUrl" alt="Mission Image">
           </div>
           <div class="flex-auto">
-            <h4 class="mb-3">{{ questCfg?.display.name }}</h4>
+            <h4 class="mb-3">{{ missionCfg?.display.name }}</h4>
             <div class="mb-3 prose-sm prose-blockquote:py-0 prose-img:my-0"
-              v-html="mdRenderer.render(questCfg?.display.description)"></div>
+              v-html="mdRenderer.render(missionCfg?.display.description)"></div>
           </div>
         </div>
-        <!-- Quest Prepare -->
+        <!-- Mission Prepare -->
         <div class="flex flex-col gap-2">
           <FlowConnect v-if="!user?.activeRecord || !isRegistered" @registered="userRefresh" />
         </div>
-        <!-- Quest steps -->
+        <!-- Mission steps -->
         <div class="flex flex-col gap-2">
-          <ItemQuestStep v-for="i in questCfg?.steps" :key="i" :quest="info?.quest!" :step="(i - 1)" :steps-cfg="info?.stepsCfg!"
-            :is-completed="profileStatus?.steps[i - 1] ?? false" :is-locked="lockingArr[i - 1] ?? false" @success="updateQuest" />
+          <ItemMissionStep v-for="i in missionCfg?.steps" :key="i" :mission="info?.mission!" :step="(i - 1)"
+            :steps-cfg="info?.stepsCfg!" :is-completed="profileStatus?.steps[i - 1] ?? false"
+            :is-locked="lockingArr[i - 1] ?? false" @success="updateMission" />
         </div>
         <div class="flex flex-col py-2">
           <FlowSubmitTransaction v-if="bountyId" :disabled="isInvalid || isBountyCompleted" :method="completeBounty"
@@ -207,16 +208,17 @@ async function completeBounty(): Promise<string | null> {
             <div class="inline-flex-between">
               Reward
               <div class="tag">
-                {{ info?.quest?.pointReward?.rewardPoints }} Points
+                {{ info?.mission?.pointReward?.rewardPoints }} Points
               </div>
             </div>
             <div>
-              {{ info?.quest?.participantAmt }} completed
+              {{ info?.mission?.participantAmt }} completed
             </div>
           </div>
-          </div>
+        </div>
       </div>
-      <article v-if="info?.guideMD" class="flex-auto rounded-xl h-[calc(100vh-240px)] overflow-x-clip overflow-y-scroll">
+      <article v-if="info?.guideMD"
+        class="flex-auto rounded-xl h-[calc(100vh-240px)] overflow-x-clip overflow-y-scroll">
         <div class="prose-sm prose-blockquote:py-0 prose-img:my-0" v-html="mdRenderer.render(info.guideMD)" />
       </article>
     </div>

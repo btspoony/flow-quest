@@ -9,14 +9,14 @@ pub contract QueryStructs {
     pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
     pub let properties: {UInt8: Bool}
     pub let display: MetadataViews.Display
-    pub let questDetail: Interfaces.QuestDetail?
+    pub let missionDetail: Interfaces.MissionDetail?
     pub let challengeDetail: Interfaces.ChallengeDetail?
     // bounty data
     pub let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
     pub let participants: {Address: {String: AnyStruct}}
     pub let participantAmt: UInt64
     // reward info
-    pub let rewardType: Helper.QuestRewardType
+    pub let rewardType: Helper.MissionRewardType
     pub let pointReward: Helper.PointReward?
     pub let floatReward: Helper.FLOATReward?
 
@@ -25,12 +25,12 @@ pub contract QueryStructs {
       identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
       properties: {UInt8: Bool},
       display: MetadataViews.Display,
-      questDetail: Interfaces.QuestDetail?,
+      missionDetail: Interfaces.MissionDetail?,
       challengeDetail: Interfaces.ChallengeDetail?,
       preconditions: [AnyStruct{Interfaces.UnlockCondition}],
       participants: {Address: {String: AnyStruct}},
       participantAmt: UInt64,
-      rewardType: Helper.QuestRewardType,
+      rewardType: Helper.MissionRewardType,
       pointReward: Helper.PointReward?,
       floatReward: Helper.FLOATReward?,
     ) {
@@ -38,7 +38,7 @@ pub contract QueryStructs {
       self.identifier = identifier
       self.properties = properties
       self.display = display
-      self.questDetail = questDetail
+      self.missionDetail = missionDetail
       self.challengeDetail = challengeDetail
       self.preconditions = preconditions
       self.participants = participants
@@ -49,15 +49,15 @@ pub contract QueryStructs {
     }
   }
 
-  pub struct QuestData {
+  pub struct MissionData {
     pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
     pub let display: MetadataViews.Display
-    pub let detail: Interfaces.QuestDetail
+    pub let detail: Interfaces.MissionDetail
 
     init(
       identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
       display: MetadataViews.Display,
-      detail: Interfaces.QuestDetail,
+      detail: Interfaces.MissionDetail,
     ) {
       self.identifier = identifier
       self.display = display

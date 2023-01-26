@@ -9,7 +9,7 @@ const user = useUserProfile()
 interface ChallengeDetail {
   season: CompetitionSeason | null,
   challenge: BountyInfo | null,
-  quests: BountyInfo[]
+  missions: BountyInfo[]
 }
 
 const bountyId = computed(() => route.params.bountyId as string)
@@ -23,13 +23,13 @@ const { data: info, pending, refresh } = useAsyncData<ChallengeDetail>(`challeng
   const challenge = await apiGetCurrentChallenge(bountyId.value);
 
   const { $scripts } = useNuxtApp();
-  let quests: BountyInfo[] = []
+  let missions: BountyInfo[] = []
   if (season && challenge) {
-    quests = await $scripts.getQuestsDetail(season.seasonId, (challenge.config as ChallengeConfig).quests)
+    missions = await $scripts.getMissionsDetail(season.seasonId, (challenge.config as ChallengeConfig).missions)
   } else {
-    quests = []
+    missions = []
   }
-  return { season, challenge, quests }
+  return { season, challenge, missions }
 }, {
   server: false
 });
@@ -45,9 +45,9 @@ const imageUrl = computed(() => {
 
 const totalPoints = computed(() => {
   let points = 0
-  info.value?.quests.forEach(quest => {
-    if (quest.rewardType === 'Points') {
-      points += quest.pointReward?.rewardPoints ?? 0
+  info.value?.missions.forEach(mission => {
+    if (mission.rewardType === 'Points') {
+      points += mission.pointReward?.rewardPoints ?? 0
     }
   })
   return points
@@ -59,12 +59,12 @@ const progress = ref(0);
 watchEffect(() => {
   if (info.value) {
     if (user.value && user.value.activeRecord && bountyId.value) {
-      let len = info.value.quests.length
+      let len = info.value.missions.length
       let current = 0
       for (let i = 0; i < len; i++) {
-        const quest = info.value.quests[i];
-        const isQuestCompleted = !!user.value.activeRecord.bountiesCompleted[quest.id]
-        if (isQuestCompleted) {
+        const mission = info.value.missions[i];
+        const isMissionCompleted = !!user.value.activeRecord.bountiesCompleted[mission.id]
+        if (isMissionCompleted) {
           current++
         } else {
           break
@@ -74,7 +74,7 @@ watchEffect(() => {
     } else {
       currentIndex.value = 0
     }
-    progress.value = Math.floor(currentIndex.value / info.value.quests.length * 100)
+    progress.value = Math.floor(currentIndex.value / info.value.missions.length * 100)
   }
 })
 
@@ -137,7 +137,7 @@ async function claimFloat(): Promise<string | null> {
           </div>
           <h3 class="section-header-text mb-3">{{ challengeCfg?.display.name }}</h3>
           <div class="flex gap-2 items-center justify-start">
-            <span class="tag">{{ challengeCfg?.quests?.length ?? 0 }} Quests</span>
+            <span class="tag">{{ challengeCfg?.missions?.length ?? 0 }} Missions</span>
             <span class="tag">{{ totalPoints }} Points</span>
             <progress :value="progress" max="100" class="w-40 mb-[2px]" />
           </div>
@@ -148,8 +148,8 @@ async function claimFloat(): Promise<string | null> {
       </div>
       <div role="separator" class="divider mb-11 mt-4" />
       <div class="flex flex-col gap-24">
-        <ItemChallengeQuestBar v-for="(bounty, index) in info?.quests" :key="'idx_' + index" :bounty="bounty" :index="index"
-          :isLast="(((info?.quests?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"
+        <ItemChallengeMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty" :index="index"
+          :isLast="(((info?.missions?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"
           :current="currentIndex" />
         <div v-if="challengeCfg?.achievement" class="flex-center flex-col gap-2">
           <span class="tag">Achievement FLOAT</span>

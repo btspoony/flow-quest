@@ -2,7 +2,9 @@ import { z, useValidatedBody } from "h3-zod";
 import { flow, actions, utils } from "../helpers";
 import { executeOrLoadFromRedis } from "../helpers/redis";
 
-export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
+export default defineEventHandler<ResponseVerifyMission>(async function (
+  event
+) {
   const config = useRuntimeConfig();
 
   // Step.0 verify body parameters
@@ -19,10 +21,10 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
           signature: z.string(),
         })
       ),
-      // required, quest identifier
+      // required, mission identifier
       communityId: z.string(),
-      questKey: z.string(),
-      // required, quest answer related
+      missionKey: z.string(),
+      // required, mission answer related
       step: z.number(),
       questParams: z.array(
         z.object({
@@ -33,19 +35,21 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     })
   );
 
-  console.log(`Request<VerifyQuest>[${body.address}] - Step.0: Body verified`);
+  console.log(
+    `Request<VerifyMission>[${body.address}] - Step.0: Body verified`
+  );
 
   const isProduction = config.public.network === "mainnet";
 
   const signer = await utils.pickOneSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
-  let isQuestValid = false;
+  let isMissionValid = false;
   let transactionId: string | null = null;
 
   if (isAccountValid) {
     console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.1: Signature verified`
+      `Request<VerifyMission>[${body.address}] - Step.1: Signature verified`
     );
 
     if (isProduction) {
@@ -54,23 +58,23 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
       flow.switchToTestnet();
     }
 
-    const questDetail = await executeOrLoadFromRedis<QuestDetail>(
-      `QuestDetail:${body.communityId}:${body.questKey}`,
-      actions.scGetQuestDetail(signer, body.communityId, body.questKey)
+    const missionDetail = await executeOrLoadFromRedis<MissionDetail>(
+      `MissionDetail:${body.communityId}:${body.missionKey}`,
+      actions.scGetMissionDetail(signer, body.communityId, body.missionKey)
     );
 
     if (
-      typeof questDetail?.stepsCfg !== "string" ||
-      !questDetail?.stepsCfg.startsWith("http")
+      typeof missionDetail?.stepsCfg !== "string" ||
+      !missionDetail?.stepsCfg.startsWith("http")
     ) {
-      throw new Error("Invalid quest detail.");
+      throw new Error("Invalid mission detail.");
     }
 
-    const stepsCfg = await executeOrLoadFromRedis<QuestDetailConfig>(
-      `QuestStepsConfig:${questDetail?.stepsCfg}`,
-      (async (): Promise<QuestDetailConfig> => {
+    const stepsCfg = await executeOrLoadFromRedis<MissionDetailConfig>(
+      `MissionStepsConfig:${missionDetail?.stepsCfg}`,
+      (async (): Promise<MissionDetailConfig> => {
         const data = JSON.parse(
-          (await $fetch(questDetail?.stepsCfg)) as string
+          (await $fetch(missionDetail?.stepsCfg)) as string
         );
         if (Array.isArray(data)) {
           return { steps: data };
@@ -83,7 +87,7 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     const stepCfg = stepsCfg.steps[body.step];
     if (!stepCfg) throw new Error("Missing step Cfg");
     console.log(
-      `Request<VerifyQuest>[${body.address}] - Step.2-1: loaded cfg from ${questDetail?.stepsCfg}`
+      `Request<VerifyMission>[${body.address}] - Step.2-1: loaded cfg from ${missionDetail?.stepsCfg}`
     );
 
     const params = body.questParams.reduce((prev, curr) => {
@@ -92,7 +96,7 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
     }, {} as { [key: string]: string });
 
     // Step.2 run a script to ensure transactions
-    isQuestValid = await actions.scVerifyQuest(
+    isMissionValid = await actions.scVerifyMission(
       signer,
       stepCfg,
       body.questParams
@@ -105,11 +109,11 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
       flow.switchToTestnet();
     }
 
-    if (isQuestValid) {
+    if (isMissionValid) {
       // run the reward transaction
-      transactionId = await actions.txCtrlerSetQuestAnswer(signer, {
+      transactionId = await actions.txCtrlerSetMissionAnswer(signer, {
         target: body.address,
-        questKey: body.questKey,
+        missionKey: body.missionKey,
         step: body.step,
         params,
       });
@@ -117,16 +121,16 @@ export default defineEventHandler<ResponseVerifyQuest>(async function (event) {
 
     if (transactionId) {
       console.log(
-        `Request<VerifyQuest>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
+        `Request<VerifyMission>[${body.address}] - Step.3: Transaction Sent: ${transactionId}`
       );
     }
   }
 
   // Step.4 Return the transaction id
   return {
-    ok: isAccountValid && isQuestValid && transactionId !== null,
+    ok: isAccountValid && isMissionValid && transactionId !== null,
     isAccountValid,
-    isQuestValid,
+    isMissionValid,
     transactionId,
   };
 });

@@ -10,12 +10,12 @@ const progress = ref(0);
 
 watchEffect(() => {
   if (user.value && user.value.activeRecord) {
-    let len = challengeCfg.value.quests.length
+    let len = challengeCfg.value.missions.length
     let current = 0
     for (let i = 0; i < len; i++) {
-      const quest = challengeCfg.value.quests[i];
-      const questscore = user.value.activeRecord.questScores[quest.key]
-      if (questscore?.completed) {
+      const mission = challengeCfg.value.missions[i];
+      const score = user.value.activeRecord.missionScores[mission.key]
+      if (score?.completed) {
         current++
       } else {
         break
@@ -35,7 +35,7 @@ watchEffect(() => {
       <div class="inline-flex gap-2 items-center justify-start">
         <TagCommunity :community-id="challengeCfg?.communityId" />
         <span class="tag">
-          {{ challengeCfg.quests.length }} quests
+          {{ challengeCfg.missions.length }} missions
         </span>
       </div>
       <div>

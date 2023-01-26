@@ -33,7 +33,7 @@ const completedBounties = computed<BountyStatus[]>(() => {
       <div class="divider"></div>
       <div class="text-xl">
         Total
-        <span class="font-extrabold">{{ completedBounties.length }} Quests</span>
+        <span class="font-extrabold">{{ completedBounties.length }} Missions</span>
         completed
       </div>
     </div>

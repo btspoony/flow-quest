@@ -53,8 +53,8 @@ pub contract FLOATVerifiers {
         }
     }
 
-    pub struct QuestCompletedInActiveSeason: FLOAT.IVerifier {
-        pub let questKey: String
+    pub struct MissionCompletedInActiveSeason: FLOAT.IVerifier {
+        pub let missionKey: String
 
         pub fun verify(_ params: {String: AnyStruct}) {
             let claimee: Address = params["claimee"]! as! Address
@@ -64,18 +64,18 @@ pub contract FLOATVerifiers {
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
                 let service = CompetitionService.borrowServicePublic()
                 let seasonId = service.getActiveSeasonID()
-                let questStatus = profile.getQuestStatus(seasonId: seasonId, questKey: self.questKey)
+                let status = profile.getMissionStatus(seasonId: seasonId, missionKey: self.missionKey)
                 assert(
-                    questStatus.completed,
-                    message: "You didn't complete the quest #:".concat(self.questKey)
+                    status.completed,
+                    message: "You didn't complete the mission #:".concat(self.missionKey)
                 )
             } else {
                 panic("You do not have Profile resource")
             }
         }
 
-        init(questKey: String) {
-            self.questKey = questKey
+        init(missionKey: String) {
+            self.missionKey = missionKey
         }
     }
 }

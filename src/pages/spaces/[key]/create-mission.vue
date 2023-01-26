@@ -6,14 +6,14 @@ definePageMeta({
 const route = useRoute()
 const spaceKey = computed<string>(() => typeof route.params.key === 'string' ? route.params.key : route.params.key[0])
 
-const data = reactive<QuestConfigRequest>({
+const data = reactive<MissionConfigRequest>({
   key: '',
   name: '',
   description: '',
   steps: 0,
   stepsCfg: '',
 })
-provide(spaceNewQuestsInjectKey, [data])
+provide(spaceNewMissionsInjectKey, [data])
 
 function resetComp() {
   data.key = ''
@@ -25,12 +25,12 @@ function resetComp() {
 
 function onTransactionSuccess() {
   const router = useRouter()
-  router.push({ path: `/spaces/${spaceKey.value}`, query: { tab: 'Quests' } })
+  router.push({ path: `/spaces/${spaceKey.value}`, query: { tab: 'Missions' } })
 }
 
 async function sendTransaction(): Promise<string> {
   const { $transactions } = useNuxtApp();
-  return $transactions.spaceAddQuests(spaceKey.value, [{
+  return $transactions.spaceAddMissions(spaceKey.value, [{
     key: data.key,
     name: data.name,
     description: data.description,
@@ -43,8 +43,8 @@ async function sendTransaction(): Promise<string> {
 <template>
   <div class="pt-8 flex flex-col gap-4">
     <BtnBack />
-    <h2 class="mb-2">Create a new quest</h2>
-    <FormSpaceNewQuest :index="0" />
+    <h2 class="mb-2">Create a new mission</h2>
+    <FormSpaceNewMission :index="0" />
     <FlowSubmitTransaction :disabled="!data.valid" :method="sendTransaction"
       @success="onTransactionSuccess()" @sealed="resetComp()" @reset="resetComp()">
       <template v-slot:disabled>

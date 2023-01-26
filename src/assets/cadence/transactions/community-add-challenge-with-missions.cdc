@@ -8,14 +8,14 @@ transaction(
     title: String,
     description: String,
     image: String,
-    // Quest
-    existsQuestKeys: [String],
-    newQuestKeys: [String],
-    newQuestTitles: [String],
-    newQuestDescriptions: [String],
-    newQuestImages: [String?],
-    newQuestSteps: [UInt64],
-    newQuestStepsCfg: [String],
+    // Mission
+    existsMissionKeys: [String],
+    newMissionKeys: [String],
+    newMissionTitles: [String],
+    newMissionDescriptions: [String],
+    newMissionImages: [String?],
+    newMissionSteps: [UInt64],
+    newMissionStepsCfg: [String],
     // Achievement
     achievementHost: Address?,
     achievementId: UInt64?,
@@ -32,11 +32,11 @@ transaction(
     }
 
     pre {
-        newQuestKeys.length == newQuestTitles.length: "Miss match"
-        newQuestKeys.length == newQuestDescriptions.length: "Miss match"
-        newQuestKeys.length == newQuestImages.length: "Miss match"
-        newQuestKeys.length == newQuestSteps.length: "Miss match"
-        newQuestKeys.length == newQuestStepsCfg.length: "Miss match"
+        newMissionKeys.length == newMissionTitles.length: "Miss match"
+        newMissionKeys.length == newMissionDescriptions.length: "Miss match"
+        newMissionKeys.length == newMissionImages.length: "Miss match"
+        newMissionKeys.length == newMissionSteps.length: "Miss match"
+        newMissionKeys.length == newMissionStepsCfg.length: "Miss match"
     }
 
     execute {
@@ -45,35 +45,35 @@ transaction(
         let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
 
-        let questKeys = existsQuestKeys
-        let len = newQuestKeys.length
+        let missionKeys = existsMissionKeys
+        let len = newMissionKeys.length
         var i = 0
         while i < len {
-            let exist = community.borrowQuestRef(key: newQuestKeys[i])
+            let exist = community.borrowMissionRef(key: newMissionKeys[i])
             if exist == nil {
-                let quest = Community.QuestConfig(
+                let mission = Community.MissionConfig(
                     communityId: communityId,
-                    key: newQuestKeys[i],
-                    title: newQuestTitles[i],
-                    description: newQuestDescriptions[i],
-                    image: newQuestImages[i],
-                    steps: newQuestSteps[i],
-                    stepsCfg: newQuestStepsCfg[i],
+                    key: newMissionKeys[i],
+                    title: newMissionTitles[i],
+                    description: newMissionDescriptions[i],
+                    image: newMissionImages[i],
+                    steps: newMissionSteps[i],
+                    stepsCfg: newMissionStepsCfg[i],
                 )
-                community.addQuest(key: newQuestKeys[i], quest: quest)
+                community.addMission(key: newMissionKeys[i], mission: mission)
             }
-            if !questKeys.contains(newQuestKeys[i]) {
-                questKeys.append(newQuestKeys[i])
+            if !missionKeys.contains(newMissionKeys[i]) {
+                missionKeys.append(newMissionKeys[i])
             }
             i = i + 1
         }
 
-        let quests: [Community.BountyEntityIdentifier] = []
-        for questKey in questKeys {
-            quests.append(Community.BountyEntityIdentifier(
-                Interfaces.BountyType.quest,
+        let missions: [Community.BountyEntityIdentifier] = []
+        for missionKey in missionKeys {
+            missions.append(Community.BountyEntityIdentifier(
+                Interfaces.BountyType.mission,
                 communityId: communityId,
-                key: questKey,
+                key: missionKey,
             ))
         }
 
@@ -90,7 +90,7 @@ transaction(
             title: title,
             description: description,
             image: image,
-            quests: quests,
+            missions: missions,
             achievement: achievement
         )
         community.addChallenge(key: key, challenge: challenge)

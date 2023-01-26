@@ -50,10 +50,10 @@ type UnlockConditions =
   | FLOATRequired
   | CompletedBountyAmount;
 
-type QuestRewardType = "Points" | "FLOAT" | "None";
+type MissionRewardType = "Points" | "FLOAT" | "None";
 
 interface RewardInfo {
-  rewardType: QuestRewardType;
+  rewardType: MissionRewardType;
 }
 
 interface PointRewardInfo extends RewardInfo {
@@ -66,7 +66,7 @@ interface FLOATRewardInfo extends RewardInfo {
   eventId: string;
 }
 
-type BountyType = "quest" | "challenge";
+type BountyType = "mission" | "challenge";
 type RewardInfos = PointRewardInfo | FLOATRewardInfo;
 
 /**
@@ -79,14 +79,15 @@ interface BountyEntity extends BountyIdentifier {
   display: Display;
 }
 
-interface QuestDetail {
+interface MissionDetail {
   steps: number;
   stepsCfg: string;
+  guideMD?: string;
 }
 
-interface QuestConfig extends BountyEntity, QuestDetail {}
+interface MissionConfig extends BountyEntity, MissionDetail {}
 
-interface QuestConfigRequest extends Display, QuestDetail {
+interface MissionConfigRequest extends Display, MissionDetail {
   key: string;
   valid?: boolean;
 }
@@ -104,41 +105,41 @@ interface QuizSchema {
   answer: string;
 }
 
-interface QuestStepBasic {
+interface MissionStepBasic {
   title: string;
   description: string;
   external?: string;
 }
 
-interface QuestStepQuiz extends QuestStepBasic {
+interface MissionStepQuiz extends MissionStepBasic {
   type: "quiz";
   quiz: QuizSchema[];
 }
 
-interface QuestStepTest {
+interface MissionStepTest {
   network: "testnet" | "mainnet";
   expect: "return" | "error";
   result: any;
 }
 
-interface QuestSchema {
+interface MissionSchema {
   key: string;
   type: string;
   label?: string;
 }
 
-interface QuestStepOnChain extends QuestStepBasic {
+interface MissionStepOnChain extends MissionStepBasic {
   type: "onchain";
   code: string;
-  schema: QuestSchema[];
-  test: QuestStepTest; // All tests should be OK, then quest passed
+  schema: MissionSchema[];
+  test: MissionStepTest; // All tests should be OK, then mission passed
 }
 
-type QuestStepsConfig = QuestStepQuiz | QuestStepOnChain;
+type MissionStepsConfig = MissionStepQuiz | MissionStepOnChain;
 
-interface QuestDetailConfig {
+interface MissionDetailConfig {
   guide?: string;
-  steps: QuestStepsConfig[];
+  steps: MissionStepsConfig[];
 }
 
 interface FLOATAchievement {
@@ -147,7 +148,7 @@ interface FLOATAchievement {
 }
 
 interface ChallengeDetail {
-  quests: BountyIdentifier[];
+  missions: BountyIdentifier[];
   achievement?: FLOATAchievement;
 }
 
@@ -156,7 +157,7 @@ interface ChallengeConfig extends BountyEntity, ChallengeDetail {}
 interface ChallengeConfigDetail {
   owner: string;
   challenge: ChallengeConfig;
-  quests: QuestConfig[];
+  missions: MissionConfig[];
 }
 
 interface FLOATEvent {
@@ -170,7 +171,7 @@ interface FLOATEvent {
   url: string;
 }
 
-type BountyEntities = QuestConfig | ChallengeConfig;
+type BountyEntities = MissionConfig | ChallengeConfig;
 
 interface SpaceDisplay {
   name: string;
@@ -217,7 +218,7 @@ interface BountyInfo {
   preconditions: UnlockConditions[];
   participants: { [key: string]: ParticipantRecord };
   participantAmt: number;
-  rewardType: QuestRewardType;
+  rewardType: MissionRewardType;
   pointReward?: PointRewardInfo;
   floatReward?: FLOATRewardInfo;
 }
@@ -236,7 +237,7 @@ interface AdminStatus {
   enabled: boolean;
 }
 
-interface QuestStatus {
+interface MissionStatus {
   steps: boolean[];
   completed: boolean;
 }
@@ -246,7 +247,7 @@ interface SeasonRecord {
   referredFromAddress?: string;
   referralCode?: string;
   points: number;
-  questScores: { [key: string]: QuestStatus };
+  missionScores: { [key: string]: MissionStatus };
   bountiesCompleted: { [uid: string]: string };
 }
 

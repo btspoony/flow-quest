@@ -24,8 +24,8 @@ pub contract Community {
 
     pub event ContractInitialized()
 
-    pub event QuestCreated(key: String, communityId: UInt64, owner: Address, steps: UInt64)
-    pub event ChallengeCreated(key: String, communityId: UInt64, owner: Address, questKeys: [String], achievementHost: Address?, achievementId: UInt64?)
+    pub event MissionCreated(key: String, communityId: UInt64, owner: Address, steps: UInt64)
+    pub event ChallengeCreated(key: String, communityId: UInt64, owner: Address, missionKeys: [String], achievementHost: Address?, achievementId: UInt64?)
     pub event ChallengeAchievementUpdated(key: String, communityId: UInt64, owner: Address, achievementHost: Address, achievementId: UInt64)
 
     pub event CommunityCreated(id: UInt64, key: String, owner: Address, name: String, description: String, image: String)
@@ -70,13 +70,13 @@ pub contract Community {
             if self.category == Interfaces.BountyType.challenge {
                 return self.getChallengeConfig()
             } else {
-                return self.getQuestConfig()
+                return self.getMissionConfig()
             }
         }
 
-        pub fun getQuestConfig(): &QuestConfig {
+        pub fun getMissionConfig(): &MissionConfig {
             let community = self.getOwnerCommunity()
-            return community.borrowQuestRef(key: self.key) ?? panic("Failed to borrow quest.")
+            return community.borrowMissionRef(key: self.key) ?? panic("Failed to borrow mission.")
         }
 
         pub fun getChallengeConfig(): &ChallengeConfig {
@@ -90,7 +90,7 @@ pub contract Community {
         }
     }
 
-    pub struct QuestConfig: Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic {
+    pub struct MissionConfig: Interfaces.BountyEntityPublic, Interfaces.MissionInfoPublic {
         pub let category: Interfaces.BountyType
         pub let communityId: UInt64
         pub let key: String
@@ -111,7 +111,7 @@ pub contract Community {
             steps: UInt64,
             stepsCfg: String,
         ) {
-            self.category = Interfaces.BountyType.quest
+            self.category = Interfaces.BountyType.mission
             self.communityId = communityId
             self.key = key
             self.title = title
@@ -141,8 +141,8 @@ pub contract Community {
             )
         }
 
-        pub fun getDetail(): Interfaces.QuestDetail {
-            return Interfaces.QuestDetail(
+        pub fun getDetail(): Interfaces.MissionDetail {
+            return Interfaces.MissionDetail(
                 steps: self.steps,
                 stepsCfg: self.stepsCfg.uri(),
             )
@@ -155,7 +155,7 @@ pub contract Community {
             }
         }
 
-        access(contract) fun updateQuestStepsCfg(stepsCfg: String) {
+        access(contract) fun updateMissionStepsCfg(stepsCfg: String) {
             self.stepsCfg = MetadataViews.HTTPFile(stepsCfg)
         }
     }
@@ -167,7 +167,7 @@ pub contract Community {
         pub let title: String
         pub let description: String
         pub let image: String
-        pub let quests: [AnyStruct{Interfaces.BountyEntityIdentifier}]
+        pub let missions: [AnyStruct{Interfaces.BountyEntityIdentifier}]
         pub var achievement: Helper.EventIdentifier?
 
         init(
@@ -176,7 +176,7 @@ pub contract Community {
             title: String,
             description: String,
             image: String,
-            quests: [BountyEntityIdentifier],
+            missions: [BountyEntityIdentifier],
             achievement: Helper.EventIdentifier?
         ) {
             self.category = Interfaces.BountyType.challenge
@@ -186,7 +186,7 @@ pub contract Community {
             self.description = description
             self.image = image
             // details
-            self.quests = quests
+            self.missions = missions
             self.achievement = achievement
         }
 
@@ -201,7 +201,7 @@ pub contract Community {
 
         pub fun getDetail(): Interfaces.ChallengeDetail {
             return Interfaces.ChallengeDetail(
-                quests: self.quests,
+                missions: self.missions,
                 achievement: self.achievement
             )
         }
@@ -250,9 +250,9 @@ pub contract Community {
         pub fun getStandardDisplay(): MetadataViews.Display
         pub fun getDetailedDisplay(): CommunityDisplay
 
-        pub fun getQuestKeys(): [String]
+        pub fun getMissionKeys(): [String]
         pub fun getChallengeKeys(): [String]
-        pub fun borrowQuestRef(key: String): &QuestConfig?
+        pub fun borrowMissionRef(key: String): &MissionConfig?
         pub fun borrowChallengeRef(key: String): &ChallengeConfig?
     }
 
@@ -264,7 +264,7 @@ pub contract Community {
         pub var bannerIpfs: String?
         pub let socials: {String: String}
         pub let bounties: [CommuntiyBountyBasics]
-        access(contract) let quests: {String: QuestConfig}
+        access(contract) let missions: {String: MissionConfig}
         access(contract) let challenges: {String: ChallengeConfig}
 
         init(
@@ -281,7 +281,7 @@ pub contract Community {
             self.imageIpfs = image
             self.bannerIpfs = banner
             self.socials = socials ?? {}
-            self.quests = {}
+            self.missions = {}
             self.challenges = {}
             self.bounties = []
         }
@@ -312,26 +312,26 @@ pub contract Community {
             )
         }
 
-        pub fun addQuest(key: String, quest: QuestConfig) {
+        pub fun addMission(key: String, mission: MissionConfig) {
             pre {
                 self.owner != nil: "Owner exists."
                 Community.entityMapping[key] == nil: "Mapping bounty entity exists."
-                Community.communityIdMapping[quest.communityId] != nil: "Community mapping doesn't exist."
+                Community.communityIdMapping[mission.communityId] != nil: "Community mapping doesn't exist."
             }
             let owner = self.owner!.address
             Community.entityMapping[key] = owner
-            self.quests[key] = quest
+            self.missions[key] = mission
             self.bounties.append(CommuntiyBountyBasics(
-                Interfaces.BountyType.quest,
+                Interfaces.BountyType.mission,
                 key,
                 getCurrentBlock().timestamp
             ))
 
-            emit QuestCreated(
+            emit MissionCreated(
                 key: key,
                 communityId: self.uuid,
                 owner: owner,
-                steps: quest.steps
+                steps: mission.steps
             )
         }
 
@@ -350,18 +350,18 @@ pub contract Community {
                 getCurrentBlock().timestamp
             ))
 
-            // quest keys
-            let questKeys: [String] = []
-            for one in challenge.quests {
-                assert(Community.entityMapping[one.key] != nil, message: "Failed to find quest:".concat(one.key))
-                questKeys.append(one.key)
+            // mission keys
+            let missionKeys: [String] = []
+            for one in challenge.missions {
+                assert(Community.entityMapping[one.key] != nil, message: "Failed to find mission:".concat(one.key))
+                missionKeys.append(one.key)
             }
 
             emit ChallengeCreated(
                 key: key,
                 communityId: self.uuid,
                 owner: owner,
-                questKeys: questKeys,
+                missionKeys: missionKeys,
                 achievementHost: challenge.achievement?.host,
                 achievementId: challenge.achievement?.eventId,
             )
@@ -384,9 +384,9 @@ pub contract Community {
             )
         }
 
-        pub fun updateQuestStepsCfg(key: String, stepsCfg: String) {
-            let quest = self.quests[key] ?? panic("Failed to find quest:".concat(key))
-            quest.updateQuestStepsCfg(stepsCfg: stepsCfg)
+        pub fun updateMissionStepsCfg(key: String, stepsCfg: String) {
+            let mission = self.missions[key] ?? panic("Failed to find mission:".concat(key))
+            mission.updateMissionStepsCfg(stepsCfg: stepsCfg)
         }
 
         /************* Internals *************/
@@ -401,16 +401,16 @@ pub contract Community {
             return self.uuid
         }
 
-        pub fun getQuestKeys(): [String] {
-            return self.quests.keys
+        pub fun getMissionKeys(): [String] {
+            return self.missions.keys
         }
 
         pub fun getChallengeKeys(): [String] {
             return self.challenges.keys
         }
 
-        pub fun borrowQuestRef(key: String): &QuestConfig? {
-            return &self.quests[key] as &QuestConfig?
+        pub fun borrowMissionRef(key: String): &MissionConfig? {
+            return &self.missions[key] as &MissionConfig?
         }
 
         pub fun borrowChallengeRef(key: String): &ChallengeConfig? {

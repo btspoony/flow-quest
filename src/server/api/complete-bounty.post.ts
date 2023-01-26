@@ -20,7 +20,7 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
           signature: z.string(),
         })
       ),
-      // required, quest identifier
+      // required, mission identifier
       bountyId: z.string(),
     })
   );
@@ -46,7 +46,7 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
       flow.switchToTestnet();
     }
 
-    // Step.2 Verify the quest result on testnet
+    // Step.2 Verify the mission result on testnet
     // Check to ensure bounty completed
     isBountyCompleted = await actions.scCheckBountyComplete(
       signer,

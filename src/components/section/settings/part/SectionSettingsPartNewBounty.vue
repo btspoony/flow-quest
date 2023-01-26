@@ -37,7 +37,7 @@ const rewardPoints = reactive<number[]>([]);
 const referralPoints = reactive<number[]>([]);
 
 const isValid = computed(() => {
-  return selectedChallenge.value?.quests.length === rewardPoints.length
+  return selectedChallenge.value?.missions.length === rewardPoints.length
     && rewardPoints.length === referralPoints.length
     && rewardPoints.filter(p => p <= 0).length === 0;
 })
@@ -86,14 +86,14 @@ function onSuccess() {
     <WidgetLoadingCard v-if="isSearching" />
     <div v-else-if="selectedChallenge" class="flex flex-col gap-2">
       <ItemSpaceChallengeCard :challenge="selectedChallenge?.challenge" />
-      <h5 class="mb-1">Set Reward Points of Quests</h5>
-      <div v-for="quest, index in selectedChallenge.quests" :key="quest.key"
+      <h5 class="mb-1">Set Reward Points of Missions</h5>
+      <div v-for="mission, index in selectedChallenge.missions" :key="mission.key"
         class="card card-border non-interactive flex items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-100 dark:bg-gray-900">
             {{ index + 1 }}
           </span>
-          <span class="tag">{{ quest.key }}</span>
+          <span class="tag">{{ mission.key }}</span>
         </div>
         <div class="flex-auto grid">
           <label :for="`rewardPoint_${index}`">

@@ -17,7 +17,7 @@ pub contract Interfaces {
         }
     }
 
-    pub struct QuestStatus {
+    pub struct MissionStatus {
         pub let steps: [Bool]
         pub let completed: Bool
 
@@ -48,13 +48,13 @@ pub contract Interfaces {
         pub fun isRegistered(seasonId: UInt64): Bool
         pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64}
         pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool
-        pub fun getQuestStatus(seasonId: UInt64, questKey: String): QuestStatus
-        pub fun getQuestsParticipanted(seasonId: UInt64): [String]
+        pub fun getMissionStatus(seasonId: UInt64, missionKey: String): MissionStatus
+        pub fun getMissionsParticipanted(seasonId: UInt64): [String]
 
         // writable
         access(account) fun addPoints(seasonId: UInt64, points: UInt64)
-        access(account) fun updateQuestNewParams(seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct})
-        access(account) fun updateQuestVerificationResult(seasonId: UInt64, questKey: String, step: Int, result: Bool)
+        access(account) fun updateMissionNewParams(seasonId: UInt64, missionKey: String, step: Int, params: {String: AnyStruct})
+        access(account) fun updateMissionVerificationResult(seasonId: UInt64, missionKey: String, step: Int, result: Bool)
         access(account) fun completeBounty(seasonId: UInt64, bountyId: UInt64)
 
         access(account) fun setupReferralCode(seasonId: UInt64, code: String)
@@ -63,13 +63,13 @@ pub contract Interfaces {
     // =================== Community ====================
 
     pub enum BountyType: UInt8 {
-        pub case quest
+        pub case mission
         pub case challenge
     }
 
     pub struct interface BountyEntityIdentifier {
         pub let category: BountyType
-        // The offchain key of the quest
+        // The offchain key of the mission
         pub let key: String
         // The community belongs to
         pub let communityId: UInt64
@@ -83,7 +83,7 @@ pub contract Interfaces {
 
     pub struct interface BountyEntityPublic {
         pub let category: BountyType
-        // The offchain key of the quest
+        // The offchain key of the mission
         pub let key: String
         // The community belongs to
         pub let communityId: UInt64
@@ -96,11 +96,11 @@ pub contract Interfaces {
         }
     }
 
-    pub struct interface QuestInfoPublic {
-        pub fun getDetail(): QuestDetail
+    pub struct interface MissionInfoPublic {
+        pub fun getDetail(): MissionDetail
     }
 
-    pub struct QuestDetail {
+    pub struct MissionDetail {
         pub let steps: UInt64
         pub let stepsCfg: String
 
@@ -118,14 +118,14 @@ pub contract Interfaces {
     }
 
     pub struct ChallengeDetail {
-        pub let quests: [AnyStruct{BountyEntityIdentifier}]
+        pub let missions: [AnyStruct{BountyEntityIdentifier}]
         pub let achievement: Helper.EventIdentifier?;
 
         init(
-            quests: [AnyStruct{BountyEntityIdentifier}],
+            missions: [AnyStruct{BountyEntityIdentifier}],
             achievement: Helper.EventIdentifier?
         ) {
-            self.quests = quests
+            self.missions = missions
             self.achievement = achievement
         }
     }
@@ -145,9 +145,9 @@ pub contract Interfaces {
         pub fun getPreconditions(): [AnyStruct{UnlockCondition}]
         pub fun getIdentifier(): AnyStruct{BountyEntityIdentifier}
 
-        pub fun getRequiredQuestKeys(): [String]
+        pub fun getRequiredMissionKeys(): [String]
 
-        pub fun getRewardType(): Helper.QuestRewardType
+        pub fun getRewardType(): Helper.MissionRewardType
         pub fun getPointReward(): Helper.PointReward
         pub fun getFLOATReward(): Helper.FLOATReward
     }
@@ -163,7 +163,7 @@ pub contract Interfaces {
         pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
 
         pub fun hasBountyByKey(_ key: String): Bool
-        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{BountyEntityPublic, QuestInfoPublic}
+        pub fun borrowMissionRef(_ missionKey: String): &AnyStruct{BountyEntityPublic, MissionInfoPublic}
 
         access(account) fun onProfileRegistered(acct: Address)
         access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address)

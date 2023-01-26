@@ -5,7 +5,7 @@ const props = defineProps<{
 
 const user = useUserProfile()
 
-const questCfg = computed(() => (props.bounty.config as QuestConfig));
+const missionCfg = computed(() => (props.bounty.config as MissionConfig));
 
 const isCompleted = ref(false)
 watchEffect(() => {
@@ -21,9 +21,9 @@ watchEffect(() => {
   <div class="card p-0 w-full h-full flex flex-col gap-4">
     <div class="h-full flex gap-4 justify-between">
       <div class="flex flex-col gap-1">
-        <h4 class="mb-2">{{ questCfg?.display.name }}</h4>
+        <h4 class="mb-2">{{ missionCfg?.display.name }}</h4>
         <p class="mb-2 text-sm">
-          {{ questCfg?.display.description }}
+          {{ missionCfg?.display.description }}
         </p>
       </div>
       <div class="flex flex-col items-end justify-between">

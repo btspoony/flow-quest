@@ -4,7 +4,7 @@ import CompetitionService from "../../../../../cadence/dev-challenge/Competition
 
 transaction(
     target: Address,
-    questKey: String,
+    missionKey: String,
     step: Int,
     params: {String: AnyStruct}?
 ) {
@@ -23,9 +23,9 @@ transaction(
         let seasonId = self.season.getSeasonId()
 
         if let p = params {
-          self.ctrler.updateNewParams(acct: target, seasonId: seasonId, questKey: questKey, step: step, params: p)
+          self.ctrler.updateNewParams(acct: target, seasonId: seasonId, missionKey: missionKey, step: step, params: p)
         }
 
-        self.ctrler.questStepCompleted(acct: target, seasonId: seasonId, questKey: questKey, step: step)
+        self.ctrler.missionStepCompleted(acct: target, seasonId: seasonId, missionKey: missionKey, step: step)
     }
 }

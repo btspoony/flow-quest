@@ -8,9 +8,9 @@ import Community from "../../../../../cadence/dev-challenge/Community.cdc"
 
 pub fun main(
   communityId: UInt64,
-  questKey: String,
-): Interfaces.QuestDetail {
+  missionKey: String,
+): Interfaces.MissionDetail {
   let community = Community.borrowCommunityById(id: communityId) ?? panic("Failed to load community")
-  let quest = community.borrowQuestRef(key: questKey) ?? panic("Failed to load quest")
-  return quest.getDetail()
+  let mission = community.borrowMissionRef(key: missionKey) ?? panic("Failed to load mission")
+  return mission.getDetail()
 }

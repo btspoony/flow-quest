@@ -5,8 +5,8 @@ import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 import claimFloat from "./transactions/claim-float.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
-import spaceAddQuests from "./transactions/community-add-quests.cdc?raw";
-import spaceAddChallenge from "./transactions/community-add-challenge-with-quests.cdc?raw";
+import spaceAddMissions from "./transactions/community-add-missions.cdc?raw";
+import spaceAddChallenge from "./transactions/community-add-challenge-with-missions.cdc?raw";
 import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
@@ -14,7 +14,7 @@ import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
 import adminBountyUpdateProperty from "./transactions/admin-update-bounty-property.cdc?raw";
 
 /**
- * scripts for quest checking
+ * scripts for mission checking
  */
 import getFLOATEvent from "./scripts/get_event.cdc?raw";
 import hasFLOATClaimed from "./scripts/has_claimed_event.cdc?raw";
@@ -27,7 +27,7 @@ import getRankingStatus from "./scripts/get_ranking_status.cdc?raw";
 import getPlatformLinkedAddress from "./scripts/get_platform_linked_address.cdc?raw";
 import getAdminStatus from "./scripts/is_admin.cdc?raw";
 import profileExists from "./scripts/profile_exists.cdc?raw";
-import profileGetQuestStatus from "./scripts/profile_get_quest_status.cdc?raw";
+import profileGetMissionStatus from "./scripts/profile_get_mission_status.cdc?raw";
 import profileIsRegistered from "./scripts/profile_is_registered.cdc?raw";
 import profileGetSeasonRecord from "./scripts/profile_get_season_record.cdc?raw";
 import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?raw";
@@ -39,8 +39,8 @@ import spaceGetBasicsByKey from "./scripts/space_get_basics_by_key.cdc?raw";
 import spaceGetList from "./scripts/space_get_list.cdc?raw";
 import spaceGetChallengeList from "./scripts/space_get_challenge_list.cdc?raw";
 import spaceGetChallengeDetail from "./scripts/space_get_challenge_detail.cdc?raw";
-import spaceGetQuestList from "./scripts/space_get_quest_list.cdc?raw";
-import spaceSearchQuests from "./scripts/space_search_quests.cdc?raw";
+import spaceGetMissionList from "./scripts/space_get_mission_list.cdc?raw";
+import spaceSearchMissions from "./scripts/space_search_missions.cdc?raw";
 
 export default {
     transactions: {
@@ -54,7 +54,7 @@ export default {
         adminAddBounties,
         adminBountyUpdateProperty,
         spaceCreate,
-        spaceAddQuests,
+        spaceAddMissions,
         spaceAddChallenge,
     },
     scripts: {
@@ -72,7 +72,7 @@ export default {
         profileExists,
         profileIsRegistered,
         profileGetSeasonRecord,
-        profileGetQuestStatus,
+        profileGetMissionStatus,
         profileIsBountyCompleted,
         profileGetIdentities,
         profilesGetIdentity,
@@ -83,7 +83,7 @@ export default {
         spaceGetList,
         spaceGetChallengeList,
         spaceGetChallengeDetail,
-        spaceGetQuestList,
-        spaceSearchQuests,
+        spaceGetMissionList,
+        spaceSearchMissions,
     },
 };

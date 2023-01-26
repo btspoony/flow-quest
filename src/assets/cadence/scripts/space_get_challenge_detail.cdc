@@ -26,18 +26,18 @@ pub fun main(
             return nil
         }
 
-        let quests: [QueryStructs.QuestData] = []
-        for qid in challenge!.quests {
-            if let questCommunity = Community.borrowCommunityById(id: qid.communityId) {
-                if let quest = questCommunity.borrowQuestRef(key: qid.key) {
-                    quests.append(QueryStructs.QuestData(
+        let missions: [QueryStructs.MissionData] = []
+        for qid in challenge!.missions {
+            if let community = Community.borrowCommunityById(id: qid.communityId) {
+                if let mission = community.borrowMissionRef(key: qid.key) {
+                    missions.append(QueryStructs.MissionData(
                         identifier: qid,
-                        display: quest.getStandardDisplay(),
-                        detail: quest.getDetail()
+                        display: mission.getStandardDisplay(),
+                        detail: mission.getDetail()
                     ))
                 }
             }
-        } // build quest detail
+        } // build mission detail
         return ChallengeDetail(
             community.owner!.address,
             QueryStructs.ChallengeData(
@@ -49,7 +49,7 @@ pub fun main(
                 display: challenge!.getStandardDisplay(),
                 detail: challenge!.getDetail()
             ),
-            quests
+            missions
         )
     }
     return nil
@@ -58,15 +58,15 @@ pub fun main(
 pub struct ChallengeDetail {
     pub let owner: Address
     pub let challenge: QueryStructs.ChallengeData
-    pub let quests: [QueryStructs.QuestData]
+    pub let missions: [QueryStructs.MissionData]
 
     init(
         _ owner: Address,
         _ challenge: QueryStructs.ChallengeData,
-        _ quests: [QueryStructs.QuestData]
+        _ missions: [QueryStructs.MissionData]
     ) {
         self.owner = owner
         self.challenge = challenge
-        self.quests = quests
+        self.missions = missions
     }
 }

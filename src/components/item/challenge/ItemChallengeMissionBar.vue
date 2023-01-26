@@ -6,7 +6,6 @@ const props = defineProps<{
   isLast: boolean,
 }>()
 
-// const questCfg = computed(() => (props.bounty.config as QuestConfig));
 const isCurrentProcess = computed(() => props.current === props.index)
 const isOdd = computed(() => props.index % 2 === 0)
 </script>
@@ -15,7 +14,7 @@ const isOdd = computed(() => props.index % 2 === 0)
   <div :class="['w-full relative flex gap-0', isOdd ? 'justify-start' : 'justify-end']">
     <div class="relative w-[560px]">
       <div class="absolute w-full" v-if="isCurrentProcess">
-        <span class="tag tag-sm absolute -top-9 left-1/2" style="transform: translateX(-50%);">Next Quest:</span>
+        <span class="tag tag-sm absolute -top-9 left-1/2" style="transform: translateX(-50%);">Next Mission:</span>
       </div>
       <ItemBountyInfoCard :bounty="bounty" :highlight="isCurrentProcess" :locked="(index > current)" />
       <div v-if="!isLast"

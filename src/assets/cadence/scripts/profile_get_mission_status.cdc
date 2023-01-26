@@ -9,8 +9,8 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 pub fun main(
   acct: Address,
   seasonId: UInt64,
-  questKey: String,
-): Interfaces.QuestStatus {
+  missionKey: String,
+): Interfaces.MissionStatus {
   let profile = UserProfile.borrowUserProfilePublic(acct)
-  return profile.getQuestStatus(seasonId: seasonId, questKey: questKey)
+  return profile.getMissionStatus(seasonId: seasonId, missionKey: missionKey)
 }

@@ -9,7 +9,7 @@ function isCurrentInActivePage(pageKey: string): boolean {
 }
 
 const menus = reactive([
-  { path: 'active', display: 'Competition', icon: 'fire-20-solid', iconClass: 'text-secondary' },
+  { path: 'active', display: 'Quests', icon: 'fire-20-solid', iconClass: 'text-secondary' },
   { path: 'leaderboard', display: 'Leaderboard', icon: 'chart-bar-square-20-solid', iconClass: '' },
 ])
 

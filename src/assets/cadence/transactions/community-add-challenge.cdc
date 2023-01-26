@@ -8,7 +8,7 @@ transaction(
     title: String,
     description: String,
     image: String,
-    questKeys: [String],
+    missionKeys: [String],
     achievementHost: Address?,
     achievementId: UInt64?,
 ) {
@@ -29,12 +29,12 @@ transaction(
         let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
 
-        let quests: [Community.BountyEntityIdentifier] = []
-        for questKey in questKeys {
-            quests.append(Community.BountyEntityIdentifier(
-                Interfaces.BountyType.quest,
+        let missions: [Community.BountyEntityIdentifier] = []
+        for missionKey in missionKeys {
+            missions.append(Community.BountyEntityIdentifier(
+                Interfaces.BountyType.mission,
                 communityId: communityId,
-                key: questKey,
+                key: missionKey,
             ))
         }
 
@@ -51,7 +51,7 @@ transaction(
             title: title,
             description: description,
             image: image,
-            quests: quests,
+            missions: missions,
             achievement: achievement
         )
         community.addChallenge(key: key, challenge: challenge)

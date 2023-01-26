@@ -3,7 +3,7 @@ const props = defineProps<{
   index: number
 }>()
 
-const injected = inject(spaceNewQuestsInjectKey, [])
+const injected = inject(spaceNewMissionsInjectKey, [])
 
 const cfgPreview = ref("")
 const isStepsCfgURLValid = ref(false)
@@ -15,7 +15,7 @@ watch([isStepsCfgURLValid], ([newStepsValidA]) => {
   if (
     data
     && data.key
-    && data.key !== 'create-quest'
+    && data.key !== 'create-mission'
     && data.key !== 'create-challenge'
     && data.name
     && data.description
@@ -38,7 +38,7 @@ async function loadAndValidateCfg() {
     const stepsJson: any[] = Array.isArray(cfg) ? cfg : Array.isArray(cfg.steps) ? cfg.steps : []
     if (stepsJson.length > 0) {
       valid = stepsJson.filter(one => {
-        const stepCfg = one as QuestStepsConfig
+        const stepCfg = one as MissionStepsConfig
         return typeof stepCfg.type === 'string'
           && typeof stepCfg.title === 'string'
           && (stepCfg.type === 'onchain' ? typeof stepCfg.code === 'string' && Array.isArray(stepCfg.schema) : Array.isArray(stepCfg.quiz))
@@ -61,23 +61,23 @@ async function loadAndValidateCfg() {
 
 <template>
   <form class="mb-0" v-if="injected[index]">
-    <label for="questKey">
+    <label for="missionKey">
       Key
-      <input type="text" id="questKey" placeholder="Unique Key" v-model.trim="injected[index].key" required />
+      <input type="text" id="missionKey" placeholder="Unique Key" v-model.trim="injected[index].key" required />
     </label>
-    <label for="questTitle">
+    <label for="missionTitle">
       Title
-      <input type="text" id="questTitle" placeholder="Title" v-model.trim="injected[index].name" required />
+      <input type="text" id="missionTitle" placeholder="Title" v-model.trim="injected[index].name" required />
     </label>
-    <label for="questDesc">
+    <label for="missionDesc">
       Description
-      <textarea id="questDesc" placeholder="Description" class="resize-y h-28 max-h-60"
+      <textarea id="missionDesc" placeholder="Description" class="resize-y h-28 max-h-60"
         v-model.trim="injected[index].description" required />
     </label>
     <div class="grid mb-2">
-      <label for="questStepsCfg">
-        URL of quest steps config
-        <input type="url" id="questStepsCfg" placeholder="https://raw.githubusercontent.com/.../verify.json"
+      <label for="missionStepsCfg">
+        URL of mission steps config
+        <input type="url" id="missionStepsCfg" placeholder="https://raw.githubusercontent.com/.../xxx.json"
           v-model.trim="injected[index].stepsCfg"
           :aria-invalid="!injected[index].stepsCfg ? undefined : !isStepsCfgURLValid"
           :aria-busy="stepsCfgLoading"
@@ -87,7 +87,7 @@ async function loadAndValidateCfg() {
       <code class="overflow-scroll max-h-28" :aria-busy="stepsCfgLoading">{{ cfgPreview }}</code>
     </div>
     <div v-if="isStepsCfgURLValid && cfgGuideURL">
-      <h6 class="mb-1">Quest Guide:</h6>
+      <h6 class="mb-1">Mission Guide:</h6>
       <NuxtLink :to="cfgGuideURL" target="_blank">
         {{ cfgGuideURL }}
       </NuxtLink>

@@ -12,9 +12,9 @@ interface OptionProfileRegister {
   referredFrom?: string;
 }
 
-interface OptionCtrlerSetQuestAnswer {
+interface OptionCtrlerSetMissionAnswer {
   target: string;
-  questKey: string;
+  missionKey: string;
   step: number;
   params: { [key: string]: string };
 }
@@ -32,9 +32,9 @@ interface ResponseBasics {
   };
 }
 
-interface ResponseVerifyQuest extends ResponseBasics {
+interface ResponseVerifyMission extends ResponseBasics {
   isAccountValid?: boolean;
-  isQuestValid?: boolean;
+  isMissionValid?: boolean;
   transactionId?: string | null;
 }
 

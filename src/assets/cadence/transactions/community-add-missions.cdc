@@ -37,9 +37,9 @@ transaction(
         let len = keys.length
         var i = 0
         while i < len {
-            let exist = community.borrowQuestRef(key: keys[i])
+            let exist = community.borrowMissionRef(key: keys[i])
             if exist == nil {
-                let quest = Community.QuestConfig(
+                let mission = Community.MissionConfig(
                     communityId: communityId,
                     key: keys[i],
                     title: title[i],
@@ -48,7 +48,7 @@ transaction(
                     steps: steps[i],
                     stepsCfg: stepsCfg[i],
                 )
-                community.addQuest(key: keys[i], quest: quest)
+                community.addMission(key: keys[i], mission: mission)
             }
             i = i + 1
         }

@@ -5,7 +5,7 @@ export function parseProfileSeasonRecord(record: any): SeasonRecord {
     referredFromAddress: record.referredFromAddress,
     referralCode: record.referralCode,
     bountiesCompleted: record.bountiesCompleted,
-    questScores: record.questScores,
+    missionScores: record.missionScores,
   };
 }
 
@@ -17,14 +17,14 @@ export function parseDisplay(display: any): Display {
   };
 }
 
-export function parseQuestInfo(info: any): QuestConfig {
+export function parseMissionInfo(info: any): MissionConfig {
   return {
     category: parseIdentifierCategory(info.identifier.category),
     communityId: info.identifier.communityId,
     key: info.identifier.key,
     display: parseDisplay(info.display),
-    steps: parseInt((info.questDetail ?? info.detail)?.steps ?? 0),
-    stepsCfg: (info.questDetail ?? info.detail)?.stepsCfg,
+    steps: parseInt((info.missionDetail ?? info.detail)?.steps ?? 0),
+    stepsCfg: (info.missionDetail ?? info.detail)?.stepsCfg,
   };
 }
 
@@ -34,9 +34,9 @@ export function parseChallengeInfo(info: any): ChallengeConfig {
     communityId: info.identifier.communityId,
     key: info.identifier.key,
     display: parseDisplay(info.display),
-    quests:
-      (info.challengeDetail ?? info.detail)?.quests?.map((quest: any) =>
-        parseIdentifier(quest)
+    missions:
+      (info.challengeDetail ?? info.detail)?.missions?.map((mission: any) =>
+        parseIdentifier(mission)
       ) ?? [],
     achievement: (info.challengeDetail ?? info.detail)?.achievement,
   };
@@ -46,7 +46,9 @@ export function parseChallengeInfoDetail(info: any): ChallengeConfigDetail {
   return {
     owner: info.owner,
     challenge: parseChallengeInfo(info.challenge),
-    quests: (info.quests ?? []).map((quest: any) => parseQuestInfo(quest)),
+    missions: (info.missions ?? []).map((mission: any) =>
+      parseMissionInfo(mission)
+    ),
   };
 }
 
@@ -57,7 +59,7 @@ export function parseBountyInfo(info: any): BountyInfo {
     config:
       category === "challenge"
         ? parseChallengeInfo(info)
-        : parseQuestInfo(info),
+        : parseMissionInfo(info),
     preconditions: (info.preconditions ?? []).map((one: any) => {
       const cloned = Object.assign({}, one);
       if (typeof cloned.amount === "string")
@@ -103,9 +105,9 @@ export function parseIdentifier(identifier: any): BountyIdentifier {
 }
 
 export function parseIdentifierCategory({ rawValue }: EnumData): BountyType {
-  return rawValue === "0" ? "quest" : "challenge";
+  return rawValue === "0" ? "mission" : "challenge";
 }
 
-export function parseRewardType({ rawValue }: EnumData): QuestRewardType {
+export function parseRewardType({ rawValue }: EnumData): MissionRewardType {
   return rawValue === "0" ? "Points" : rawValue === "1" ? "FLOAT" : "None";
 }

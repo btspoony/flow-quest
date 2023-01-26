@@ -186,25 +186,25 @@ export default defineNuxtPlugin((nuxtApp) => {
           return !!ret;
         },
         /**
-         * Get quests
-         * @param quests
+         * Get missions
+         * @param missions
          */
-        async getQuestsDetail(
+        async getMissionsDetail(
           seasonId: string,
-          quests: BountyIdentifier[]
+          missions: BountyIdentifier[]
         ): Promise<BountyInfo[]> {
           const result = await executeScript(
             cadence.scripts.getBountiesDetail,
             (arg, t) => [
               arg(seasonId, t.UInt64),
               arg(
-                quests.map((one) => one.key),
+                missions.map((one) => one.key),
                 t.Array(t.String)
               ),
             ],
             []
           );
-          if (quests.length !== result?.length) {
+          if (missions.length !== result?.length) {
             throw new Error("Result invalid");
           }
           return result.map((one: any) => parseBountyInfo(one));
@@ -340,15 +340,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
-         * get quest status
+         * get mission status
          */
-        async profileGetQuestStatus(
+        async profileGetMissionStatus(
           acct: string,
           seasonId: string,
           key: string
-        ): Promise<QuestStatus | null> {
+        ): Promise<MissionStatus | null> {
           return await executeScript(
-            cadence.scripts.profileGetQuestStatus,
+            cadence.scripts.profileGetMissionStatus,
             (arg, t) => [
               arg(acct, t.Address),
               arg(seasonId, t.UInt64),
@@ -536,15 +536,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           return parseChallengeInfoDetail(result);
         },
         /**
-         * get quest list
+         * get mission list
          * @param communityKey
          */
-        async spaceGetQuestList(
+        async spaceGetMissionList(
           communityKey: string,
           opt?: ListReqOption
-        ): Promise<QuestConfig[]> {
+        ): Promise<MissionConfig[]> {
           const result = await executeScript(
-            cadence.scripts.spaceGetQuestList,
+            cadence.scripts.spaceGetMissionList,
             (arg, t) => [
               arg(communityKey, t.String),
               arg(opt?.page ? String(opt?.page) : null, t.Optional(t.Int)),
@@ -555,26 +555,26 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (!result || result.length === 0) {
             return [];
           }
-          return result.map((one: any) => parseQuestInfo(one));
+          return result.map((one: any) => parseMissionInfo(one));
         },
         /**
-         * search quests by key
+         * search missions by key
          * @param communityKey
          * @param searchKey
          */
-        async spaceSearchQuests(
+        async spaceSearchMissions(
           communityKey: string,
           searchKey: string
-        ): Promise<QuestConfig[]> {
+        ): Promise<MissionConfig[]> {
           const result = await executeScript(
-            cadence.scripts.spaceSearchQuests,
+            cadence.scripts.spaceSearchMissions,
             (arg, t) => [arg(communityKey, t.String), arg(searchKey, t.String)],
             []
           );
           if (!result || result.length === 0) {
             return [];
           }
-          return result.map((one: any) => parseQuestInfo(one));
+          return result.map((one: any) => parseMissionInfo(one));
         },
       },
       transactions: {
@@ -650,19 +650,19 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async adminAddChallengeToSeason(
           challenge: ChallengeConfig,
-          questRewards: PointRewardInfo[]
+          rewards: PointRewardInfo[]
         ) {
-          // quests
-          const data = challenge.quests.reduce(
+          // missions
+          const data = challenge.missions.reduce(
             (prev, curr, index) => {
               prev.communities.push(curr.communityId);
               prev.keys.push(curr.key);
               prev.categories.push("0");
               prev.rewardPoints.push(
-                questRewards[index].rewardPoints.toFixed(0)
+                rewards[index].rewardPoints.toFixed(0)
               );
               prev.referralPoints.push(
-                questRewards[index].referalPoints.toFixed(0)
+                rewards[index].referalPoints.toFixed(0)
               );
               prev.primary.push(false);
               return prev;
@@ -741,10 +741,13 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
-         * add quest to a community space
+         * add mission to a community space
          */
-        async spaceAddQuests(spaceKey: string, quests: QuestConfigRequest[]) {
-          const data = quests.reduce(
+        async spaceAddMissions(
+          spaceKey: string,
+          missions: MissionConfigRequest[]
+        ) {
+          const data = missions.reduce(
             (prev, curr) => {
               prev.keys.push(curr.key);
               prev.titles.push(curr.name);
@@ -764,7 +767,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             }
           );
           return await sendTransaction(
-            cadence.transactions.spaceAddQuests,
+            cadence.transactions.spaceAddMissions,
             (arg, t) => [
               arg(spaceKey, t.String),
               arg(data.keys, t.Array(t.String)),
@@ -783,11 +786,11 @@ export default defineNuxtPlugin((nuxtApp) => {
           spaceKey: string,
           key: string,
           display: Display,
-          existsQuestKeys: string[],
-          newQuests: QuestConfigRequest[],
+          existsMissionKeys: string[],
+          newMissions: MissionConfigRequest[],
           achievement?: FLOATAchievement
         ) {
-          const newQuestData = newQuests.reduce(
+          const newMissionData = newMissions.reduce(
             (prev, curr) => {
               prev.keys.push(curr.key);
               prev.titles.push(curr.name);
@@ -814,14 +817,14 @@ export default defineNuxtPlugin((nuxtApp) => {
               arg(display.name, t.String),
               arg(display.description, t.String),
               arg(display.thumbnail, t.String),
-              // Quest
-              arg(existsQuestKeys, t.Array(t.String)),
-              arg(newQuestData.keys, t.Array(t.String)),
-              arg(newQuestData.titles, t.Array(t.String)),
-              arg(newQuestData.descs, t.Array(t.String)),
-              arg(newQuestData.images, t.Array(t.Optional(t.String))),
-              arg(newQuestData.steps, t.Array(t.UInt64)),
-              arg(newQuestData.stepCfgs, t.Array(t.String)),
+              // Mission
+              arg(existsMissionKeys, t.Array(t.String)),
+              arg(newMissionData.keys, t.Array(t.String)),
+              arg(newMissionData.titles, t.Array(t.String)),
+              arg(newMissionData.descs, t.Array(t.String)),
+              arg(newMissionData.images, t.Array(t.Optional(t.String))),
+              arg(newMissionData.steps, t.Array(t.UInt64)),
+              arg(newMissionData.stepCfgs, t.Array(t.String)),
               // Achievement
               arg(achievement ? achievement.host : null, t.Optional(t.Address)),
               arg(

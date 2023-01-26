@@ -86,7 +86,7 @@ pub contract CompetitionService {
         access(contract) let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
         access(contract) let participants: {Address: {String: AnyStruct}}
         access(contract) var rewardInfo: AnyStruct{Helper.RewardInfo}
-        access(contract) var rewardType: Helper.QuestRewardType
+        access(contract) var rewardType: Helper.MissionRewardType
 
         init(
             seasonId: UInt64,
@@ -148,32 +148,32 @@ pub contract CompetitionService {
             return ret
         }
 
-        pub fun getRequiredQuestKeys(): [String] {
+        pub fun getRequiredMissionKeys(): [String] {
             let ret: [String] = []
-            if self.identifier.category == Interfaces.BountyType.quest {
+            if self.identifier.category == Interfaces.BountyType.mission {
                 ret.append(self.identifier.key)
             } else {
                 let challenge = self.identifier.getChallengeConfig()
-                for one in challenge.quests {
+                for one in challenge.missions {
                     ret.append(one.key)
                 }
             }
             return ret
         }
 
-        pub fun getRewardType(): Helper.QuestRewardType {
+        pub fun getRewardType(): Helper.MissionRewardType {
             return self.rewardType
         }
 
         pub fun getPointReward(): Helper.PointReward {
-            if self.rewardType == Helper.QuestRewardType.Points {
+            if self.rewardType == Helper.MissionRewardType.Points {
                 return self.rewardInfo as! Helper.PointReward
             }
             panic("Reward type is not Points")
         }
 
         pub fun getFLOATReward(): Helper.FLOATReward {
-            if self.rewardType == Helper.QuestRewardType.FLOAT {
+            if self.rewardType == Helper.MissionRewardType.FLOAT {
                 return self.rewardInfo as! Helper.FLOATReward
             }
             panic("Reward type is not FLOAT")
@@ -232,7 +232,7 @@ pub contract CompetitionService {
             self.rewardInfo = reward
 
             // emit event by type
-            if reward.type == Helper.QuestRewardType.Points {
+            if reward.type == Helper.MissionRewardType.Points {
                 let pointsReward = reward as! Helper.PointReward
                 emit BountyRewardUpdatedAsPoints(
                     seasonId: self.seasonId,
@@ -240,7 +240,7 @@ pub contract CompetitionService {
                     points: pointsReward.rewardPoints,
                     referralPoints: pointsReward.referralPoints,
                 )
-            } else if reward.type == Helper.QuestRewardType.FLOAT {
+            } else if reward.type == Helper.MissionRewardType.FLOAT {
                 let floatReward = reward as! Helper.FLOATReward
                 emit BountyRewardUpdatedAsFLOAT(
                     seasonId: self.seasonId,
@@ -319,7 +319,7 @@ pub contract CompetitionService {
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
-        // QuestKey -> BountyID
+        // MissionKey -> BountyID
         access(self) var keyIdMapping: {String: UInt64}
         access(contract) var bounties: @{UInt64: BountyInfo}
         access(contract) var primaryBounties: [UInt64]
@@ -396,7 +396,7 @@ pub contract CompetitionService {
         }
 
         pub fun borrowBountyInfoByKey(_ key: String): &BountyInfo{BountyInfoPublic, Interfaces.BountyInfoPublic} {
-            let bountyId = self.keyIdMapping[key] ?? panic("Missing questKey.")
+            let bountyId = self.keyIdMapping[key] ?? panic("Missing missionKey.")
             return self.borrowBountyDetail(bountyId)
         }
 
@@ -404,11 +404,11 @@ pub contract CompetitionService {
             return self.borrowBountyPrivateRef(bountyId)
         }
 
-        pub fun borrowQuestRef(_ questKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.QuestInfoPublic} {
-            let bountyId = self.keyIdMapping[questKey] ?? panic("Missing questKey.")
+        pub fun borrowMissionRef(_ missionKey: String): &AnyStruct{Interfaces.BountyEntityPublic, Interfaces.MissionInfoPublic} {
+            let bountyId = self.keyIdMapping[missionKey] ?? panic("Missing missionKey.")
             let bountyRef = self.borrowBountyPrivateRef(bountyId)
-            assert(bountyRef.identifier.category == Interfaces.BountyType.quest, message: "Bounty should be a quest.")
-            return bountyRef.identifier.getQuestConfig()
+            assert(bountyRef.identifier.category == Interfaces.BountyType.mission, message: "Bounty should be a mission.")
+            return bountyRef.identifier.getMissionConfig()
         }
 
         pub fun getReferralAddress(_ code: String): Address? {
@@ -435,15 +435,15 @@ pub contract CompetitionService {
             let bounty = self.borrowBountyPrivateRef(bountyId)
             // result
             var isCompleted = false
-            // ensure quest completed
-            if bounty.identifier.category == Interfaces.BountyType.quest {
-                let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: bounty.identifier.key)
+            // ensure mission completed
+            if bounty.identifier.category == Interfaces.BountyType.mission {
+                let status = profileRef.getMissionStatus(seasonId: seasonId, missionKey: bounty.identifier.key)
                 isCompleted = status.completed
             } else {
                 let challengeRef = bounty.identifier.getChallengeConfig()
                 var allCompleted = true
-                for identifier in challengeRef.quests {
-                    let status = profileRef.getQuestStatus(seasonId: seasonId, questKey: identifier.key)
+                for identifier in challengeRef.missions {
+                    let status = profileRef.getMissionStatus(seasonId: seasonId, missionKey: identifier.key)
                     allCompleted = allCompleted && status.completed
                 }
                 isCompleted = allCompleted
@@ -570,11 +570,11 @@ pub contract CompetitionService {
             pre {
                 self.keyIdMapping[identifier.key] == nil: "Already registered."
             }
-            // ensure quests added to bounties
+            // ensure missions added to bounties
             if identifier.category == Interfaces.BountyType.challenge {
                 let challengeCfg = identifier.getChallengeConfig()
-                for questIdentifier in challengeCfg.quests {
-                    assert(self.keyIdMapping[questIdentifier.key] != nil, message: "Quest not registered.")
+                for one in challengeCfg.missions {
+                    assert(self.keyIdMapping[one.key] != nil, message: "Mission not registered.")
                 }
             }
 
@@ -814,22 +814,22 @@ pub contract CompetitionService {
     /// Mainly used to update user profile
     pub resource SeasonPointsController {
 
-        pub fun updateNewParams(acct: Address, seasonId: UInt64, questKey: String, step: Int, params: {String: AnyStruct}) {
+        pub fun updateNewParams(acct: Address, seasonId: UInt64, missionKey: String, step: Int, params: {String: AnyStruct}) {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.updateQuestNewParams(seasonId: seasonId, questKey: questKey, step: step, params: params)
+            profileRef.updateMissionNewParams(seasonId: seasonId, missionKey: missionKey, step: step, params: params)
         }
 
-        pub fun questStepCompleted(acct: Address, seasonId: UInt64, questKey: String, step: Int) {
+        pub fun missionStepCompleted(acct: Address, seasonId: UInt64, missionKey: String, step: Int) {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.updateQuestVerificationResult(seasonId: seasonId, questKey: questKey, step: step, result: true)
+            profileRef.updateMissionVerificationResult(seasonId: seasonId, missionKey: missionKey, step: step, result: true)
         }
 
-        pub fun questStepFailure(acct: Address, seasonId: UInt64, questKey: String, step: Int) {
+        pub fun missionStepFailure(acct: Address, seasonId: UInt64, missionKey: String, step: Int) {
             // get profile and update points
             let profileRef = UserProfile.borrowUserProfilePublic(acct)
-            profileRef.updateQuestVerificationResult(seasonId: seasonId, questKey: questKey, step: step, result: false)
+            profileRef.updateMissionVerificationResult(seasonId: seasonId, missionKey: missionKey, step: step, result: false)
         }
 
         pub fun completeBounty(acct: Address, seasonId: UInt64, bountyId: UInt64) {
@@ -848,7 +848,7 @@ pub contract CompetitionService {
             assert(checkCompleted, message: "Bounty not completed")
 
             // distribute rewards
-            if bounty.rewardType == Helper.QuestRewardType.Points {
+            if bounty.rewardType == Helper.MissionRewardType.Points {
                 let reward = bounty.getPointReward()
                 self.addPoints(acct: acct, seasonId: seasonId, points: reward.rewardPoints)
 
@@ -857,7 +857,7 @@ pub contract CompetitionService {
                 if referralFrom != nil && reward.referralPoints > 0 {
                     self.addPoints(acct: referralFrom!, seasonId: seasonId, points: reward.referralPoints)
                 }
-            } else if bounty.rewardType == Helper.QuestRewardType.FLOAT {
+            } else if bounty.rewardType == Helper.MissionRewardType.FLOAT {
                 // NOTHING for now
             }
 

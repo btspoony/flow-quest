@@ -39,23 +39,26 @@ export async function apiGetCurrentChallenge(
   return challenge;
 }
 
-export async function apiGetCurrentQuest(
-  defaultQuestKey: string
+export async function apiGetCurrentMission(
+  defaultMissionKey: string
 ): Promise<BountyInfo | null> {
-  const current = useCurrentQuest();
-  let quest: BountyInfo | null;
+  const current = useCurrentMission();
+  let mission: BountyInfo | null;
   if (current.value) {
-    quest = current.value;
+    mission = current.value;
   } else {
     const { $scripts } = useNuxtApp();
     const season = await apiGetActiveSeason();
     if (season) {
-      quest = await $scripts.getBountyByKey(season.seasonId, defaultQuestKey);
+      mission = await $scripts.getBountyByKey(
+        season.seasonId,
+        defaultMissionKey
+      );
     } else {
-      quest = null;
+      mission = null;
     }
   }
-  return quest;
+  return mission;
 }
 
 const communityPromises: {
@@ -209,25 +212,25 @@ function handleResponseError(e: any): { code: string; message: string } {
   }
 }
 
-export async function apiPostVerifyQuest(
-  questIdentifier: BountyIdentifier,
+export async function apiPostVerifyMission(
+  identifier: BountyIdentifier,
   step: number,
-  questParams: { key: string; value: string }[]
-): Promise<ResponseVerifyQuest> {
+  params: { key: string; value: string }[]
+): Promise<ResponseVerifyMission> {
   try {
-    const result = await $fetch("/api/verify-quest", {
+    const result = await $fetch("/api/verify-mission", {
       method: "post",
       body: Object.assign(
         {
-          communityId: questIdentifier.communityId,
-          questKey: questIdentifier.key,
+          communityId: identifier.communityId,
+          missionKey: identifier.key,
           step,
-          questParams,
+          params,
         },
         await fetchAccountProof()
       ),
     });
-    return result;
+    return result as ResponseVerifyMission;
   } catch (e: any) {
     return { ok: false, error: handleResponseError(e) };
   }

@@ -18,17 +18,17 @@ pub fun main(
   }
   let profileSeasonId = ensureSeasonId ?? panic("No seasson id")
 
-  let questKeys = profile.getQuestsParticipanted(seasonId: profileSeasonId)
-  let questScores: {String: Interfaces.QuestStatus} = {}
-  for key in questKeys {
-    questScores[key] = profile.getQuestStatus(seasonId: profileSeasonId, questKey: key)
+  let missionKeys = profile.getMissionsParticipanted(seasonId: profileSeasonId)
+  let missionScores: {String: Interfaces.MissionStatus} = {}
+  for key in missionKeys {
+    missionScores[key] = profile.getMissionStatus(seasonId: profileSeasonId, missionKey: key)
   }
   return SeasonRecord(
     seasonId: profileSeasonId,
     referredFromAddress: profile.getReferredFrom(seasonId: profileSeasonId),
     referralCode: profile.getReferralCode(seasonId: profileSeasonId),
     points: profile.getSeasonPoints(seasonId: profileSeasonId),
-    questScores: questScores,
+    missionScores: missionScores,
     bountiesCompleted: profile.getBountiesCompleted(seasonId: profileSeasonId)
   )
 }
@@ -38,7 +38,7 @@ pub struct SeasonRecord {
   pub let referredFromAddress: Address?
   pub let referralCode: String?
   pub let points: UInt64
-  pub let questScores: {String: Interfaces.QuestStatus}
+  pub let missionScores: {String: Interfaces.MissionStatus}
   pub let bountiesCompleted: {UInt64: UFix64}
 
   init(
@@ -46,14 +46,14 @@ pub struct SeasonRecord {
     referredFromAddress: Address?,
     referralCode: String?,
     points: UInt64,
-    questScores: {String: Interfaces.QuestStatus},
+    missionScores: {String: Interfaces.MissionStatus},
     bountiesCompleted: {UInt64: UFix64},
   ) {
     self.seasonId = seasonId
     self.referredFromAddress = referredFromAddress
     self.referralCode = referralCode
     self.points = points
-    self.questScores = questScores
+    self.missionScores = missionScores
     self.bountiesCompleted = bountiesCompleted
   }
 }

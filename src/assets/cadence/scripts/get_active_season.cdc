@@ -29,14 +29,14 @@ pub fun main(
             identifier: identifier,
             properties: bounty.getProperties(),
             display: identifier.getBountyEntity().getStandardDisplay(),
-            questDetail: identifier.category == Interfaces.BountyType.quest ? identifier.getQuestConfig().getDetail() : nil,
+            missionDetail: identifier.category == Interfaces.BountyType.mission ? identifier.getMissionConfig().getDetail() : nil,
             challengeDetail: identifier.category == Interfaces.BountyType.challenge ? identifier.getChallengeConfig().getDetail() : nil,
             preconditions: bounty.getPreconditions(),
             participants: bounty.getParticipants(),
             participantAmt: UInt64(bounty.getParticipantsAmount()),
             rewardType: rewardType,
-            pointReward: rewardType == Helper.QuestRewardType.Points ? bounty.getPointReward() : nil,
-            floatReward: rewardType == Helper.QuestRewardType.FLOAT ? bounty.getFLOATReward() : nil,
+            pointReward: rewardType == Helper.MissionRewardType.Points ? bounty.getPointReward() : nil,
+            floatReward: rewardType == Helper.MissionRewardType.FLOAT ? bounty.getFLOATReward() : nil,
         )
     }
 
