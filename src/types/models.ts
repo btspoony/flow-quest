@@ -66,7 +66,7 @@ interface FLOATRewardInfo extends RewardInfo {
   eventId: string;
 }
 
-type BountyType = "mission" | "challenge";
+type BountyType = "mission" | "quest";
 type RewardInfos = PointRewardInfo | FLOATRewardInfo;
 
 /**
@@ -147,16 +147,16 @@ interface FLOATAchievement {
   eventId: string;
 }
 
-interface ChallengeDetail {
+interface QuestDetail {
   missions: BountyIdentifier[];
   achievement?: FLOATAchievement;
 }
 
-interface ChallengeConfig extends BountyEntity, ChallengeDetail {}
+interface QuestConfig extends BountyEntity, QuestDetail {}
 
-interface ChallengeConfigDetail {
+interface QuestConfigDetail {
   owner: string;
-  challenge: ChallengeConfig;
+  quest: QuestConfig;
   missions: MissionConfig[];
 }
 
@@ -171,7 +171,7 @@ interface FLOATEvent {
   url: string;
 }
 
-type BountyEntities = MissionConfig | ChallengeConfig;
+type BountyEntities = MissionConfig | QuestConfig;
 
 interface SpaceDisplay {
   name: string;

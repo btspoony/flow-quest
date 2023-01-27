@@ -14,8 +14,8 @@ const github = useGithubProfile();
     <div class="relative container min-h-[calc(100vh-180px)]">
       <div class="hero" v-if="!github.auth">
         <div class="page-container hero-content flex-col">
-          <h4>Start Challenges</h4>
-          <p>Login with Github to start the challenge tour</p>
+          <h4>Start Quests</h4>
+          <p>Login with Github to start</p>
           <AuthGithubButton />
         </div>
       </div>

@@ -1,12 +1,12 @@
 /**
- * transactions for dev challenges
+ * transactions for dev quests
  */
 import profileRegister from "./transactions/profile-register.cdc?raw";
 import profileRegisterWithUser from "./transactions/profile-register-with-user.cdc?raw";
 import claimFloat from "./transactions/claim-float.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
 import spaceAddMissions from "./transactions/community-add-missions.cdc?raw";
-import spaceAddChallenge from "./transactions/community-add-challenge-with-missions.cdc?raw";
+import spaceAddQuest from "./transactions/community-add-quest-with-missions.cdc?raw";
 import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
@@ -37,8 +37,8 @@ import spaceGetAll from "./scripts/space_get_all.cdc?raw";
 import spaceGetBasics from "./scripts/space_get_basics.cdc?raw";
 import spaceGetBasicsByKey from "./scripts/space_get_basics_by_key.cdc?raw";
 import spaceGetList from "./scripts/space_get_list.cdc?raw";
-import spaceGetChallengeList from "./scripts/space_get_challenge_list.cdc?raw";
-import spaceGetChallengeDetail from "./scripts/space_get_challenge_detail.cdc?raw";
+import spaceGetQuestList from "./scripts/space_get_quest_list.cdc?raw";
+import spaceGetQuestDetail from "./scripts/space_get_quest_detail.cdc?raw";
 import spaceGetMissionList from "./scripts/space_get_mission_list.cdc?raw";
 import spaceSearchMissions from "./scripts/space_search_missions.cdc?raw";
 
@@ -55,7 +55,7 @@ export default {
         adminBountyUpdateProperty,
         spaceCreate,
         spaceAddMissions,
-        spaceAddChallenge,
+        spaceAddQuest,
     },
     scripts: {
         getFLOATEvent,
@@ -81,8 +81,8 @@ export default {
         spaceGetBasics,
         spaceGetBasicsByKey,
         spaceGetList,
-        spaceGetChallengeList,
-        spaceGetChallengeDetail,
+        spaceGetQuestList,
+        spaceGetQuestDetail,
         spaceGetMissionList,
         spaceSearchMissions,
     },

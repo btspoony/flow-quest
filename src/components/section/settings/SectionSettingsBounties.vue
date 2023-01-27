@@ -14,11 +14,11 @@ const activeBounties = computed<BountyInfo[]>(() => {
 })
 
 const isEdit = ref(false)
-const isAddChallenge = ref(false)
+const isAddQuest = ref(false)
 
 function resetEdit() {
   if (isEdit.value) {
-    isAddChallenge.value = false
+    isAddQuest.value = false
   }
 }
 
@@ -46,12 +46,12 @@ function resetEdit() {
       <div v-if="isEdit" class="card card-border non-interactive p-6 flex-auto flex flex-col">
         <div class="flex items-center justify-start gap-2">
           <span class="font-bold text-xl">Edit:</span>
-          <button class="mb-0 rounded-full text-xs max-w-fit" @click="isAddChallenge = !isAddChallenge">
-            Add Challenge as bounty
+          <button class="mb-0 rounded-full text-xs max-w-fit" @click="isAddQuest = !isAddQuest">
+            Add Quest as bounty
           </button>
         </div>
         <div class="divider my-2"></div>
-        <SectionSettingsPartNewBounty v-if="isAddChallenge" @added="isAddChallenge = false" />
+        <SectionSettingsPartNewBounty v-if="isAddQuest" @added="isAddQuest = false" />
       </div>
     </div>
   </section>

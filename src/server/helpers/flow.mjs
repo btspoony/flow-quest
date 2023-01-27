@@ -1,6 +1,6 @@
 import * as fcl from "@onflow/fcl";
 
-export const APP_IDENTIFIER = "Flow Dev Challenge V1.0";
+export const APP_IDENTIFIER = "Flow Dev Quest V1.0";
 
 export function switchToMainnet() {
   fcl

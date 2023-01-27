@@ -153,8 +153,8 @@ pub contract CompetitionService {
             if self.identifier.category == Interfaces.BountyType.mission {
                 ret.append(self.identifier.key)
             } else {
-                let challenge = self.identifier.getChallengeConfig()
-                for one in challenge.missions {
+                let quest = self.identifier.getQuestConfig()
+                for one in quest.missions {
                     ret.append(one.key)
                 }
             }
@@ -440,9 +440,9 @@ pub contract CompetitionService {
                 let status = profileRef.getMissionStatus(seasonId: seasonId, missionKey: bounty.identifier.key)
                 isCompleted = status.completed
             } else {
-                let challengeRef = bounty.identifier.getChallengeConfig()
+                let questRef = bounty.identifier.getQuestConfig()
                 var allCompleted = true
-                for identifier in challengeRef.missions {
+                for identifier in questRef.missions {
                     let status = profileRef.getMissionStatus(seasonId: seasonId, missionKey: identifier.key)
                     allCompleted = allCompleted && status.completed
                 }
@@ -571,9 +571,9 @@ pub contract CompetitionService {
                 self.keyIdMapping[identifier.key] == nil: "Already registered."
             }
             // ensure missions added to bounties
-            if identifier.category == Interfaces.BountyType.challenge {
-                let challengeCfg = identifier.getChallengeConfig()
-                for one in challengeCfg.missions {
+            if identifier.category == Interfaces.BountyType.quest {
+                let questCfg = identifier.getQuestConfig()
+                for one in questCfg.missions {
                     assert(self.keyIdMapping[one.key] != nil, message: "Mission not registered.")
                 }
             }
@@ -588,7 +588,7 @@ pub contract CompetitionService {
             self.bounties[bounty.uuid] <-! bounty
 
             self.keyIdMapping[identifier.key] = uid
-            if identifier.category == Interfaces.BountyType.challenge || primary {
+            if identifier.category == Interfaces.BountyType.quest || primary {
                 self.primaryBounties.append(uid)
             }
 
@@ -935,7 +935,7 @@ pub contract CompetitionService {
         // Store admin and controller resources
         self.account.save(<- create CompetitionAdmin(), to: self.AdminStoragePath)
         self.account.save(<- store.createSeasonPointsController(), to: self.ControllerStoragePath)
-        // Store the resource of Challenge Seasons in the account
+        // Store the resource of Quest Seasons in the account
         self.account.save(<- store, to: self.ServiceStoragePath)
         self.account.link<&CompetitionServiceStore{CompetitionServicePublic, Interfaces.CompetitionServicePublic}>(
             self.ServicePublicPath,

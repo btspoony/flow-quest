@@ -16,7 +16,7 @@ watch([isStepsCfgURLValid], ([newStepsValidA]) => {
     data
     && data.key
     && data.key !== 'create-mission'
-    && data.key !== 'create-challenge'
+    && data.key !== 'create-quest'
     && data.name
     && data.description
     && newStepsValidA

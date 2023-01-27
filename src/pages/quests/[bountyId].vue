@@ -6,9 +6,9 @@ definePageMeta({
 const route = useRoute()
 const user = useUserProfile()
 
-interface ChallengeDetail {
+interface QuestDetail {
   season: CompetitionSeason | null,
-  challenge: BountyInfo | null,
+  quest: BountyInfo | null,
   missions: BountyInfo[]
 }
 
@@ -18,26 +18,26 @@ watch(bountyId, (newVal) => {
   refresh();
 });
 
-const { data: info, pending, refresh } = useAsyncData<ChallengeDetail>(`challenge:${bountyId.value}`, async () => {
+const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${bountyId.value}`, async () => {
   const season = await apiGetActiveSeason();
-  const challenge = await apiGetCurrentChallenge(bountyId.value);
+  const quest = await apiGetCurrentQuest(bountyId.value);
 
   const { $scripts } = useNuxtApp();
   let missions: BountyInfo[] = []
-  if (season && challenge) {
-    missions = await $scripts.getMissionsDetail(season.seasonId, (challenge.config as ChallengeConfig).missions)
+  if (season && quest) {
+    missions = await $scripts.getMissionsDetail(season.seasonId, (quest.config as QuestConfig).missions)
   } else {
     missions = []
   }
-  return { season, challenge, missions }
+  return { season, quest, missions }
 }, {
   server: false
 });
 
-const challengeCfg = computed(() => (info.value?.challenge?.config as ChallengeConfig));
+const questCfg = computed(() => (info.value?.quest?.config as QuestConfig));
 const imageUrl = computed(() => {
-  if (challengeCfg.value?.display.thumbnail) {
-    return getIPFSUrl(challengeCfg.value?.display.thumbnail)
+  if (questCfg.value?.display.thumbnail) {
+    return getIPFSUrl(questCfg.value?.display.thumbnail)
   } else {
     return undefined
   }
@@ -82,7 +82,7 @@ const floatClaimable = ref(false)
 const floatClaimed = ref(false)
 
 watchEffect(async () => {
-  if (progress.value >= 100 && challengeCfg?.value?.achievement && user.value?.address) {
+  if (progress.value >= 100 && questCfg?.value?.achievement && user.value?.address) {
     await updateHasClaimed()
     floatClaimable.value = !floatClaimed.value
   } else {
@@ -92,7 +92,7 @@ watchEffect(async () => {
 
 async function updateHasClaimed() {
   const { $scripts } = useNuxtApp()
-  const achiInfo = challengeCfg?.value?.achievement
+  const achiInfo = questCfg?.value?.achievement
   if (achiInfo && user.value?.address) {
     floatClaimed.value = await $scripts.hasFLOATClaimed(achiInfo.host, achiInfo.eventId, user.value?.address)
   } else {
@@ -101,11 +101,11 @@ async function updateHasClaimed() {
 }
 
 async function claimFloat(): Promise<string | null> {
-  if (!challengeCfg?.value.achievement) {
+  if (!questCfg?.value.achievement) {
     return null
   }
   const { $transactions } = useNuxtApp()
-  const achi = challengeCfg?.value.achievement
+  const achi = questCfg?.value.achievement
   return $transactions.claimFloat(achi.host, achi.eventId)
 }
 
@@ -128,34 +128,34 @@ async function claimFloat(): Promise<string | null> {
       <div class=" -mt-36 mb-4 flex gap-4 items-center flex-col sm:flex-row justify-between sm:justify-center">
         <div class="flex-none" :aria-busy="pending">
           <div class="w-32 h-32 rounded-lg bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden">
-            <img v-if="imageUrl" class="object-contain w-full h-full" :src="imageUrl" alt="Challenge Icon">
+            <img v-if="imageUrl" class="object-contain w-full h-full" :src="imageUrl" alt="Quest Icon">
           </div>
         </div>
-        <div v-if="challengeCfg" class="flex-1 flex gap-1 flex-col justify-between min-w-[360px]">
+        <div v-if="questCfg" class="flex-1 flex gap-1 flex-col justify-between min-w-[360px]">
           <div class="flex items-center justify-center sm:justify-start min-h-[1.5rem]">
-            <TagCommunity :community-id="challengeCfg?.communityId" />
+            <TagCommunity :community-id="questCfg?.communityId" />
           </div>
-          <h3 class="section-header-text mb-3">{{ challengeCfg?.display.name }}</h3>
+          <h3 class="section-header-text mb-3">{{ questCfg?.display.name }}</h3>
           <div class="flex gap-2 items-center justify-start">
-            <span class="tag">{{ challengeCfg?.missions?.length ?? 0 }} Missions</span>
+            <span class="tag">{{ questCfg?.missions?.length ?? 0 }} Missions</span>
             <span class="tag">{{ totalPoints }} Points</span>
             <progress :value="progress" max="100" class="w-40 mb-[2px]" />
           </div>
         </div>
       </div>
       <div class="mb-4 prose-sm lg:prose">
-        {{ challengeCfg?.display.description }}
+        {{ questCfg?.display.description }}
       </div>
       <div role="separator" class="divider mb-11 mt-4" />
       <div class="flex flex-col gap-24">
-        <ItemChallengeMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty" :index="index"
-          :isLast="(((info?.missions?.length ?? 0) - 1 === index) && !challengeCfg?.achievement)"
+        <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"
+          :index="index" :isLast="(((info?.missions?.length ?? 0) - 1 === index) && !questCfg?.achievement)"
           :current="currentIndex" />
-        <div v-if="challengeCfg?.achievement" class="flex-center flex-col gap-2">
+        <div v-if="questCfg?.achievement" class="flex-center flex-col gap-2">
           <span class="tag">Achievement FLOAT</span>
           <div class="relative">
             <div class="shiny" />
-            <ItemFLOATEvent :host="challengeCfg?.achievement.host" :event-id="challengeCfg?.achievement.eventId" />
+            <ItemFLOATEvent :host="questCfg?.achievement.host" :event-id="questCfg?.achievement.eventId" />
           </div>
           <button v-if="floatClaimed" class="secondary outline rounded-xl w-[8rem]" disabled>Claimed</button>
           <FlowSubmitTransaction v-else-if="floatClaimable" class="min-w-[8rem]" :method="claimFloat"
@@ -176,6 +176,7 @@ async function claimFloat(): Promise<string | null> {
   animation: spin 20s linear infinite;
   transform-origin: center;
 }
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

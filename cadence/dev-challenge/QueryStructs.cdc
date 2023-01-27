@@ -10,7 +10,7 @@ pub contract QueryStructs {
     pub let properties: {UInt8: Bool}
     pub let display: MetadataViews.Display
     pub let missionDetail: Interfaces.MissionDetail?
-    pub let challengeDetail: Interfaces.ChallengeDetail?
+    pub let questDetail: Interfaces.QuestDetail?
     // bounty data
     pub let preconditions: [AnyStruct{Interfaces.UnlockCondition}]
     pub let participants: {Address: {String: AnyStruct}}
@@ -26,7 +26,7 @@ pub contract QueryStructs {
       properties: {UInt8: Bool},
       display: MetadataViews.Display,
       missionDetail: Interfaces.MissionDetail?,
-      challengeDetail: Interfaces.ChallengeDetail?,
+      questDetail: Interfaces.QuestDetail?,
       preconditions: [AnyStruct{Interfaces.UnlockCondition}],
       participants: {Address: {String: AnyStruct}},
       participantAmt: UInt64,
@@ -39,7 +39,7 @@ pub contract QueryStructs {
       self.properties = properties
       self.display = display
       self.missionDetail = missionDetail
-      self.challengeDetail = challengeDetail
+      self.questDetail = questDetail
       self.preconditions = preconditions
       self.participants = participants
       self.participantAmt = participantAmt
@@ -65,15 +65,15 @@ pub contract QueryStructs {
     }
   }
 
-  pub struct ChallengeData {
+  pub struct QuestData {
     pub let identifier: AnyStruct{Interfaces.BountyEntityIdentifier}
     pub let display: MetadataViews.Display
-    pub let detail: Interfaces.ChallengeDetail
+    pub let detail: Interfaces.QuestDetail
 
     init(
       identifier: AnyStruct{Interfaces.BountyEntityIdentifier},
       display: MetadataViews.Display,
-      detail: Interfaces.ChallengeDetail
+      detail: Interfaces.QuestDetail
     ) {
         self.identifier = identifier
         self.display = display

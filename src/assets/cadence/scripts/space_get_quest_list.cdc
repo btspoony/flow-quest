@@ -10,9 +10,9 @@ pub fun main(
     communityKey: String,
     page: Int?,
     limit: Int?
-): [QueryStructs.ChallengeData] {
+): [QueryStructs.QuestData] {
     if let community = Community.borrowCommunityByKey(key: communityKey) {
-        let keys = community.getChallengeKeys()
+        let keys = community.getQuestKeys()
         let totalLen = keys.length
 
         let pageNum = page ?? 0
@@ -23,17 +23,17 @@ pub fun main(
         }
         let slicedKeys = keys.slice(from: startAt, upTo: startAt + limitNum < totalLen ? startAt + limitNum : totalLen)
 
-        let ret: [QueryStructs.ChallengeData] = []
+        let ret: [QueryStructs.QuestData] = []
         for key in slicedKeys {
-            if let challenge = community.borrowChallengeRef(key: key) {
-                ret.append(QueryStructs.ChallengeData(
+            if let quest = community.borrowQuestRef(key: key) {
+                ret.append(QueryStructs.QuestData(
                     identifier: Community.BountyEntityIdentifier(
-                        category: Interfaces.BountyType.challenge,
+                        category: Interfaces.BountyType.quest,
                         communityId: community.getID(),
                         key: key
                     ),
-                    display: challenge.getStandardDisplay(),
-                    detail: challenge.getDetail()
+                    display: quest.getStandardDisplay(),
+                    detail: quest.getDetail()
                 ))
             }
         }

@@ -10,7 +10,7 @@ onMounted(() => {
 })
 
 const selectedCommunity = ref("")
-const selectedChallenge = ref<ChallengeConfigDetail | null>(null)
+const selectedQuest = ref<QuestConfigDetail | null>(null)
 
 const { data: communities, pending: isLoadingCommunities } = useAsyncData(`all_communities`, async () => {
   const { $scripts } = useNuxtApp()
@@ -23,10 +23,10 @@ async function onSearch() {
   if (!searchKey.value || isSearching.value) return
   isSearching.value = true
 
-  selectedChallenge.value = null
+  selectedQuest.value = null
   const { $scripts } = useNuxtApp()
-  const result = await $scripts.spaceGetChallengeDetail(selectedCommunity.value, searchKey.value)
-  selectedChallenge.value = result
+  const result = await $scripts.spaceGetQuestDetail(selectedCommunity.value, searchKey.value)
+  selectedQuest.value = result
   rewardPoints.length = 0
   referralPoints.length = 0
 
@@ -37,7 +37,7 @@ const rewardPoints = reactive<number[]>([]);
 const referralPoints = reactive<number[]>([]);
 
 const isValid = computed(() => {
-  return selectedChallenge.value?.missions.length === rewardPoints.length
+  return selectedQuest.value?.missions.length === rewardPoints.length
     && rewardPoints.length === referralPoints.length
     && rewardPoints.filter(p => p <= 0).length === 0;
 })
@@ -55,7 +55,7 @@ async function sendTransaction(): Promise<string> {
       referalPoints: referralPoints[index]
     })
   })
-  return $transactions.adminAddChallengeToSeason(toRaw(selectedChallenge.value!.challenge), rewards)
+  return $transactions.adminAddQuestToSeason(toRaw(selectedQuest.value!.quest), rewards)
 }
 
 function onSuccess() {
@@ -78,16 +78,16 @@ function onSuccess() {
         </select>
       </label>
       <label for="search">
-        Search Challenge
-        <input type="search" id="challengeSearch" placeholder="Search Challenge" :disabled="!selectedCommunity"
+        Search Quest
+        <input type="search" id="searchInput" placeholder="Search Quest" :disabled="!selectedCommunity"
           v-model="searchKey" @change="onSearch">
       </label>
     </div>
     <WidgetLoadingCard v-if="isSearching" />
-    <div v-else-if="selectedChallenge" class="flex flex-col gap-2">
-      <ItemSpaceChallengeCard :challenge="selectedChallenge?.challenge" />
+    <div v-else-if="selectedQuest" class="flex flex-col gap-2">
+      <ItemSpaceQuestCard :quest="selectedQuest?.quest" />
       <h5 class="mb-1">Set Reward Points of Missions</h5>
-      <div v-for="mission, index in selectedChallenge.missions" :key="mission.key"
+      <div v-for="mission, index in selectedQuest.missions" :key="mission.key"
         class="card card-border non-interactive flex items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-100 dark:bg-gray-900">

@@ -64,7 +64,7 @@ pub contract Interfaces {
 
     pub enum BountyType: UInt8 {
         pub case mission
-        pub case challenge
+        pub case quest
     }
 
     pub struct interface BountyEntityIdentifier {
@@ -113,11 +113,11 @@ pub contract Interfaces {
         }
     }
 
-    pub struct interface ChallengeInfoPublic {
-        pub fun getDetail(): ChallengeDetail
+    pub struct interface QuestInfoPublic {
+        pub fun getDetail(): QuestDetail
     }
 
-    pub struct ChallengeDetail {
+    pub struct QuestDetail {
         pub let missions: [AnyStruct{BountyEntityIdentifier}]
         pub let achievement: Helper.EventIdentifier?;
 

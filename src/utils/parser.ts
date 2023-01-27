@@ -28,24 +28,24 @@ export function parseMissionInfo(info: any): MissionConfig {
   };
 }
 
-export function parseChallengeInfo(info: any): ChallengeConfig {
+export function parseQuestInfo(info: any): QuestConfig {
   return {
     category: parseIdentifierCategory(info.identifier.category),
     communityId: info.identifier.communityId,
     key: info.identifier.key,
     display: parseDisplay(info.display),
     missions:
-      (info.challengeDetail ?? info.detail)?.missions?.map((mission: any) =>
+      (info.questDetail ?? info.detail)?.missions?.map((mission: any) =>
         parseIdentifier(mission)
       ) ?? [],
-    achievement: (info.challengeDetail ?? info.detail)?.achievement,
+    achievement: (info.questDetail ?? info.detail)?.achievement,
   };
 }
 
-export function parseChallengeInfoDetail(info: any): ChallengeConfigDetail {
+export function parseQuestInfoDetail(info: any): QuestConfigDetail {
   return {
     owner: info.owner,
-    challenge: parseChallengeInfo(info.challenge),
+    quest: parseQuestInfo(info.quest),
     missions: (info.missions ?? []).map((mission: any) =>
       parseMissionInfo(mission)
     ),
@@ -57,9 +57,7 @@ export function parseBountyInfo(info: any): BountyInfo {
   return {
     id: info.id,
     config:
-      category === "challenge"
-        ? parseChallengeInfo(info)
-        : parseMissionInfo(info),
+      category === "quest" ? parseQuestInfo(info) : parseMissionInfo(info),
     preconditions: (info.preconditions ?? []).map((one: any) => {
       const cloned = Object.assign({}, one);
       if (typeof cloned.amount === "string")
@@ -105,7 +103,7 @@ export function parseIdentifier(identifier: any): BountyIdentifier {
 }
 
 export function parseIdentifierCategory({ rawValue }: EnumData): BountyType {
-  return rawValue === "0" ? "mission" : "challenge";
+  return rawValue === "0" ? "mission" : "quest";
 }
 
 export function parseRewardType({ rawValue }: EnumData): MissionRewardType {

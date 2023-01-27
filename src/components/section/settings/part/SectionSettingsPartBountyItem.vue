@@ -48,7 +48,7 @@ async function onSuccess() {
       <span class="tag" :data-tooltip="bounty.config.category">
         {{ bounty.config.category.charAt(0).toUpperCase() }}
       </span>
-      <NuxtLink :to="`/challenges/${bounty.id}`">{{ bounty.id }}</NuxtLink>
+      <NuxtLink :to="`/quests/${bounty.id}`">{{ bounty.id }}</NuxtLink>
       <div class="flex-auto flex-center gap-2">
         <Icon :icon="bounty.properties.Launched ? 'heroicons:rocket-launch-solid' : 'heroicons:rocket-launch'"
           :class="['w-6 h-6', bounty.properties.Launched ? 'text-success' : 'opacity-20']" />

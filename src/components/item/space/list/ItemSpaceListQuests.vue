@@ -2,10 +2,10 @@
 const route = useRoute()
 const { space } = inject(spaceInjectKey, { space: useCurrentSpace() })
 
-const { data: list, pending } = useAsyncData(`challengeList:${space.value?.key ?? 'unknown'}`, async () => {
+const { data: list, pending } = useAsyncData(`questList:${space.value?.key ?? 'unknown'}`, async () => {
   if (typeof space.value?.key === 'string') {
     const { $scripts } = useNuxtApp()
-    return await $scripts.spaceGetChallengeList(space.value.key)
+    return await $scripts.spaceGetQuestList(space.value.key)
   } else {
     return []
   }
@@ -17,10 +17,10 @@ const { data: list, pending } = useAsyncData(`challengeList:${space.value?.key ?
 
 <template>
   <div class=" flex flex-col gap-4">
-    <BtnGoPage :next="`${route.path}/create-challenge`"> Create a new challenge </BtnGoPage>
+    <BtnGoPage :next="`${route.path}/create-quest`"> Create a new quest </BtnGoPage>
     <WidgetLoadingCard v-if="pending" />
     <template v-else>
-      <ItemSpaceChallengeCard v-for="one in list" :key="one.key" :challenge="one" />
+      <ItemSpaceQuestCard v-for="one in list" :key="one.key" :quest="one" />
     </template>
   </div>
 </template>

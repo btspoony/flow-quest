@@ -494,15 +494,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
-         * get challenge list
+         * get quest list
          * @param communityKey
          */
-        async spaceGetChallengeList(
+        async spaceGetQuestList(
           communityKey: string,
           opt?: ListReqOption
-        ): Promise<ChallengeConfig[]> {
+        ): Promise<QuestConfig[]> {
           const result = await executeScript(
-            cadence.scripts.spaceGetChallengeList,
+            cadence.scripts.spaceGetQuestList,
             (arg, t) => [
               arg(communityKey, t.String),
               arg(opt?.page ? String(opt?.page) : null, t.Optional(t.Int)),
@@ -513,27 +513,24 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (!result || result.length === 0) {
             return [];
           }
-          return result.map((one: any) => parseChallengeInfo(one));
+          return result.map((one: any) => parseQuestInfo(one));
         },
         /**
-         * get challenge detail
+         * get quest detail
          * @param communityKey
-         * @param challengeKey
+         * @param questKey
          */
-        async spaceGetChallengeDetail(
+        async spaceGetQuestDetail(
           communityKey: string,
-          challengeKey: string
-        ): Promise<ChallengeConfigDetail | null> {
+          questKey: string
+        ): Promise<QuestConfigDetail | null> {
           const result = await executeScript(
-            cadence.scripts.spaceGetChallengeDetail,
-            (arg, t) => [
-              arg(communityKey, t.String),
-              arg(challengeKey, t.String),
-            ],
+            cadence.scripts.spaceGetQuestDetail,
+            (arg, t) => [arg(communityKey, t.String), arg(questKey, t.String)],
             null
           );
           if (!result) return result;
-          return parseChallengeInfoDetail(result);
+          return parseQuestInfoDetail(result);
         },
         /**
          * get mission list
@@ -646,24 +643,20 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
-         * add challenges to season
+         * add quests to season
          */
-        async adminAddChallengeToSeason(
-          challenge: ChallengeConfig,
+        async adminAddQuestToSeason(
+          quest: QuestConfig,
           rewards: PointRewardInfo[]
         ) {
           // missions
-          const data = challenge.missions.reduce(
+          const data = quest.missions.reduce(
             (prev, curr, index) => {
               prev.communities.push(curr.communityId);
               prev.keys.push(curr.key);
               prev.categories.push("0");
-              prev.rewardPoints.push(
-                rewards[index].rewardPoints.toFixed(0)
-              );
-              prev.referralPoints.push(
-                rewards[index].referalPoints.toFixed(0)
-              );
+              prev.rewardPoints.push(rewards[index].rewardPoints.toFixed(0));
+              prev.referralPoints.push(rewards[index].referalPoints.toFixed(0));
               prev.primary.push(false);
               return prev;
             },
@@ -676,9 +669,9 @@ export default defineNuxtPlugin((nuxtApp) => {
               primary: [] as boolean[],
             }
           );
-          // challenge
-          data.communities.push(challenge.communityId);
-          data.keys.push(challenge.key);
+          // quest
+          data.communities.push(quest.communityId);
+          data.keys.push(quest.key);
           data.categories.push("1");
           data.rewardPoints.push("0");
           data.referralPoints.push("0");
@@ -780,9 +773,9 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
-         * Add challenge to a community space
+         * Add quest to a community space
          */
-        async spaceAddChallenge(
+        async spaceAddQuest(
           spaceKey: string,
           key: string,
           display: Display,
@@ -810,7 +803,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             }
           );
           return await sendTransaction(
-            cadence.transactions.spaceAddChallenge,
+            cadence.transactions.spaceAddQuest,
             (arg, t) => [
               arg(spaceKey, t.String),
               arg(key, t.String),

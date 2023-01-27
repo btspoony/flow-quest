@@ -1,8 +1,8 @@
 export const useReferralCode = () =>
   useState<string | null>("appReferralCode", () => ref(null));
 
-export const useCurrentChallenge = () =>
-  useState<BountyInfo | null>("currentChallenge", () => ref(null));
+export const useCurrentQuest = () =>
+  useState<BountyInfo | null>("currentQuest", () => ref(null));
 
 export const useCurrentMission = () =>
   useState<BountyInfo | null>("currentMission", () => ref(null));

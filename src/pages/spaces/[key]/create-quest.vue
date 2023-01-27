@@ -10,7 +10,7 @@ definePageMeta({
 const route = useRoute()
 const spaceKey = computed<string>(() => typeof route.params.key === 'string' ? route.params.key : route.params.key[0])
 
-const challengeKey = ref<string>("")
+const questKey = ref<string>("")
 const display = reactive<Display>({
   name: "",
   description: "",
@@ -114,19 +114,19 @@ function onCloseDialog() {
 }
 
 const isValid = computed(() => {
-  return challengeKey.value && display.name && display.description && display.thumbnail && (existsMissionKeys.length > 0 || newMissions.length > 0)
+  return questKey.value && display.name && display.description && display.thumbnail && (existsMissionKeys.length > 0 || newMissions.length > 0)
 })
 
 function onTransactionSuccess() {
   const router = useRouter()
-  router.push({ path: `/spaces/${spaceKey.value}`, query: { tab: 'Challenges' } })
+  router.push({ path: `/spaces/${spaceKey.value}`, query: { tab: 'Quests' } })
 }
 
 async function sendTransaction(): Promise<string> {
   const { $transactions } = useNuxtApp();
-  return $transactions.spaceAddChallenge(
+  return $transactions.spaceAddQuest(
     spaceKey.value,
-    challengeKey.value,
+    questKey.value,
     toRaw(display),
     toRaw(existsMissionKeys),
     toRaw(newMissions).map(one => toRaw(one)),
@@ -139,21 +139,21 @@ async function sendTransaction(): Promise<string> {
 <template>
   <div class="pt-8 flex flex-col gap-4">
     <BtnBack />
-    <h2 class="mb-2">Create a new challenge</h2>
+    <h2 class="mb-2">Create a new quest</h2>
     <form class="mb-0">
       <div class="grid">
-        <label for="challengeKey">
+        <label for="questKey">
           Key
-          <input type="text" id="challengeKey" placeholder="Unique Key" v-model="challengeKey" required />
+          <input type="text" id="questKey" placeholder="Unique Key" v-model="questKey" required />
         </label>
-        <label for="challengeName">
+        <label for="questName">
           Name
-          <input type="text" id="challengeName" placeholder="Display Name" v-model="display.name" required />
+          <input type="text" id="questName" placeholder="Display Name" v-model="display.name" required />
         </label>
       </div>
-      <label for="challengeDesc">
+      <label for="questDesc">
         Description
-        <input type="text" id="challengeDesc" placeholder="Description" v-model="display.description" required />
+        <input type="text" id="questDesc" placeholder="Description" v-model="display.description" required />
       </label>
       <WidgetUploader @ipfs-added="(cid) => { display.thumbnail = cid }">
         <template v-slot:preview>

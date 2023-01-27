@@ -8,26 +8,26 @@ import Community from "../../../../cadence/dev-challenge/Community.cdc"
 
 pub fun main(
     communityKey: String,
-    challengeKey: String,
-): ChallengeDetail? {
+    questKey: String,
+): QuestDetail? {
     if let community = Community.borrowCommunityByKey(key: communityKey) {
-        var challenge = community.borrowChallengeRef(key: challengeKey)
-        if challenge == nil {
-            let challengeKeys = community.getChallengeKeys()
-            let searchKeyLen = challengeKey.length
-            for key in challengeKeys {
-                if searchKeyLen <= key.length && key.slice(from: 0, upTo: searchKeyLen) == challengeKey {
-                    challenge = community.borrowChallengeRef(key: key)
+        var quest = community.borrowQuestRef(key: questKey)
+        if quest == nil {
+            let questKeys = community.getQuestKeys()
+            let searchKeyLen = questKey.length
+            for key in questKeys {
+                if searchKeyLen <= key.length && key.slice(from: 0, upTo: searchKeyLen) == questKey {
+                    quest = community.borrowQuestRef(key: key)
                     break
                 }
             }
         }
-        if challenge == nil {
+        if quest == nil {
             return nil
         }
 
         let missions: [QueryStructs.MissionData] = []
-        for qid in challenge!.missions {
+        for qid in quest!.missions {
             if let community = Community.borrowCommunityById(id: qid.communityId) {
                 if let mission = community.borrowMissionRef(key: qid.key) {
                     missions.append(QueryStructs.MissionData(
@@ -38,16 +38,16 @@ pub fun main(
                 }
             }
         } // build mission detail
-        return ChallengeDetail(
+        return QuestDetail(
             community.owner!.address,
-            QueryStructs.ChallengeData(
+            QueryStructs.QuestData(
                 identifier: Community.BountyEntityIdentifier(
-                    category: Interfaces.BountyType.challenge,
+                    category: Interfaces.BountyType.quest,
                     communityId: community.getID(),
-                    key: challenge!.key
+                    key: quest!.key
                 ),
-                display: challenge!.getStandardDisplay(),
-                detail: challenge!.getDetail()
+                display: quest!.getStandardDisplay(),
+                detail: quest!.getDetail()
             ),
             missions
         )
@@ -55,18 +55,18 @@ pub fun main(
     return nil
 }
 
-pub struct ChallengeDetail {
+pub struct QuestDetail {
     pub let owner: Address
-    pub let challenge: QueryStructs.ChallengeData
+    pub let quest: QueryStructs.QuestData
     pub let missions: [QueryStructs.MissionData]
 
     init(
         _ owner: Address,
-        _ challenge: QueryStructs.ChallengeData,
+        _ quest: QueryStructs.QuestData,
         _ missions: [QueryStructs.MissionData]
     ) {
         self.owner = owner
-        self.challenge = challenge
+        self.quest = quest
         self.missions = missions
     }
 }

@@ -17,26 +17,23 @@ export async function refreshActiveSeason(
   return result;
 }
 
-export async function apiGetCurrentChallenge(
+export async function apiGetCurrentQuest(
   defaultBountyId: string
 ): Promise<BountyInfo | null> {
-  const current = useCurrentChallenge();
-  let challenge: BountyInfo | null;
+  const current = useCurrentQuest();
+  let quest: BountyInfo | null;
   if (current.value) {
-    challenge = current.value;
+    quest = current.value;
   } else {
     const { $scripts } = useNuxtApp();
     const season = await apiGetActiveSeason();
     if (season) {
-      challenge = await $scripts.getBountyById(
-        season.seasonId,
-        defaultBountyId
-      );
+      quest = await $scripts.getBountyById(season.seasonId, defaultBountyId);
     } else {
-      challenge = null;
+      quest = null;
     }
   }
-  return challenge;
+  return quest;
 }
 
 export async function apiGetCurrentMission(

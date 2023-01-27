@@ -30,7 +30,7 @@ pub fun main(
             properties: bounty.getProperties(),
             display: identifier.getBountyEntity().getStandardDisplay(),
             missionDetail: identifier.category == Interfaces.BountyType.mission ? identifier.getMissionConfig().getDetail() : nil,
-            challengeDetail: identifier.category == Interfaces.BountyType.challenge ? identifier.getChallengeConfig().getDetail() : nil,
+            questDetail: identifier.category == Interfaces.BountyType.quest ? identifier.getQuestConfig().getDetail() : nil,
             preconditions: bounty.getPreconditions(),
             participants: bounty.getParticipants(),
             participantAmt: UInt64(bounty.getParticipantsAmount()),

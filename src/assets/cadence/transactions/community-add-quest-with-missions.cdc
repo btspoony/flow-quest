@@ -8,7 +8,15 @@ transaction(
     title: String,
     description: String,
     image: String,
-    missionKeys: [String],
+    // Mission
+    existsMissionKeys: [String],
+    newMissionKeys: [String],
+    newMissionTitles: [String],
+    newMissionDescriptions: [String],
+    newMissionImages: [String?],
+    newMissionSteps: [UInt64],
+    newMissionStepsCfg: [String],
+    // Achievement
     achievementHost: Address?,
     achievementId: UInt64?,
 ) {
@@ -23,11 +31,42 @@ transaction(
         self.builder = acct.borrow<&Community.CommunityBuilder>(from: Community.CommunityStoragePath)!
     }
 
+    pre {
+        newMissionKeys.length == newMissionTitles.length: "Miss match"
+        newMissionKeys.length == newMissionDescriptions.length: "Miss match"
+        newMissionKeys.length == newMissionImages.length: "Miss match"
+        newMissionKeys.length == newMissionSteps.length: "Miss match"
+        newMissionKeys.length == newMissionStepsCfg.length: "Miss match"
+    }
+
     execute {
         let comPubRef= Community.borrowCommunityByKey(key: communityKey)
         assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
         let communityId = comPubRef!.getID()
         let community = self.builder.borrowCommunityPrivateRef(id: communityId)
+
+        let missionKeys = existsMissionKeys
+        let len = newMissionKeys.length
+        var i = 0
+        while i < len {
+            let exist = community.borrowMissionRef(key: newMissionKeys[i])
+            if exist == nil {
+                let mission = Community.MissionConfig(
+                    communityId: communityId,
+                    key: newMissionKeys[i],
+                    title: newMissionTitles[i],
+                    description: newMissionDescriptions[i],
+                    image: newMissionImages[i],
+                    steps: newMissionSteps[i],
+                    stepsCfg: newMissionStepsCfg[i],
+                )
+                community.addMission(key: newMissionKeys[i], mission: mission)
+            }
+            if !missionKeys.contains(newMissionKeys[i]) {
+                missionKeys.append(newMissionKeys[i])
+            }
+            i = i + 1
+        }
 
         let missions: [Community.BountyEntityIdentifier] = []
         for missionKey in missionKeys {
@@ -45,7 +84,7 @@ transaction(
             achievement!.getEventPublic()
         }
 
-        let challenge = Community.ChallengeConfig(
+        let quest = Community.QuestConfig(
             communityId: communityId,
             key: key,
             title: title,
@@ -54,6 +93,6 @@ transaction(
             missions: missions,
             achievement: achievement
         )
-        community.addChallenge(key: key, challenge: challenge)
+        community.addQuest(key: key, quest: quest)
     }
 }
