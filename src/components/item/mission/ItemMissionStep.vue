@@ -160,7 +160,10 @@ function onCloseDialgue() {
             :src="getIPFSUrl(currentMissionCfg.image)" alt="question alt" />
           <template v-for="option in currentMissionOptions" :key="`quiz_${currentMissionIdx}_${option.i}`">
             <label :for="`${mission.id}_${step}_quiz_${currentMissionIdx}_${option.i}`"
-              :class="['card card-border border-2 p-4',{ '!border-success bg-success/10': isSelectedQuizAnswer(option.i) && isTheQuizAnswerCorrect(option.i), '!border-failure bg-failure/10': isSelectedQuizAnswer(option.i) && !isTheQuizAnswerCorrect(option.i)}]">
+              :class="['card card-border overflow-x-scroll overflow-y-clip border-2 p-4',{
+                '!border-success bg-success/10': isSelectedQuizAnswer(option.i) && isTheQuizAnswerCorrect(option.i),
+                '!border-failure bg-failure/10': isSelectedQuizAnswer(option.i) && !isTheQuizAnswerCorrect(option.i)
+              }]">
               <input v-if="currentMissionCfg.type === 'radio'" type="radio"
                 :id="`${mission.id}_${step}_quiz_${currentMissionIdx}_${option.i}`" :value="option.key"
                 v-model="answers[currentMissionIdx][0]"
