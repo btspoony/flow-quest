@@ -21,6 +21,7 @@ enum UnlockConditionTypes {
   MinimumPoint = 0,
   FLOATRequired,
   CompletedBountyAmount,
+  BountyCompleted,
 }
 
 interface UnlockCondition {
@@ -43,6 +44,12 @@ interface CompletedBountyAmount extends UnlockCondition {
   type: UnlockConditionTypes.CompletedBountyAmount;
   seasonId: string;
   amount: number;
+}
+
+interface BountyCompleted extends UnlockCondition {
+  type: UnlockConditionTypes.BountyCompleted;
+  seasonId: string;
+  bountyId: string;
 }
 
 type UnlockConditions =

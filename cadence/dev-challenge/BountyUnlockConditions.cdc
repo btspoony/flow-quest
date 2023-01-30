@@ -13,6 +13,7 @@ pub contract BountyUnlockConditions {
         pub case MinimumPoint
         pub case FLOATRequired
         pub case CompletedBountyAmount
+        pub case BountyCompleted
     }
 
     pub struct MinimumPointRequired: Interfaces.UnlockCondition {
@@ -90,6 +91,32 @@ pub contract BountyUnlockConditions {
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
                 let completed = profile.getBountiesCompleted(seasonId: self.seasonId)
                 return UInt64(completed.keys.length) >= self.amount
+            } else {
+                return false
+            }
+        }
+    }
+
+    pub struct BountyCompleted: Interfaces.UnlockCondition {
+        pub let type: UInt8;
+        pub let seasonId: UInt64
+        pub let bountyId: UInt64
+
+        init(
+            seasonId: UInt64,
+            bountyId: UInt64
+        ) {
+            self.type = UnlockConditionTypes.BountyCompleted.rawValue
+            self.seasonId = seasonId
+            self.bountyId = bountyId
+        }
+
+        pub fun isUnlocked(_ params: {String: AnyStruct}): Bool {
+            let profileAddr: Address = params["profile"]! as! Address
+            if let profile = getAccount(profileAddr)
+                .getCapability(UserProfile.ProfilePublicPath)
+                .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
+                return profile.isBountyCompleted(seasonId: self.seasonId, bountyId: self.bountyId)
             } else {
                 return false
             }
