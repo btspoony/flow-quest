@@ -72,15 +72,12 @@ pub contract BountyUnlockConditions {
 
     pub struct CompletedBountyAmount: Interfaces.UnlockCondition {
         pub let type: UInt8;
-        pub let seasonId: UInt64
         pub let amount: UInt64
 
         init(
-            seasonId: UInt64,
             amount: UInt64
         ) {
             self.type = UnlockConditionTypes.CompletedBountyAmount.rawValue
-            self.seasonId = seasonId
             self.amount = amount
         }
 
@@ -89,7 +86,7 @@ pub contract BountyUnlockConditions {
             if let profile = getAccount(profileAddr)
                 .getCapability(UserProfile.ProfilePublicPath)
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
-                let completed = profile.getBountiesCompleted(seasonId: self.seasonId)
+                let completed = profile.getBountiesCompleted()
                 return UInt64(completed.keys.length) >= self.amount
             } else {
                 return false
@@ -99,15 +96,12 @@ pub contract BountyUnlockConditions {
 
     pub struct BountyCompleted: Interfaces.UnlockCondition {
         pub let type: UInt8;
-        pub let seasonId: UInt64
         pub let bountyId: UInt64
 
         init(
-            seasonId: UInt64,
             bountyId: UInt64
         ) {
             self.type = UnlockConditionTypes.BountyCompleted.rawValue
-            self.seasonId = seasonId
             self.bountyId = bountyId
         }
 
@@ -116,7 +110,7 @@ pub contract BountyUnlockConditions {
             if let profile = getAccount(profileAddr)
                 .getCapability(UserProfile.ProfilePublicPath)
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
-                return profile.isBountyCompleted(seasonId: self.seasonId, bountyId: self.bountyId)
+                return profile.isBountyCompleted(bountyId: self.bountyId)
             } else {
                 return false
             }

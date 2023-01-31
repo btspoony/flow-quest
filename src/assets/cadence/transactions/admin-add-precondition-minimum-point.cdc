@@ -8,12 +8,10 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 transaction(
 ) {
     let admin: &CompetitionService.CompetitionAdmin
-    let activeSeasonId: UInt64
 
     prepare(acct: AuthAccount) {
         self.admin = acct.borrow<&CompetitionService.CompetitionAdmin>(from: CompetitionService.AdminStoragePath)
             ?? panic("Without admin resource")
-        self.activeSeasonId = CompetitionService.borrowServicePublic().getActiveSeasonID()
     }
 
     execute {

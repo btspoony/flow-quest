@@ -10,8 +10,5 @@ pub fun main(
   addr: Address
 ): String? {
   let service = CompetitionService.borrowServicePublic()
-  let activeSeasonId = service.getActiveSeasonID()
-  let season = service.borrowSeasonDetail(seasonId: activeSeasonId)
-
-  return season.getReferralCode(addr)
+  return service.getReferralCode(addr)
 }

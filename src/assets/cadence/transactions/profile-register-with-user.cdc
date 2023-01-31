@@ -16,7 +16,10 @@ transaction(
     prepare(acct: AuthAccount) {
         // SETUP profile resource and link public
         if acct.borrow<&UserProfile.Profile>(from: UserProfile.ProfileStoragePath) == nil {
-            acct.save(<- UserProfile.createUserProfile(), to: UserProfile.ProfileStoragePath)
+            acct.save(
+                <- UserProfile.createUserProfile(serviceCap: CompetitionService.getPublicCapability(), referredFrom),
+                to: UserProfile.ProfileStoragePath
+            )
             acct.link<&UserProfile.Profile{Interfaces.ProfilePublic}>
                 (UserProfile.ProfilePublicPath, target: UserProfile.ProfileStoragePath)
         }
@@ -45,7 +48,10 @@ transaction(
             }
         }
 
-        // register new season
-        self.profile.registerForNewSeason(serviceCap: CompetitionService.getPublicCapability(), referredFrom: referredFrom)
+        let service = CompetitionService.borrowServicePublic()
+        if let season = service.borrowLastActiveSeason() {
+            // register new season
+            self.profile.registerForNewSeason(seasonId: season.getSeasonId())
+        }
     }
 }

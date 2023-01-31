@@ -5,7 +5,6 @@
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
-    seasonId: UInt64,
     bountyId: UInt64,
     index: Int
 ) {
@@ -17,6 +16,6 @@ transaction(
     }
 
     execute {
-        self.admin.removeBountyPrecondition(seasonId: seasonId, bountyId: bountyId, idx: index)
+        self.admin.removeBountyPrecondition(bountyId: bountyId, idx: index)
     }
 }

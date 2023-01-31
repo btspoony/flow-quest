@@ -231,9 +231,9 @@ interface BountyInfo {
 }
 
 interface CompetitionSeason {
-  seasonId: string;
-  endDate: number;
-  referralThreshold: number;
+  seasonId?: string;
+  endDate?: number;
+  referralThreshold?: number;
   bounties: { [uid: string]: BountyInfo };
 }
 
@@ -250,10 +250,10 @@ interface MissionStatus {
 }
 
 interface SeasonRecord {
-  seasonId: string;
   referredFromAddress?: string;
   referralCode?: string;
   points: number;
+  seasonPoints: { [seasonId: string]: number };
   missionScores: { [key: string]: MissionStatus };
   bountiesCompleted: { [uid: string]: string };
 }

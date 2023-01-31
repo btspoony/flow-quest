@@ -133,10 +133,9 @@ const isInvalid = computed(() => {
 
 async function updateMission() {
   const { $scripts } = useNuxtApp();
-  const season = await apiGetActiveSeason();
-  if (user.value?.address && bountyId.value && season) {
-    profileStatus.value = await $scripts.profileGetMissionStatus(user.value?.address, season.seasonId, missionKey.value)
-    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(user.value?.address, season.seasonId, bountyId.value)
+  if (user.value?.address && bountyId.value) {
+    profileStatus.value = await $scripts.profileGetMissionStatus(user.value?.address, missionKey.value)
+    isBountyCompleted.value = await $scripts.profileIsBountyCompleted(user.value?.address, bountyId.value)
   } else {
     profileStatus.value = null
     isBountyCompleted.value = false

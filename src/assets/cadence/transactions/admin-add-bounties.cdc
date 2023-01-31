@@ -29,13 +29,11 @@ transaction(
 
     execute {
         let service = CompetitionService.borrowServicePublic()
-        let seasonId = service.getActiveSeasonID()
-        let season = service.borrowSeason(seasonId: seasonId)
 
         let len = keys.length
         var i = 0
         while i < len {
-            if !season.hasBountyByKey(keys[i]) {
+            if !service.hasBountyByKey(keys[i]) {
                 let entityIdentifier = Community.BountyEntityIdentifier(
                     category: Interfaces.BountyType(rawValue: categories[i]) ?? panic("Wrong category value"),
                     communityId: communityIds[i],
@@ -45,7 +43,6 @@ transaction(
                 entityIdentifier.getBountyEntity()
 
                 self.admin.addBounty(
-                    seasonId: season.getSeasonId(),
                     identifier: entityIdentifier,
                     preconditions: [], // FIXME: no precondition for now
                     reward: Helper.PointReward(rewardPoints[i], referralPoints[i]),

@@ -29,7 +29,6 @@ pub contract FLOATVerifiers {
     }
 
     pub struct BountyCompleted: FLOAT.IVerifier {
-        pub let seasonId: UInt64
         pub let bountyId: UInt64
 
         pub fun verify(_ params: {String: AnyStruct}) {
@@ -37,7 +36,7 @@ pub contract FLOATVerifiers {
             if let profile = getAccount(claimee)
                 .getCapability(UserProfile.ProfilePublicPath)
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
-                let isCompleted = profile.isBountyCompleted(seasonId: self.seasonId, bountyId: self.bountyId)
+                let isCompleted = profile.isBountyCompleted(bountyId: self.bountyId)
                 assert(
                     isCompleted,
                     message: "You didn't finish the bounty #:".concat(self.bountyId.toString())
@@ -47,8 +46,7 @@ pub contract FLOATVerifiers {
             }
         }
 
-        init(seasonId: UInt64, bountyId: UInt64) {
-            self.seasonId = seasonId
+        init(bountyId: UInt64) {
             self.bountyId = bountyId
         }
     }
@@ -62,9 +60,7 @@ pub contract FLOATVerifiers {
             if let profile = getAccount(claimee)
                 .getCapability(UserProfile.ProfilePublicPath)
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
-                let service = CompetitionService.borrowServicePublic()
-                let seasonId = service.getActiveSeasonID()
-                let status = profile.getMissionStatus(seasonId: seasonId, missionKey: self.missionKey)
+                let status = profile.getMissionStatus(missionKey: self.missionKey)
                 assert(
                     status.completed,
                     message: "You didn't complete the mission #:".concat(self.missionKey)

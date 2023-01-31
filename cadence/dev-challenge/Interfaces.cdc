@@ -33,31 +33,35 @@ pub contract Interfaces {
         }
     }
 
-    // Profile readable
+    // Profile
     pub resource interface ProfilePublic {
+        // readable
         pub fun getId(): UInt64
+        pub fun getReferredFrom(): Address?
+        pub fun getReferralCode(): String?
 
         pub fun getIdentities(): [LinkedIdentity]
         pub fun getIdentity(platform: String): LinkedIdentity
 
-        pub fun getSeasonPoints(seasonId: UInt64): UInt64
-        pub fun getReferredFrom(seasonId: UInt64): Address?
-        pub fun getReferralCode(seasonId: UInt64): String?
+        pub fun getBountiesCompleted(): {UInt64: UFix64}
+        pub fun isBountyCompleted(bountyId: UInt64): Bool
+        pub fun getMissionStatus(missionKey: String): MissionStatus
+        pub fun getMissionsParticipanted(): [String]
 
-        // readable
+        // season points
         pub fun isRegistered(seasonId: UInt64): Bool
-        pub fun getBountiesCompleted(seasonId: UInt64): {UInt64: UFix64}
-        pub fun isBountyCompleted(seasonId: UInt64, bountyId: UInt64): Bool
-        pub fun getMissionStatus(seasonId: UInt64, missionKey: String): MissionStatus
-        pub fun getMissionsParticipanted(seasonId: UInt64): [String]
+        pub fun getSeasonsJoined(): [UInt64]
+        pub fun getSeasonPoints(seasonId: UInt64): UInt64
+        pub fun getProfilePoints(): UInt64
 
         // writable
         access(account) fun addPoints(seasonId: UInt64, points: UInt64)
-        access(account) fun updateMissionNewParams(seasonId: UInt64, missionKey: String, step: Int, params: {String: AnyStruct})
-        access(account) fun updateMissionVerificationResult(seasonId: UInt64, missionKey: String, step: Int, result: Bool)
-        access(account) fun completeBounty(seasonId: UInt64, bountyId: UInt64)
 
-        access(account) fun setupReferralCode(seasonId: UInt64, code: String)
+        access(account) fun completeBounty(bountyId: UInt64)
+        access(account) fun updateMissionNewParams(missionKey: String, step: Int, params: {String: AnyStruct})
+        access(account) fun updateMissionVerificationResult(missionKey: String, step: Int, result: Bool)
+
+        access(account) fun setupReferralCode(code: String)
     }
 
     // =================== Community ====================
@@ -158,20 +162,30 @@ pub contract Interfaces {
         pub fun isActive(): Bool
         // information
         pub fun getSeasonId(): UInt64
-        pub fun getBountyIDs(): [UInt64]
-        pub fun getPrimaryBountyIDs(): [UInt64]
-        pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
-
-        pub fun hasBountyByKey(_ key: String): Bool
-        pub fun borrowMissionRef(_ missionKey: String): &AnyStruct{BountyEntityPublic, MissionInfoPublic}
-
+        // leaderboard
+        pub fun getRank(_ addr: Address): Int
+        pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]}
+        // onProfile
         access(account) fun onProfileRegistered(acct: Address)
-        access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address)
     }
 
     pub resource interface CompetitionServicePublic {
+        pub fun getReferralAddress(_ code: String): Address?
+        pub fun getReferralCode(_ addr: Address): String?
+
+        // season
         pub fun getActiveSeasonID(): UInt64
         pub fun borrowSeason(seasonId: UInt64): &{CompetitionPublic}
-        pub fun borrowLatestActiveSeason(): &{CompetitionPublic}
+
+        // bounties
+        pub fun getBountyIDs(): [UInt64]
+        pub fun getPrimaryBountyIDs(): [UInt64]
+        pub fun hasBountyByKey(_ key: String): Bool
+        pub fun checkBountyCompleteStatus(acct: Address, bountyId: UInt64): Bool
+
+        pub fun borrowBountyInfo(_ bountyId: UInt64): &AnyResource{BountyInfoPublic}
+        pub fun borrowMissionRef(_ missionKey: String): &AnyStruct{BountyEntityPublic, MissionInfoPublic}
+
+        access(account) fun onBountyCompleted(bountyId: UInt64, acct: Address)
     }
 }

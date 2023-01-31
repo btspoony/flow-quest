@@ -7,13 +7,11 @@ import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 pub fun main(
-  seasonId: UInt64,
   bountyId: UInt64,
 ): QueryStructs.BountyInfo {
   let service = CompetitionService.borrowServicePublic()
-  let season = service.borrowSeasonDetail(seasonId: seasonId)
 
-  let bounty = season.borrowBountyDetail(bountyId)
+  let bounty = service.borrowBountyDetail(bountyId)
   let identifier = bounty.getBountyIdentifier()
   let rewardType = bounty.getRewardType()
   return QueryStructs.BountyInfo(

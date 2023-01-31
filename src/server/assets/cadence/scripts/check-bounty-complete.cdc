@@ -11,7 +11,5 @@ pub fun main(
   bountyId: UInt64
 ): Bool {
   let service = CompetitionService.borrowServicePublic()
-  let seasonId = service.getActiveSeasonID()
-  let season = service.borrowSeasonDetail(seasonId: seasonId)
-  return season.checkBountyCompleteStatus(acct: acct, bountyId: bountyId)
+  return service.checkBountyCompleteStatus(acct: acct, bountyId: bountyId)
 }

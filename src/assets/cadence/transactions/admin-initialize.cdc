@@ -15,7 +15,10 @@ transaction {
 
         // SETUP profile resource and link public
         if acct.borrow<&UserProfile.Profile>(from: UserProfile.ProfileStoragePath) == nil {
-            acct.save(<- UserProfile.createUserProfile(), to: UserProfile.ProfileStoragePath)
+            acct.save(
+                <- UserProfile.createUserProfile(serviceCap: CompetitionService.getPublicCapability(), nil),
+                to: UserProfile.ProfileStoragePath
+            )
             acct.link<&UserProfile.Profile{Interfaces.ProfilePublic}>
                 (UserProfile.ProfilePublicPath, target: UserProfile.ProfileStoragePath)
         }

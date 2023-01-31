@@ -5,7 +5,6 @@
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
-    seasonId: UInt64,
     bountyId: UInt64,
     index: Int
 ) {

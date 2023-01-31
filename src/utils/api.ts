@@ -26,12 +26,7 @@ export async function apiGetCurrentQuest(
     quest = current.value;
   } else {
     const { $scripts } = useNuxtApp();
-    const season = await apiGetActiveSeason();
-    if (season) {
-      quest = await $scripts.getBountyById(season.seasonId, defaultBountyId);
-    } else {
-      quest = null;
-    }
+    quest = await $scripts.getBountyById(defaultBountyId);
   }
   return quest;
 }
@@ -45,15 +40,7 @@ export async function apiGetCurrentMission(
     mission = current.value;
   } else {
     const { $scripts } = useNuxtApp();
-    const season = await apiGetActiveSeason();
-    if (season) {
-      mission = await $scripts.getBountyByKey(
-        season.seasonId,
-        defaultMissionKey
-      );
-    } else {
-      mission = null;
-    }
+    mission = await $scripts.getBountyByKey(defaultMissionKey);
   }
   return mission;
 }

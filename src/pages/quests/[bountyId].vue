@@ -7,7 +7,6 @@ const route = useRoute()
 const user = useUserProfile()
 
 interface QuestDetail {
-  season: CompetitionSeason | null,
   quest: BountyInfo | null,
   missions: BountyInfo[]
 }
@@ -19,17 +18,16 @@ watch(bountyId, (newVal) => {
 });
 
 const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${bountyId.value}`, async () => {
-  const season = await apiGetActiveSeason();
   const quest = await apiGetCurrentQuest(bountyId.value);
 
   const { $scripts } = useNuxtApp();
   let missions: BountyInfo[] = []
-  if (season && quest) {
-    missions = await $scripts.getMissionsDetail(season.seasonId, (quest.config as QuestConfig).missions)
+  if (quest) {
+    missions = await $scripts.getMissionsDetail((quest.config as QuestConfig).missions)
   } else {
     missions = []
   }
-  return { season, quest, missions }
+  return { quest, missions }
 }, {
   server: false
 });

@@ -18,10 +18,8 @@ transaction(
 
     execute {
         let property = CompetitionService.BountyProperty(rawValue: propertyKey) ?? panic("Invalid property key")
-        let season = CompetitionService.borrowServicePublic().borrowLatestActiveSeason()
 
         self.admin.updateBountyProperty(
-            seasonId: season.getSeasonId(),
             bountyId: bountyId,
             property: property,
             value: propertyValue

@@ -145,9 +145,9 @@ export default defineNuxtPlugin((nuxtApp) => {
             bounties[id] = parseBountyInfo(ret.bounties[id]);
           }
           return {
-            seasonId: ret.seasonID,
-            endDate: parseInt(ret.endDate),
-            referralThreshold: parseInt(ret.referralThreshold),
+            seasonId: ret.seasonID ?? undefined,
+            endDate: parseInt(ret.endDate ?? 0),
+            referralThreshold: parseInt(ret.referralThreshold ?? -1),
             bounties: bounties,
           };
         },
@@ -190,13 +190,11 @@ export default defineNuxtPlugin((nuxtApp) => {
          * @param missions
          */
         async getMissionsDetail(
-          seasonId: string,
           missions: BountyIdentifier[]
         ): Promise<BountyInfo[]> {
           const result = await executeScript(
             cadence.scripts.getBountiesDetail,
             (arg, t) => [
-              arg(seasonId, t.UInt64),
               arg(
                 missions.map((one) => one.key),
                 t.Array(t.String)
@@ -213,10 +211,10 @@ export default defineNuxtPlugin((nuxtApp) => {
          * get simple bounty info
          * @param id
          */
-        async getBountyById(seasonId: string, id: string): Promise<BountyInfo> {
+        async getBountyById(id: string): Promise<BountyInfo> {
           const result = await executeScript(
             cadence.scripts.getBountyById,
-            (arg, t) => [arg(seasonId, t.UInt64), arg(id, t.UInt64)],
+            (arg, t) => [arg(id, t.UInt64)],
             undefined
           );
           if (!result) {
@@ -228,16 +226,10 @@ export default defineNuxtPlugin((nuxtApp) => {
          * get bounty info
          * @param key
          */
-        async getBountyByKey(
-          seasonId: string,
-          key: string
-        ): Promise<BountyInfo> {
+        async getBountyByKey(key: string): Promise<BountyInfo> {
           const result = await executeScript(
             cadence.scripts.getBountiesDetail,
-            (arg, t) => [
-              arg(seasonId, t.UInt64),
-              arg([key], t.Array(t.String)),
-            ],
+            (arg, t) => [arg([key], t.Array(t.String))],
             []
           );
           if (result?.length !== 1) {
@@ -272,11 +264,13 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async getRankingStatus(
           limit = 100,
-          address: string | null = null
+          address: string | null = null,
+          isPermanent = true
         ): Promise<RankingStatus | null> {
           const result = await executeScript(
             cadence.scripts.getRankingStatus,
             (arg, t) => [
+              arg(isPermanent, t.Bool),
               arg(String(limit), t.Optional(t.Int)),
               arg(address, t.Optional(t.Address)),
             ],
@@ -344,16 +338,11 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async profileGetMissionStatus(
           acct: string,
-          seasonId: string,
           key: string
         ): Promise<MissionStatus | null> {
           return await executeScript(
             cadence.scripts.profileGetMissionStatus,
-            (arg, t) => [
-              arg(acct, t.Address),
-              arg(seasonId, t.UInt64),
-              arg(key, t.String),
-            ],
+            (arg, t) => [arg(acct, t.Address), arg(key, t.String)],
             null
           );
         },
@@ -362,16 +351,11 @@ export default defineNuxtPlugin((nuxtApp) => {
          */
         async profileIsBountyCompleted(
           acct: string,
-          seasonId: string,
           bountyId: string
         ): Promise<boolean> {
           return await executeScript(
             cadence.scripts.profileIsBountyCompleted,
-            (arg, t) => [
-              arg(acct, t.Address),
-              arg(seasonId, t.UInt64),
-              arg(bountyId, t.UInt64),
-            ],
+            (arg, t) => [arg(acct, t.Address), arg(bountyId, t.UInt64)],
             false
           );
         },
@@ -436,15 +420,11 @@ export default defineNuxtPlugin((nuxtApp) => {
          * load profile season record
          */
         async loadProfileSeasonRecord(
-          acct: string,
-          seasonId: string | null = null
+          acct: string
         ): Promise<SeasonRecord | undefined> {
           const result = await executeScript(
             cadence.scripts.profileGetSeasonRecord,
-            (arg, t) => [
-              arg(acct, t.Address),
-              arg(seasonId, t.Optional(t.UInt64)),
-            ],
+            (arg, t) => [arg(acct, t.Address)],
             undefined
           );
           if (!result) return result;

@@ -8,17 +8,15 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 
 pub fun main(
     includeUnlaunched: Bool?
-): SessonInfo {
+): ResultInfo {
     let service = CompetitionService.borrowServicePublic()
-    let activeSeasonId = service.getActiveSeasonID()
-    let season = service.borrowSeasonDetail(seasonId: activeSeasonId)
 
     let willIncludeUnlaunched = includeUnlaunched ?? false
 
-    let bountyIDs = season.getPrimaryBountyIDs()
+    let bountyIDs = service.getPrimaryBountyIDs()
     let bounties: {UInt64: QueryStructs.BountyInfo} = {}
     for id in bountyIDs {
-        let bounty = season.borrowBountyDetail(id)
+        let bounty = service.borrowBountyDetail(id)
         let identifier = bounty.getBountyIdentifier()
         let rewardType = bounty.getRewardType()
         if !willIncludeUnlaunched && !bounty.isLaunched() {
@@ -40,24 +38,26 @@ pub fun main(
         )
     }
 
-    return SessonInfo(
-        seasonID: season.getSeasonId(),
-        endDate: season.getEndDate(),
-        referralThreshold: season.getReferralThreshold(),
+    let season = service.borrowLastActiveSeason()
+
+    return ResultInfo(
+        seasonID: season?.getSeasonId(),
+        endDate: season?.getEndDate(),
+        referralThreshold: season?.getReferralThreshold(),
         bounties: bounties
     )
 }
 
-pub struct SessonInfo {
-    pub let seasonID: UInt64
-    pub let endDate: UFix64
-    pub let referralThreshold: UInt64
+pub struct ResultInfo {
+    pub let seasonID: UInt64?
+    pub let endDate: UFix64?
+    pub let referralThreshold: UInt64?
     pub let bounties: {UInt64: QueryStructs.BountyInfo}
 
     init(
-        seasonID: UInt64,
-        endDate: UFix64,
-        referralThreshold: UInt64,
+        seasonID: UInt64?,
+        endDate: UFix64?,
+        referralThreshold: UInt64?,
         bounties: {UInt64: QueryStructs.BountyInfo}
     ) {
         self.seasonID = seasonID

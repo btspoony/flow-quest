@@ -1,7 +1,7 @@
 export function parseProfileSeasonRecord(record: any): SeasonRecord {
   return {
-    seasonId: record.seasonId,
     points: parseInt(record.points),
+    seasonPoints: record.seasonPoints,
     referredFromAddress: record.referredFromAddress,
     referralCode: record.referralCode,
     bountiesCompleted: record.bountiesCompleted,

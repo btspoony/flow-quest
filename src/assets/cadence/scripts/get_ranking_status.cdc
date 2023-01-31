@@ -7,12 +7,14 @@ import UserProfile from "../../../../cadence/dev-challenge/UserProfile.cdc"
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 pub fun main(
+    permanent: Bool,
     limit: Int?,
     acct: Address?,
 ): RankingStatus {
     let service = CompetitionService.borrowServicePublic()
-    let activeSeasonId = service.getActiveSeasonID()
-    let season = service.borrowSeasonDetail(seasonId: activeSeasonId)
+    let season = permanent
+        ? service.borrowPermanentSeason()
+        : service.borrowLastActiveSeason() ?? panic("Failed to load season")
 
     let tops = season.getLeaderboardRanking(limit: limit)
     var rank: Int? = nil
@@ -20,7 +22,9 @@ pub fun main(
     if let address = acct {
         rank = season.getRank(address)
         let profile = UserProfile.borrowUserProfilePublic(address)
-        point = profile.getSeasonPoints(seasonId: activeSeasonId)
+        point = permanent
+            ? profile.getProfilePoints()
+            : profile.getSeasonPoints(seasonId: season.getSeasonId())
     }
     return RankingStatus(tops, rank, point)
 }
