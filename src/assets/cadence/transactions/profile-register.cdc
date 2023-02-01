@@ -26,7 +26,10 @@ transaction(
         let service = CompetitionService.borrowServicePublic()
         if let season = service.borrowLastActiveSeason() {
             // register new season
-            self.profile.registerForNewSeason(seasonId: season.getSeasonId())
+            let seasonId = season.getSeasonId()
+            if !self.profile.isRegistered(seasonId: seasonId) {
+                self.profile.registerForNewSeason(seasonId: seasonId)
+            }
         }
     }
 }

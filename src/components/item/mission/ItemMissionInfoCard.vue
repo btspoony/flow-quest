@@ -9,8 +9,8 @@ const missionCfg = computed(() => (props.bounty.config as MissionConfig));
 
 const isCompleted = ref(false)
 watchEffect(() => {
-  if (user.value && user.value.activeRecord) {
-    isCompleted.value = user.value.activeRecord.bountiesCompleted[props.bounty.id] !== undefined
+  if (user.value && user.value.profileRecord) {
+    isCompleted.value = user.value.profileRecord.bountiesCompleted[props.bounty.id] !== undefined
   } else {
     isCompleted.value = false
   }

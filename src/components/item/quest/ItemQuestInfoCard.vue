@@ -9,12 +9,12 @@ const questCfg = computed(() => (props.bounty.config as QuestConfig));
 const progress = ref(0);
 
 watchEffect(() => {
-  if (user.value && user.value.activeRecord) {
+  if (user.value && user.value.profileRecord) {
     let len = questCfg.value.missions.length
     let current = 0
     for (let i = 0; i < len; i++) {
       const mission = questCfg.value.missions[i];
-      const score = user.value.activeRecord.missionScores[mission.key]
+      const score = user.value.profileRecord.missionScores[mission.key]
       if (score?.completed) {
         current++
       } else {

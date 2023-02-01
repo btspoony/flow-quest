@@ -140,15 +140,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
           if (!ret) return null;
 
-          const bounties: { [key: string]: BountyInfo } = {};
+          const bounties: BountyInfo[] = [];
           for (const id in ret.bounties) {
-            bounties[id] = parseBountyInfo(ret.bounties[id]);
+            bounties.push(parseBountyInfo(ret.bounties[id]));
           }
           return {
             seasonId: ret.seasonID ?? undefined,
             endDate: parseInt(ret.endDate ?? 0),
             referralThreshold: parseInt(ret.referralThreshold ?? -1),
-            bounties: bounties,
+            bounties,
           };
         },
         /**
@@ -419,16 +419,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         /**
          * load profile season record
          */
-        async loadProfileSeasonRecord(
+        async loadProfileProfileRecord(
           acct: string
-        ): Promise<SeasonRecord | undefined> {
+        ): Promise<ProfileRecord | undefined> {
           const result = await executeScript(
-            cadence.scripts.profileGetSeasonRecord,
+            cadence.scripts.profileGetProfileRecord,
             (arg, t) => [arg(acct, t.Address)],
             undefined
           );
           if (!result) return result;
-          return parseProfileSeasonRecord(result);
+          return parseProfileProfileRecord(result);
         },
         // Spaces
         /**

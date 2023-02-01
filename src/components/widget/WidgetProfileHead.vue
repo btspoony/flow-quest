@@ -78,8 +78,8 @@ function onLogout() {
           <span class="text-xs">{{ linkedAddressShortString }} </span>
         </div>
         <div v-if="wallet?.addr" class="tag secondary" :aria-busy="isMatchedWallet && isRegistering">
-          <template v-if="isMatchedWallet && user?.activeRecord">
-            {{ user?.activeRecord?.points ?? 0 }} Points
+          <template v-if="isMatchedWallet && user?.profileRecord">
+            {{ user?.profileRecord?.points ?? 0 }} Points
           </template>
           <template v-else>
             {{ isMatchedWallet ? (isRegistering ? ' Initializing' : 'Need Register') : 'Wrong Wallet' }}

@@ -33,7 +33,7 @@ onMounted(() => {
 })
 
 function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
-  if (wallet.value?.loggedIn && newVal && !newVal.activeRecord && isMatchedWallet.value) {
+  if (wallet.value?.loggedIn && newVal && !newVal.profileRecord && isMatchedWallet.value) {
     if (!inAdmin.value && !submitTx.value?.isLoading && !submitTx.value?.isSealed && !isRegistering.value) {
       isRegistering.value = true
       submitTx.value?.startTransaction()
@@ -74,7 +74,7 @@ function transactionReset() {
 
 <template>
   <FlowConnectButton v-if="!wallet?.loggedIn" @connected="onConnected" />
-  <FlowSubmitTransaction v-if="wallet?.loggedIn && !user?.activeRecord" ref="submitTx" action="Registering Profile"
+  <FlowSubmitTransaction v-if="wallet?.loggedIn && !user?.profileRecord" ref="submitTx" action="Registering Profile"
     :hide-button="true" :hide-trx="hideTrx" :method="sendProfileRegister" @success="onProfileRegistered"
     @sealed="transactionReset" @error="transactionReset" />
 </template>

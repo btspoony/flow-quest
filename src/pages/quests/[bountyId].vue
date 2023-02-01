@@ -56,12 +56,12 @@ const progress = ref(0);
 
 watchEffect(() => {
   if (info.value) {
-    if (user.value && user.value.activeRecord && bountyId.value) {
+    if (user.value && user.value.profileRecord && bountyId.value) {
       let len = info.value.missions.length
       let current = 0
       for (let i = 0; i < len; i++) {
         const mission = info.value.missions[i];
-        const isMissionCompleted = !!user.value.activeRecord.bountiesCompleted[mission.id]
+        const isMissionCompleted = !!user.value.profileRecord.bountiesCompleted[mission.id]
         if (isMissionCompleted) {
           current++
         } else {

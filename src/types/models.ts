@@ -228,7 +228,7 @@ interface CompetitionSeason {
   seasonId?: string;
   endDate?: number;
   referralThreshold?: number;
-  bounties: { [uid: string]: BountyInfo };
+  bounties: BountyInfo[];
 }
 
 // ---- Profile ----
@@ -243,7 +243,7 @@ interface MissionStatus {
   completed: boolean;
 }
 
-interface SeasonRecord {
+interface ProfileRecord {
   referredFromAddress?: string;
   referralCode?: string;
   points: number;
@@ -255,7 +255,7 @@ interface SeasonRecord {
 interface ProfileData {
   address: string;
   linkedIdentities: { [key: string]: ProfileIdentity };
-  activeRecord?: SeasonRecord;
+  profileRecord?: ProfileRecord;
   adminStatus?: AdminStatus;
 }
 

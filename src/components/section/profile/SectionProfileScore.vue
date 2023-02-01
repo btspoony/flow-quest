@@ -9,9 +9,9 @@ interface BountyStatus {
 }
 
 const completedBounties = computed<BountyStatus[]>(() => {
-  if (props.profile.activeRecord?.bountiesCompleted) {
+  if (props.profile.profileRecord?.bountiesCompleted) {
     const bounties: BountyStatus[] = []
-    const bountiesDic = props.profile.activeRecord?.bountiesCompleted
+    const bountiesDic = props.profile.profileRecord?.bountiesCompleted
     for (const key in bountiesDic) {
       bounties.push({ id: key, completedAt: new Date(parseInt(bountiesDic[key]) * 1000) })
     }
@@ -27,7 +27,7 @@ const completedBounties = computed<BountyStatus[]>(() => {
       <div class="w-full flex-between flex-wrap text-4xl font-semibold">
         <span class="py-2">Score</span>
         <span class="rounded-full bg-secondary text-white px-4 py-2">
-          <span class="font-extrabold">{{ profile.activeRecord?.points }}</span>&nbsp;Points
+          <span class="font-extrabold">{{ profile.profileRecord?.points }}</span>&nbsp;Points
         </span>
       </div>
       <div class="divider"></div>

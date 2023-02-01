@@ -1,4 +1,4 @@
-export function parseProfileSeasonRecord(record: any): SeasonRecord {
+export function parseProfileProfileRecord(record: any): ProfileRecord {
   return {
     points: parseInt(record.points),
     seasonPoints: record.seasonPoints,

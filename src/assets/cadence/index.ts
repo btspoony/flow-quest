@@ -34,7 +34,7 @@ import getAdminStatus from "./scripts/is_admin.cdc?raw";
 import profileExists from "./scripts/profile_exists.cdc?raw";
 import profileGetMissionStatus from "./scripts/profile_get_mission_status.cdc?raw";
 import profileIsRegistered from "./scripts/profile_is_registered.cdc?raw";
-import profileGetSeasonRecord from "./scripts/profile_get_season_record.cdc?raw";
+import profileGetProfileRecord from "./scripts/profile_get_profile_record.cdc?raw";
 import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?raw";
 import profileGetIdentities from "./scripts/profile_get_identities.cdc?raw";
 import profilesGetIdentity from "./scripts/profiles_get_identity.cdc?raw";
@@ -81,7 +81,7 @@ export default {
         // profile
         profileExists,
         profileIsRegistered,
-        profileGetSeasonRecord,
+        profileGetProfileRecord,
         profileGetMissionStatus,
         profileIsBountyCompleted,
         profileGetIdentities,

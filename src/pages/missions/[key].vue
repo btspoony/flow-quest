@@ -11,7 +11,6 @@ const route = useRoute()
 const user = useUserProfile()
 
 interface MissionDetail {
-  season: CompetitionSeason | null,
   mission: BountyInfo | null,
   guideMD?: string,
   stepsCfg: MissionStepsConfig[],
@@ -24,7 +23,6 @@ watch(missionKey, (newVal) => {
 });
 
 const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${missionKey.value}`, async () => {
-  const season = await apiGetActiveSeason();
   const mission = await apiGetCurrentMission(missionKey.value)
   let guideMD: string | undefined
   let missionDetail: MissionDetailConfig | undefined
@@ -50,7 +48,6 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
   }
 
   return {
-    season,
     mission,
     guideMD,
     stepsCfg: missionDetail?.steps ?? []
@@ -61,38 +58,14 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
 
 const bountyId = computed(() => info.value?.mission?.id)
 
-const { data: isRegistered, refresh: userRefresh } = useAsyncData<boolean>('IsUserRegistered', async () => {
-  const season = await apiGetActiveSeason();
-
-  // load user profile
-  let isRegistered: boolean
-  if (user.value && user.value.activeRecord) {
-    isRegistered = true
-  } else {
-    const { $scripts } = useNuxtApp();
-    if (user.value?.address && season) {
-      isRegistered = await $scripts.isProfileRegistered(user.value?.address, season.seasonId)
-    } else {
-      isRegistered = false
-    }
-  }
-  return isRegistered
-}, {
-  server: false
-})
-
 const profileStatus = ref<MissionStatus | null>(null)
 const isBountyCompleted = ref(false)
 
-watch(user, (newVal, oldVal) => {
-  userRefresh()
-})
-
 watchEffect(async () => {
-  if (user.value && user.value.activeRecord && bountyId.value) {
-    profileStatus.value = user.value.activeRecord.missionScores[missionKey.value]
-    isBountyCompleted.value = user.value.activeRecord.bountiesCompleted[bountyId.value] !== undefined
-  } else if (isRegistered.value) {
+  if (user.value && user.value.profileRecord && bountyId.value) {
+    profileStatus.value = user.value.profileRecord.missionScores[missionKey.value]
+    isBountyCompleted.value = user.value.profileRecord.bountiesCompleted[bountyId.value] !== undefined
+  } else {
     await updateMission()
   }
 }, {
@@ -111,9 +84,6 @@ const imageUrl = computed(() => {
 const lockingArr = computed<boolean[]>(() => {
   const stepAmt = missionCfg.value?.steps ?? 10
   const result = Array(stepAmt).fill(true)
-
-  // not registered, be locked
-  if (!isRegistered.value) return result
 
   const doneSteps = profileStatus.value?.steps ?? Array(stepAmt).fill(false)
   // all step before this should be done.
@@ -183,7 +153,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
         <!-- Mission Prepare -->
         <div class="flex flex-col gap-2">
-          <FlowConnect v-if="!user?.activeRecord || !isRegistered" @registered="userRefresh" />
+          <FlowConnect v-if="!user?.profileRecord" />
         </div>
         <!-- Mission steps -->
         <div class="flex flex-col gap-2">

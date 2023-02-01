@@ -1,12 +1,3 @@
-export async function apiGetActiveSeason(): Promise<CompetitionSeason | null> {
-  const activeSeason = useActiveSeason();
-  if (activeSeason.value) {
-    return activeSeason.value;
-  } else {
-    return refreshActiveSeason();
-  }
-}
-
 export async function refreshActiveSeason(
   includeUnlaunched = false
 ): Promise<CompetitionSeason | null> {
@@ -92,7 +83,7 @@ export async function reloadCurrentUser(
   const address = wallet.value.addr!;
   const profile = (await loadUserProfile(address, ignores)) ?? {
     address,
-    activeRecord: undefined,
+    profileRecord: undefined,
     linkedIdentities: {},
   };
 
@@ -101,7 +92,7 @@ export async function reloadCurrentUser(
       profile.linkedIdentities = current.value?.linkedIdentities;
     }
     if (ignores.ignoreSeason) {
-      profile.activeRecord = current.value?.activeRecord;
+      profile.profileRecord = current.value?.profileRecord;
     }
   }
 
@@ -132,7 +123,7 @@ export async function loadUserProfile(
 
   const { $scripts } = useNuxtApp();
 
-  let activeRecord: SeasonRecord | undefined;
+  let profileRecord: ProfileRecord | undefined;
   const linkedIdentities: { [key: string]: ProfileIdentity } = {};
 
   if (!ignores.ignoreIdentities) {
@@ -143,12 +134,12 @@ export async function loadUserProfile(
   }
 
   if (!ignores.ignoreSeason) {
-    activeRecord = await $scripts.loadProfileSeasonRecord(address);
+    profileRecord = await $scripts.loadProfileProfileRecord(address);
   }
 
   return {
     address,
-    activeRecord,
+    profileRecord,
     linkedIdentities,
   };
 }

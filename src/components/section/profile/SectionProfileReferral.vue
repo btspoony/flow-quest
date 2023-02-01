@@ -9,7 +9,7 @@ const props = defineProps<{
 const season = useActiveSeason();
 
 const isUserSelf = computed<boolean>(() => user.value?.address === props.profile.address)
-const referralCode = computed<string | undefined>(() => props.profile.activeRecord?.referralCode)
+const referralCode = computed<string | undefined>(() => props.profile.profileRecord?.referralCode)
 const copyURL = computed<string>(() => {
   let host: string
   if (process.client) {
@@ -21,7 +21,7 @@ const copyURL = computed<string>(() => {
 });
 const { text, copy, copied, isSupported } = useClipboard();
 
-const executable = computed<boolean>(() => season.value ? season.value?.referralThreshold <= (props.profile.activeRecord?.points ?? 0) : false)
+const executable = computed<boolean>(() => season.value ? season.value?.referralThreshold <= (props.profile.profileRecord?.points ?? 0) : false)
 
 async function generateCode(): Promise<string | null> {
   const result = await apiPostGenerateReferralCode()
