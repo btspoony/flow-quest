@@ -22,9 +22,14 @@ defineProps<{
             <span v-for="one in quest.missions" :key="one.key" class="tag">{{ one.key }}</span>
           </div>
         </div>
-        <div v-if="quest.achievement">
+        <div>
           <h6 class="mb-2">Achievement: </h6>
-          <ItemFLOATEvent :host="quest.achievement.host" :event-id="quest.achievement.eventId" />
+          <ItemFLOATEvent v-if="quest.achievement" :host="quest.achievement.host" :event-id="quest.achievement.eventId" />
+          <div v-else>
+            <button class="rounded-full flex-center px-6 mb-0">
+              create an achievement FLOAT
+            </button>
+          </div>
         </div>
       </div>
     </details>

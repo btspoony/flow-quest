@@ -158,7 +158,8 @@ async function sendTransaction(): Promise<string> {
       </label>
       <WidgetUploader @ipfs-added="(cid) => { display.thumbnail = cid }">
         <template v-slot:preview>
-          <img v-if="display.thumbnail" :src="getIPFSUrl(display.thumbnail)" alt="Image Preview" />
+          <img v-if="display.thumbnail" :src="getIPFSUrl(display.thumbnail)" class="max-w-[12rem] max-h-[12rem]"
+            alt="Image Preview" />
         </template>
       </WidgetUploader>
     </form>
@@ -170,7 +171,7 @@ async function sendTransaction(): Promise<string> {
     </div>
     <ItemSpaceMissionCard v-for="one in allValidMissions" :key="one.key" :mission="one" />
     <div class="divider"></div>
-    <div class="grid">
+    <!-- <div class="grid">
       <label for="achievementFLOAT">
         Achievement FLOAT (Optional)
         <input type="url" id="achievementFLOAT" placeholder="https://floats.city/..." v-model="floatURL"
@@ -180,7 +181,7 @@ async function sendTransaction(): Promise<string> {
         <span v-if="!achievement">Preview</span>
         <ItemFLOATEvent v-else :host="achievement.host" :event-id="achievement.eventId" />
       </div>
-    </div>
+    </div> -->
     <FlowSubmitTransaction :disabled="!isValid" :method="sendTransaction" @success="onTransactionSuccess()">
       <template v-slot:disabled>
         <span>Required parameters should be filled</span>

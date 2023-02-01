@@ -7,6 +7,7 @@ import claimFloat from "./transactions/claim-float.cdc?raw";
 import spaceCreate from "./transactions/community-create.cdc?raw";
 import spaceAddMissions from "./transactions/community-add-missions.cdc?raw";
 import spaceAddQuest from "./transactions/community-add-quest-with-missions.cdc?raw";
+import spaceApplyFLOATinQuest from "./transactions/community-apply-FLOAT-in-quest.cdc?raw";
 import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
@@ -16,7 +17,6 @@ import adminAddPreconditionBountyCompleted from "./transactions/admin-add-precon
 import adminAddPreconditionFLOATRequired from "./transactions/admin-add-precondition-float-required.cdc?raw";
 import adminAddPreconditionMinimumPoint from "./transactions/admin-add-precondition-minimum-point.cdc?raw";
 import adminCreateFLOATinBounty from "./transactions/admin-create-FLOAT-in-bounty.cdc?raw";
-import adminCreateFLOATinMission from "./transactions/admin-create-FLOAT-in-mission.cdc?raw";
 
 /**
  * scripts for mission checking
@@ -62,7 +62,7 @@ export default {
         adminAddPreconditionFLOATRequired,
         adminAddPreconditionMinimumPoint,
         adminCreateFLOATinBounty,
-        adminCreateFLOATinMission,
+        spaceApplyFLOATinQuest,
         spaceCreate,
         spaceAddMissions,
         spaceAddQuest,

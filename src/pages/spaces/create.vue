@@ -82,7 +82,7 @@ async function sendCreateCommunity(): Promise<string> {
       </label>
       <WidgetUploader @ipfs-added="(cid) => { data.image = cid }">
         <template v-slot:preview>
-          <img v-if="data.image" :src="getIPFSUrl(data.image)" alt="Image Preview" />
+          <img v-if="data.image" :src="getIPFSUrl(data.image)" class="max-w-[12rem] max-h-[12rem]" alt="Image Preview" />
         </template>
       </WidgetUploader>
       <div class="grid">

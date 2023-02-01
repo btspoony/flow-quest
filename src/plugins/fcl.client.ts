@@ -734,23 +734,6 @@ export default defineNuxtPlugin((nuxtApp) => {
             ]
           );
         },
-        async adminCreateFLOATinMission(
-          float: FLOATBasics,
-          communityKey: string,
-          missionKey: string
-        ) {
-          return await sendTransaction(
-            cadence.transactions.adminCreateFLOATinMission,
-            (arg, t) => [
-              arg(float.name, t.String),
-              arg(float.description, t.String),
-              arg(float.image, t.String),
-              arg(float.url, t.String),
-              arg(communityKey, t.String),
-              arg(missionKey, t.String),
-            ]
-          );
-        },
         /**
          * create a new space
          */
@@ -869,6 +852,23 @@ export default defineNuxtPlugin((nuxtApp) => {
                 achievement ? achievement.eventId : null,
                 t.Optional(t.UInt64)
               ),
+            ]
+          );
+        },
+        async spaceApplyFLOATinQuest(
+          float: FLOATBasics,
+          communityKey: string,
+          questKey: string
+        ) {
+          return await sendTransaction(
+            cadence.transactions.spaceApplyFLOATinQuest,
+            (arg, t) => [
+              arg(float.name, t.String),
+              arg(float.description, t.String),
+              arg(float.image, t.String),
+              arg(float.url, t.String),
+              arg(communityKey, t.String),
+              arg(questKey, t.String),
             ]
           );
         },
