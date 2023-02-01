@@ -161,7 +161,6 @@ pub contract UserProfile {
             referredFrom: Address?
         ) {
             self.campetitionServiceCap = cap
-            self.seasonScores = {}
             self.linkedIdentities = {}
 
             self.missionScores = {}
@@ -171,8 +170,8 @@ pub contract UserProfile {
             self.referralCode = nil
 
             UserProfile.totalProfiles = UserProfile.totalProfiles + 1
-
-            self.registerForNewSeason(seasonId: 0)
+            self.seasonScores = {}
+            self.seasonScores[0] = SeasonRecord(seasonId: 0)
 
             emit ProfileCreated(profileId: self.uuid, referredFrom: referredFrom)
         }
