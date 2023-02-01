@@ -153,7 +153,8 @@ async function sendTransaction(): Promise<string> {
       </div>
       <label for="questDesc">
         Description
-        <input type="text" id="questDesc" placeholder="Description" v-model="display.description" required />
+        <textarea id="questDesc" placeholder="Description" class="resize-y h-28 max-h-60" v-model.trim="display.description"
+          required />
       </label>
       <WidgetUploader @ipfs-added="(cid) => { display.thumbnail = cid }">
         <template v-slot:preview>

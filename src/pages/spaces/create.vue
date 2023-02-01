@@ -77,7 +77,8 @@ async function sendCreateCommunity(): Promise<string> {
       </div>
       <label for="spaceDesc">
         Description
-        <input type="text" id="spaceDesc" placeholder="Description" v-model="data.description" required />
+        <textarea id="spaceDesc" placeholder="Description" class="resize-y h-28 max-h-60" v-model.trim="data.description"
+          required />
       </label>
       <WidgetUploader @ipfs-added="(cid) => { data.image = cid }">
         <template v-slot:preview>
