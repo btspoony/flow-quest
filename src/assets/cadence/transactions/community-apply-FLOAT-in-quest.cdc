@@ -11,7 +11,7 @@ transaction(
     description: String,
     image: String,
     url: String,
-    communityKey: String,
+    communityId: UInt64,
     questKey: String,
 ) {
     let FLOATEvents: &FLOAT.FLOATEvents
@@ -22,9 +22,8 @@ transaction(
             ?? panic("Could not borrow the FLOATEvents from the signer.")
 
         let builder = acct.borrow<&Community.CommunityBuilder>(from: Community.CommunityStoragePath) ?? panic("Failed to load builder.")
-        let community = Community.borrowCommunityByKey(key: communityKey) ?? panic("Failed to find community")
-        assert(community.owner!.address == acct.address, message: "Community is owned by AuthAccount")
-        self.communityIns = builder.borrowCommunityPrivateRef(id: community.getID())
+        self.communityIns = builder.borrowCommunityPrivateRef(id: communityId)
+        assert(self.communityIns.owner!.address == acct.address, message: "Community is owned by AuthAccount")
     }
 
     execute {

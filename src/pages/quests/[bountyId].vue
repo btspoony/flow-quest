@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import md from 'markdown-it';
 definePageMeta({
   key: route => route.path
 })
 
+const mdRenderer = md()
 const route = useRoute()
 const user = useUserProfile()
 
@@ -141,9 +143,8 @@ async function claimFloat(): Promise<string | null> {
           </div>
         </div>
       </div>
-      <div class="mb-4 prose-sm lg:prose">
-        {{ questCfg?.display.description }}
-      </div>
+      <div class="mb-4 prose-sm prose-blockquote:py-0 prose-img:my-0"
+        v-html="mdRenderer.render(questCfg?.display.description)"></div>
       <div role="separator" class="divider mb-11 mt-4" />
       <div class="flex flex-col gap-24">
         <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"

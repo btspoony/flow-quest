@@ -372,7 +372,7 @@ pub contract Community {
                 self.owner != nil: "Owner exists."
             }
 
-            let quest = self.quests[key] ?? panic("Failed to find quest.")
+            let quest = self.borrowQuestRef(key: key) ?? panic("Failed to find quest.")
             quest.updateAchievement(achi: achi)
 
             emit QuestAchievementUpdated(

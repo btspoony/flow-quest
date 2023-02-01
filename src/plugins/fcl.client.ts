@@ -857,7 +857,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
         async spaceApplyFLOATinQuest(
           float: FLOATBasics,
-          communityKey: string,
+          communityId: string,
           questKey: string
         ) {
           return await sendTransaction(
@@ -867,7 +867,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               arg(float.description, t.String),
               arg(float.image, t.String),
               arg(float.url, t.String),
-              arg(communityKey, t.String),
+              arg(communityId, t.UInt64),
               arg(questKey, t.String),
             ]
           );

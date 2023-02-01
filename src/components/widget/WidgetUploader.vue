@@ -50,5 +50,5 @@ async function uploadToIPFS(e: Event) {
       </slot>
     </div>
   </div>
-  <small v-if="uploadedSuccessfully">✓ Image uploaded successfully to IPFS!</small>
+  <small v-if="uploadedSuccessfully" class="my-1">✓ Image uploaded successfully to IPFS!</small>
 </template>

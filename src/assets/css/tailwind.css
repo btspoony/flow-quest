@@ -223,7 +223,7 @@
     @apply relative rounded-xl p-[3px] m-0;
     @apply bg-[var(--card-background-color)];
 
-    .card {
+    > .card {
       @apply rounded-lg p-4;
     }
 
