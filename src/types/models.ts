@@ -30,8 +30,9 @@ interface UnlockCondition {
 
 interface MinimumPointRequired extends UnlockCondition {
   type: UnlockConditionTypes.MinimumPoint;
-  seasonId: string;
   amount: number;
+  seasonId?: string;
+  usePermanentPoint?: boolean;
 }
 
 interface FLOATRequired extends UnlockCondition {
@@ -40,22 +41,12 @@ interface FLOATRequired extends UnlockCondition {
   eventId: string;
 }
 
-interface CompletedBountyAmount extends UnlockCondition {
-  type: UnlockConditionTypes.CompletedBountyAmount;
-  seasonId: string;
-  amount: number;
-}
-
 interface BountyCompleted extends UnlockCondition {
   type: UnlockConditionTypes.BountyCompleted;
-  seasonId: string;
   bountyId: string;
 }
 
-type UnlockConditions =
-  | MinimumPointRequired
-  | FLOATRequired
-  | CompletedBountyAmount;
+type UnlockConditions = MinimumPointRequired | FLOATRequired | BountyCompleted;
 
 type MissionRewardType = "Points" | "FLOAT" | "None";
 
@@ -167,15 +158,18 @@ interface QuestConfigDetail {
   missions: MissionConfig[];
 }
 
-interface FLOATEvent {
-  claimable: boolean;
+interface FLOATBasics {
+  name: string;
   description: string;
+  image: string;
+  url: string;
+}
+
+interface FLOATEvent extends FLOATBasics {
+  claimable: boolean;
   eventId: string;
   host: string;
-  image: string;
-  name: string;
   totalSupply: number;
-  url: string;
 }
 
 type BountyEntities = MissionConfig | QuestConfig;

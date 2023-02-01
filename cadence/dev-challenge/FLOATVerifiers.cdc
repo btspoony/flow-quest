@@ -51,7 +51,7 @@ pub contract FLOATVerifiers {
         }
     }
 
-    pub struct MissionCompletedInActiveSeason: FLOAT.IVerifier {
+    pub struct MissionCompleted: FLOAT.IVerifier {
         pub let missionKey: String
 
         pub fun verify(_ params: {String: AnyStruct}) {

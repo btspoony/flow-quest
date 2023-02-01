@@ -6,6 +6,8 @@ import BountyUnlockConditions from "../../../../cadence/dev-challenge/BountyUnlo
 import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
 transaction(
+    bountyId: UInt64,
+    targetBountyId: UInt64,
 ) {
     let admin: &CompetitionService.CompetitionAdmin
 
@@ -15,6 +17,8 @@ transaction(
     }
 
     execute {
-        // TODO
+        self.admin.addBountyPrecondition(bountyId: bountyId, cond: BountyUnlockConditions.BountyCompleted(
+            bountyId: targetBountyId
+        ))
     }
 }

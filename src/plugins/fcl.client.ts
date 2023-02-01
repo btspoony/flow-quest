@@ -686,6 +686,71 @@ export default defineNuxtPlugin((nuxtApp) => {
             ]
           );
         },
+        async adminAddPrecondition(
+          bountyId: string,
+          options: UnlockConditions
+        ) {
+          let promise: Promise<string>;
+          if (options.type === UnlockConditionTypes.MinimumPoint) {
+            promise = sendTransaction(
+              cadence.transactions.adminAddPreconditionMinimumPoint,
+              (arg, t) => [
+                arg(bountyId, t.UInt64),
+                arg(options.amount, t.UInt64),
+                arg(options.usePermanentPoint, t.Bool),
+              ]
+            );
+          } else if (options.type === UnlockConditionTypes.FLOATRequired) {
+            promise = sendTransaction(
+              cadence.transactions.adminAddPreconditionFLOATRequired,
+              (arg, t) => [
+                arg(bountyId, t.UInt64),
+                arg(options.host, t.Address),
+                arg(options.eventId, t.UInt64),
+              ]
+            );
+          } else if (options.type === UnlockConditionTypes.BountyCompleted) {
+            promise = sendTransaction(
+              cadence.transactions.adminAddPreconditionBountyCompleted,
+              (arg, t) => [
+                arg(bountyId, t.UInt64),
+                arg(options.bountyId, t.UInt64),
+              ]
+            );
+          } else {
+            throw new Error("Unsupported type.");
+          }
+          return await promise;
+        },
+        async adminCreateFLOATinBounty(float: FLOATBasics, bountyId: string) {
+          return await sendTransaction(
+            cadence.transactions.adminCreateFLOATinBounty,
+            (arg, t) => [
+              arg(float.name, t.String),
+              arg(float.description, t.String),
+              arg(float.image, t.String),
+              arg(float.url, t.String),
+              arg(bountyId, t.UInt64),
+            ]
+          );
+        },
+        async adminCreateFLOATinMission(
+          float: FLOATBasics,
+          communityKey: string,
+          missionKey: string
+        ) {
+          return await sendTransaction(
+            cadence.transactions.adminCreateFLOATinMission,
+            (arg, t) => [
+              arg(float.name, t.String),
+              arg(float.description, t.String),
+              arg(float.image, t.String),
+              arg(float.url, t.String),
+              arg(communityKey, t.String),
+              arg(missionKey, t.String),
+            ]
+          );
+        },
         /**
          * create a new space
          */

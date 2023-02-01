@@ -12,6 +12,11 @@ import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
 import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
 import adminBountyUpdateProperty from "./transactions/admin-update-bounty-property.cdc?raw";
+import adminAddPreconditionBountyCompleted from "./transactions/admin-add-precondition-bounty-completed.cdc?raw";
+import adminAddPreconditionFLOATRequired from "./transactions/admin-add-precondition-float-required.cdc?raw";
+import adminAddPreconditionMinimumPoint from "./transactions/admin-add-precondition-minimum-point.cdc?raw";
+import adminCreateFLOATinBounty from "./transactions/admin-create-FLOAT-in-bounty.cdc?raw";
+import adminCreateFLOATinMission from "./transactions/admin-create-FLOAT-in-mission.cdc?raw";
 
 /**
  * scripts for mission checking
@@ -53,6 +58,11 @@ export default {
         adminUpdateEndDate,
         adminAddBounties,
         adminBountyUpdateProperty,
+        adminAddPreconditionBountyCompleted,
+        adminAddPreconditionFLOATRequired,
+        adminAddPreconditionMinimumPoint,
+        adminCreateFLOATinBounty,
+        adminCreateFLOATinMission,
         spaceCreate,
         spaceAddMissions,
         spaceAddQuest,

@@ -34,7 +34,7 @@ transaction(
 
         self.admin.addBounty(
             identifier: entityIdentifier,
-            preconditions: [], // FIXME: no precondition for now
+            preconditions: [],
             reward: Helper.PointReward(rewardPoints, referralPoints),
             primary: primary,
         )
