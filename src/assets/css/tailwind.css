@@ -339,7 +339,15 @@
     @apply inline-flex gap-1 items-center justify-around;
   }
 
+  .bg-native {
+    @apply bg-[var(--card-background-color)];
+  }
+
+  .absolute-full {
+    @apply absolute top-0 left-0 w-full h-full flex-center;
+  }
+
   .overlay {
-    @apply absolute top-0 left-0 w-full h-full flex-center bg-gray-700/60;
+    @apply absolute-full bg-gray-700/60;
   }
 }

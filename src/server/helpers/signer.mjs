@@ -104,22 +104,16 @@ class FlowSigner {
   async sendTransaction(code, args, mainAuthz = undefined, extraAuthz = []) {
     mainAuthz = mainAuthz ?? this.buildAuthorization();
 
-    let transactionId;
-    try {
-      transactionId = await fcl.mutate({
-        cadence: replaceImportAddresses(code, this._addressMapping),
-        args: args,
-        proposer: mainAuthz,
-        payer: mainAuthz,
-        authorizations:
-          extraAuthz.length === 0 ? [mainAuthz] : [mainAuthz, ...extraAuthz],
-      });
-      console.log("Tx Sent:", transactionId);
-      return transactionId;
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
+    const transactionId = await fcl.mutate({
+      cadence: replaceImportAddresses(code, this._addressMapping),
+      args: args,
+      proposer: mainAuthz,
+      payer: mainAuthz,
+      authorizations:
+        extraAuthz.length === 0 ? [mainAuthz] : [mainAuthz, ...extraAuthz],
+    });
+    console.log("Tx Sent:", transactionId);
+    return transactionId;
   }
 
   /**

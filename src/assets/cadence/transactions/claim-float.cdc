@@ -1,8 +1,12 @@
 import FLOAT from "../../../../cadence/deps/FLOAT.cdc"
 import NonFungibleToken from "../../../../cadence/deps/NonFungibleToken.cdc"
 import MetadataViews from "../../../../cadence/deps/MetadataViews.cdc"
+import Interfaces from "../../../../cadence/dev-challenge/Interfaces.cdc"
+// import Community from "../../../../cadence/dev-challenge/Community.cdc"
+import Helper from "../../../../cadence/dev-challenge/Helper.cdc"
+import CompetitionService from "../../../../cadence/dev-challenge/CompetitionService.cdc"
 
-transaction(host: Address, eventId: UInt64) {
+transaction(bountyId: UInt64) {
   let FLOATEvent: &FLOAT.FLOATEvent{FLOAT.FLOATEventPublic}
   let Collection: &FLOAT.Collection
 
@@ -14,20 +18,32 @@ transaction(host: Address, eventId: UInt64) {
                 (FLOAT.FLOATCollectionPublicPath, target: FLOAT.FLOATCollectionStoragePath)
     }
 
-    // SETUP FLOATEVENTS
-    if acct.borrow<&FLOAT.FLOATEvents>(from: FLOAT.FLOATEventsStoragePath) == nil {
-      acct.save(<- FLOAT.createEmptyFLOATEventCollection(), to: FLOAT.FLOATEventsStoragePath)
-      acct.link<&FLOAT.FLOATEvents{FLOAT.FLOATEventsPublic, MetadataViews.ResolverCollection}>
-                (FLOAT.FLOATEventsPublicPath, target: FLOAT.FLOATEventsStoragePath)
-    }
-
-    let FLOATEvents = getAccount(host).getCapability(FLOAT.FLOATEventsPublicPath)
-                        .borrow<&FLOAT.FLOATEvents{FLOAT.FLOATEventsPublic}>()
-                        ?? panic("Could not borrow the public FLOATEvents from the host.")
-    self.FLOATEvent = FLOATEvents.borrowPublicEventRef(eventId: eventId) ?? panic("This event does not exist.")
-
     self.Collection = acct.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath)
                         ?? panic("Could not get the Collection from the signer.")
+
+    var floatHost: Address? = nil
+    var floatId: UInt64? = nil
+    let service = CompetitionService.borrowServicePublic()
+    let bountyRef = service.borrowBountyDetail(bountyId)
+    if bountyRef.getRewardType() == Helper.MissionRewardType.FLOAT {
+        let reward = bountyRef.getFLOATReward().eventIdentifier
+        floatHost = reward.host
+        floatId = reward.eventId
+    } else {
+        let identifier = bountyRef.getBountyIdentifier()
+        if identifier.category == Interfaces.BountyType.quest {
+            if let reward = identifier.getQuestConfig().achievement {
+                floatHost = reward.host
+                floatId = reward.eventId
+            }
+        }
+    }
+    assert(floatHost != nil && floatId != nil, message: "No FLOAT reward in the bounty:".concat(bountyId.toString()))
+
+    let FLOATEvents = getAccount(floatHost!).getCapability(FLOAT.FLOATEventsPublicPath)
+                        .borrow<&FLOAT.FLOATEvents{FLOAT.FLOATEventsPublic}>()
+                        ?? panic("Could not borrow the public FLOATEvents from the host.")
+    self.FLOATEvent = FLOATEvents.borrowPublicEventRef(eventId: floatId!) ?? panic("This event does not exist.")
   }
 
   execute {

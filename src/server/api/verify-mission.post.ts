@@ -26,7 +26,7 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
       missionKey: z.string(),
       // required, mission answer related
       step: z.number(),
-      questParams: z.array(
+      params: z.array(
         z.object({
           key: z.string(),
           value: z.string(),
@@ -90,7 +90,7 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
       `Request<VerifyMission>[${body.address}] - Step.2-1: loaded cfg from ${missionDetail?.stepsCfg}`
     );
 
-    const params = body.questParams.reduce((prev, curr) => {
+    const params = body.params.reduce((prev, curr) => {
       prev[curr.key] = curr.value;
       return prev;
     }, {} as { [key: string]: string });
@@ -99,7 +99,7 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
     isMissionValid = await actions.scVerifyMission(
       signer,
       stepCfg,
-      body.questParams
+      body.params
     );
 
     // Step.3 Run a transaction on mainnet

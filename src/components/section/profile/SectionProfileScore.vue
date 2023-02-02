@@ -3,19 +3,17 @@ const props = defineProps<{
   profile: ProfileData
 }>()
 
-interface BountyStatus {
-  id: string
-  completedAt: Date
-}
-
-const completedBounties = computed<BountyStatus[]>(() => {
-  if (props.profile.profileRecord?.bountiesCompleted) {
-    const bounties: BountyStatus[] = []
-    const bountiesDic = props.profile.profileRecord?.bountiesCompleted
-    for (const key in bountiesDic) {
-      bounties.push({ id: key, completedAt: new Date(parseInt(bountiesDic[key]) * 1000) })
+const completedMissions = computed<string[]>(() => {
+  if (props.profile.profileRecord?.missionScores) {
+    const completedMissions: string[] = []
+    const scores = props.profile.profileRecord?.missionScores
+    for (const key in scores) {
+      const one = scores[key]
+      if (one.completed) {
+        completedMissions.push(key)
+      }
     }
-    return bounties
+    return completedMissions
   }
   return []
 })
@@ -33,7 +31,7 @@ const completedBounties = computed<BountyStatus[]>(() => {
       <div class="divider"></div>
       <div class="text-xl">
         Total
-        <span class="font-extrabold">{{ completedBounties.length }} Missions</span>
+        <span class="font-extrabold">{{ completedMissions.length }} Missions</span>
         completed
       </div>
     </div>

@@ -97,14 +97,18 @@ onBeforeUnmount(stopSubscribe);
 
 <template>
   <div v-if="!hidden"
-    class="w-full min-w-40 px-3 py-2 rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
-    <slot></slot>
-    <div class="font-semibold text-lg flex items-center gap-2">
-      <span class="">{{ txStatusString }}</span>
-      <a :href="fvsTx(txid)" target="_blank" class="link-highlight">
-        {{ txidDisplay }}
-      </a>
+    class="absolute left-0 bottom-0 m-2 w-fit bg-native rounded-xl flex flex-col items-center justify-center">
+    <div
+      class="w-full px-3 py-2 bg-native rounded-lg text-center border-2 border-solid border-primary flex flex-col gap-2">
+      <slot></slot>
+      <div class="font-semibold text-lg flex items-center gap-2">
+        <span class="">{{ txStatusString }}</span>
+        <a :href="fvsTx(txid)" target="_blank" class="link-highlight">
+          {{ txidDisplay }}
+        </a>
+      </div>
+      <progress class="w-full" :value="progress" max="100"></progress>
     </div>
-    <progress class="w-full" :value="progress" max="100"></progress>
+    <slot name="append"></slot>
   </div>
 </template>

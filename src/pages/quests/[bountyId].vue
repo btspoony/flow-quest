@@ -78,11 +78,33 @@ watchEffect(() => {
   }
 })
 
+const achievementFloat = computed<FLOATAchievement | null>(() => {
+  if (questCfg?.value?.achievement) {
+    return questCfg.value.achievement
+  } else if (info.value?.quest?.floatReward) {
+    const floatReward = info.value?.quest?.floatReward
+    return {
+      host: floatReward.eventHost,
+      eventId: floatReward.eventId
+    }
+  } else {
+    return null
+  }
+})
+
+const isCompleted = computed(() => {
+  if (user.value && user.value.profileRecord) {
+    return user.value.profileRecord.bountiesCompleted[bountyId.value] !== undefined
+  } else {
+    return false
+  }
+})
+
 const floatClaimable = ref(false)
 const floatClaimed = ref(false)
 
 watchEffect(async () => {
-  if (progress.value >= 100 && questCfg?.value?.achievement && user.value?.address) {
+  if (progress.value >= 100 && isCompleted.value && achievementFloat.value && user.value?.address) {
     await updateHasClaimed()
     floatClaimable.value = !floatClaimed.value
   } else {
@@ -92,7 +114,7 @@ watchEffect(async () => {
 
 async function updateHasClaimed() {
   const { $scripts } = useNuxtApp()
-  const achiInfo = questCfg?.value?.achievement
+  const achiInfo = achievementFloat.value
   if (achiInfo && user.value?.address) {
     floatClaimed.value = await $scripts.hasFLOATClaimed(achiInfo.host, achiInfo.eventId, user.value?.address)
   } else {
@@ -101,14 +123,33 @@ async function updateHasClaimed() {
 }
 
 async function claimFloat(): Promise<string | null> {
-  if (!questCfg?.value.achievement) {
+  if (!achievementFloat.value) {
     return null
   }
   const { $transactions } = useNuxtApp()
-  const achi = questCfg?.value.achievement
-  return $transactions.claimFloat(achi.host, achi.eventId)
+  return $transactions.claimFloat(bountyId.value)
 }
 
+async function completeBounty(): Promise<string | null> {
+  const result = await apiPostCompleteBounty(bountyId.value!)
+  if (result) {
+    if (result.transactionId) {
+      return result.transactionId
+    }
+    if (result.error && result.error.message) {
+      throw new Error(`[ErrCode:${result.error.code}] ${result.error.message}`)
+    }
+    if (!result.isAccountValid) {
+      throw new Error("Account verification invalid")
+    }
+    if (!result.isBountyCompleted) {
+      throw new Error("Bounty not completed")
+    }
+  } else {
+    throw new Error("Failed to requeset")
+  }
+  return null
+}
 </script>
 
 <template>
@@ -145,19 +186,37 @@ async function claimFloat(): Promise<string | null> {
       <div role="separator" class="divider mb-11 mt-4" />
       <div class="flex flex-col gap-24">
         <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"
-          :index="index" :isLast="(((info?.missions?.length ?? 0) - 1 === index) && !questCfg?.achievement)"
+          :index="index" :isLast="false"
           :current="currentIndex" />
-        <div v-if="questCfg?.achievement" class="flex-center flex-col gap-2">
-          <span class="tag">Achievement FLOAT</span>
-          <div class="relative">
-            <div class="shiny" />
-            <ItemFLOATEvent :host="questCfg?.achievement.host" :event-id="questCfg?.achievement.eventId" />
-          </div>
-          <button v-if="floatClaimed" class="secondary outline rounded-xl w-[8rem]" disabled>Claimed</button>
-          <FlowSubmitTransaction v-else-if="floatClaimable" class="min-w-[8rem]" :method="claimFloat"
-            @success="updateHasClaimed()">
-            Claim
-          </FlowSubmitTransaction>
+        <div class="flex-center">
+          <article :class="['card non-interactive px-3 pt-2 w-fit']">
+            <div v-if="achievementFloat" class="flex-center flex-col gap-2 pb-14">
+              <span :class="['tag', { 'success': isCompleted }]">Achievement FLOAT</span>
+              <div class="relative">
+                <div class="shiny" />
+                <ItemFLOATEvent :host="achievementFloat?.host" :event-id="achievementFloat?.eventId" />
+              </div>
+              <div class="absolute bottom-0 w-full !items-end">
+                <button v-if="floatClaimed" class="secondary outline rounded-b-xl mb-0 w-full" disabled>Claimed</button>
+                <FlowSubmitTransaction v-else-if="floatClaimable" class="w-full" :half-button="true" :method="claimFloat"
+                  @success="updateHasClaimed()">
+                  Claim
+                </FlowSubmitTransaction>
+              </div>
+              </div>
+              <div v-else class="min-w-[9rem] min-h-[9rem]">
+                TODO
+              </div>
+              <template v-if="!isCompleted">
+                <div class="overlay rounded-xl z-10"></div>
+                <div class="absolute-full !items-end z-20">
+                  <FlowSubmitTransaction v-if="progress >= 100" class="w-full" :half-button="true" :method="completeBounty"
+                    @success="reloadCurrentUser({ ignoreIdentities: true })">
+                    Verify & {{ achievementFloat ? 'Unlock' : 'Complete' }}
+                  </FlowSubmitTransaction>
+                </div>
+              </template>
+            </article>
         </div>
       </div>
     </section>

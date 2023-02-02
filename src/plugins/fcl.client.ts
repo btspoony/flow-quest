@@ -586,10 +586,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         /**
          * claim float
          */
-        async claimFloat(host: string, eventId: string) {
+        async claimFloat(bountyId: string) {
           return await sendTransaction(
             cadence.transactions.claimFloat,
-            (arg, t) => [arg(host, t.Address), arg(eventId, t.UInt64)]
+            (arg, t) => [arg(bountyId, t.UInt64)]
           );
         },
         /**
