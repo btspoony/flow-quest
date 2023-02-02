@@ -21,7 +21,13 @@ const copyURL = computed<string>(() => {
 });
 const { text, copy, copied, isSupported } = useClipboard();
 
-const executable = computed<boolean>(() => season.value ? season.value?.referralThreshold <= (props.profile.profileRecord?.points ?? 0) : false)
+const executable = computed<boolean>(() => {
+  if (season.value && season.value.seasonId && season.value.referralThreshold) {
+    return season.value?.referralThreshold <= (props.profile.profileRecord?.seasonPoints[season.value.seasonId] ?? 0)
+  } else {
+    return false
+  }
+})
 
 async function generateCode(): Promise<string | null> {
   const result = await apiPostGenerateReferralCode()
@@ -51,7 +57,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section v-if="referralCode || isUserSelf" class="hero card card-border">
+  <section v-if="referralCode || (isUserSelf && (season?.referralThreshold ?? 0) > 0)" class="hero card card-border">
     <div class="hero-content flat w-[90%] align-start flex-col">
       <div class="w-full flex-between flex-wrap text-4xl font-semibold">
         <span class="py-2">Referral Code</span>

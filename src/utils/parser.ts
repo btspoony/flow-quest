@@ -1,7 +1,14 @@
 export function parseProfileProfileRecord(record: any): ProfileRecord {
+  const seasonPoints: { [key: string]: number } = {};
+  const pointsInfo = record.seasonPoints || {};
+  for (const key in pointsInfo) {
+    if (typeof pointsInfo[key] === "string") {
+      seasonPoints[key] = parseInt(pointsInfo[key]);
+    }
+  }
   return {
     points: parseInt(record.points),
-    seasonPoints: record.seasonPoints,
+    seasonPoints: seasonPoints,
     referredFromAddress: record.referredFromAddress,
     referralCode: record.referralCode,
     bountiesCompleted: record.bountiesCompleted,
