@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import md from 'markdown-it';
 const props = defineProps<{
   bounty: BountyInfo
 }>()
 
 const user = useUserProfile()
 
+const mdRenderer = md()
 const missionCfg = computed(() => (props.bounty.config as MissionConfig));
 
 const isCompleted = ref(false)
@@ -20,11 +22,11 @@ watchEffect(() => {
 <template>
   <div class="card p-0 w-full h-full flex flex-col gap-4">
     <div class="h-full flex gap-4 justify-between">
-      <div class="flex flex-col gap-1">
-        <h4 class="mb-2">{{ missionCfg?.display.name }}</h4>
-        <p class="mb-2 text-sm">
-          {{ missionCfg?.display.description }}
-        </p>
+      <div class="flex flex-col gap-1 max-w-[400px]">
+        <h4 class="mb-2 truncate">{{ missionCfg?.display.name }}</h4>
+        <div class="mb-2 prose-sm prose-blockquote:py-0 prose-img:my-0"
+          v-html="mdRenderer.render(missionCfg?.display.description)">
+        </div>
       </div>
       <div class="flex flex-col items-end justify-between">
         <div>

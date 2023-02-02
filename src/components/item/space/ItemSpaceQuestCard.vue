@@ -40,6 +40,7 @@ function onOpenDialogue() {
 }
 
 function onCloseDialgue() {
+  emit('dataUpdated')
   floatData.value = null
   dialog.value?.closeModal()
 }
@@ -104,7 +105,6 @@ function resetComp() {
     </form>
     <footer class="mt-4">
       <FlowSubmitTransaction :disabled="!isSubmitValid" :method="onSubmit" @sealed="resetComp()" @error="resetComp()"
-        @success="emit('dataUpdated')"
         @reset="onCloseDialgue()">
         Submit
         <template v-slot:disabled>

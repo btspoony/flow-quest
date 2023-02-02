@@ -136,7 +136,7 @@ async function completeBounty(): Promise<string | null> {
 
 <template>
   <FrameGithubAuth :content-loading="pending || !missionCfg">
-    <div class="w-full flex flex-wrap lg:flex-nowrap gap-8 justify-center">
+    <div class="w-full flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 justify-center">
       <div class="pt-10 flex-none w-full lg:w-5/12 flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
           <div class="flex-none flex-center">
