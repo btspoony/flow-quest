@@ -207,13 +207,19 @@ pub contract UserProfile {
         }
 
         pub fun getSeasonPoints(seasonId: UInt64): UInt64 {
-            let seasonRef = self.borrowSeasonRecordRef(seasonId)
-            return seasonRef.points
+            if let seasonRef = self.borrowSeasonRecordRef(seasonId) {
+                return seasonRef.points
+            } else {
+                return 0
+            }
         }
 
         pub fun getProfilePoints(): UInt64 {
-            let seasonRef = self.borrowSeasonRecordRef(0)
-            return seasonRef.points
+            if let seasonRef = self.borrowSeasonRecordRef(0) {
+                return seasonRef.points
+            } else {
+                return 0
+            }
         }
 
         pub fun getMissionStatus(missionKey: String): Interfaces.MissionStatus {
@@ -290,8 +296,13 @@ pub contract UserProfile {
             let profileAddr = self.owner?.address ?? panic("Owner not exist")
 
             // add point to a season
-            let seasonRef = self.borrowSeasonRecordRef(seasonId)
-            seasonRef.addPoints(points: points)
+            if let seasonRef = self.borrowSeasonRecordRef(seasonId) {
+                seasonRef.addPoints(points: points)
+            } else {
+                self.registerForNewSeason(seasonId: seasonId)
+                let ref = self.borrowSeasonRecordRef(seasonId)!
+                ref.addPoints(points: points)
+            }
 
             emit ProfileSeasonAddPoints(
                 profile: profileAddr,
@@ -388,8 +399,8 @@ pub contract UserProfile {
             return record!
         }
 
-        access(self) fun borrowSeasonRecordRef(_ seasonId: UInt64): &SeasonRecord {
-            return &self.seasonScores[seasonId] as &SeasonRecord? ?? panic("Missing season score")
+        access(self) fun borrowSeasonRecordRef(_ seasonId: UInt64): &SeasonRecord? {
+            return &self.seasonScores[seasonId] as &SeasonRecord?
         }
     }
 
