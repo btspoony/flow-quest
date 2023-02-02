@@ -67,8 +67,7 @@ const profileIdentity = computed<ProfileIdentity | null>(() => {
         <section class="mb-0 flex flex-col gap-8">
           <nav>
             <ul class="flex gap-2 tabs">
-              <li><a href="#" class="tab-link active">Current Season</a></li>
-              <li><span class="tab-link disabled">Achievements</span></li>
+              <li><a href="#" class="tab-link active">Profile</a></li>
             </ul>
           </nav>
           <NuxtPage />
