@@ -25,7 +25,7 @@ function resetEdit() {
 </script>
 
 <template>
-  <section v-if="currentSeason" class="w-full card card-border non-interactive p-6">
+  <section v-if="currentSeason" class="w-full p-6">
     <div class="headings mb-4">
       <h2 class="w-full inline-flex-between">
         Available Bounties

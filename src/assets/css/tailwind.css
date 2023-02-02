@@ -290,6 +290,10 @@
       @apply border-0 border-x-0 border-t-0 border-solid;
       @apply px-8 text-xl font-semibold opacity-70 cursor-pointer;
 
+      &.tab-small {
+        @apply px-4 text-sm font-medium py-2;
+      }
+
       &:not(.active, .disabled):hover {
         @apply opacity-80;
       }

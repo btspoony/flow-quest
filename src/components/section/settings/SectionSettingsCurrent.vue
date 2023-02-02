@@ -18,8 +18,7 @@ async function sendTransaction(): Promise<string> {
 </script>
 
 <template>
-  <section v-if="currentSeason"
-    class="card card-border non-interactive min-w-[24rem] p-6 flex flex-col md:flex-row gap-4">
+  <section v-if="currentSeason" class="min-w-[24rem] p-6 flex flex-col md:flex-row gap-4">
     <div class="headings mb-2">
       <h2>Active Season</h2>
       <p>ID: {{ currentSeason?.seasonId }}</p>

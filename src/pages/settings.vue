@@ -31,7 +31,7 @@ function updateRoute(name: string) {
   <FrameAdmin>
     <WidgetLoadingCard v-if="pending" />
     <template v-else>
-      <nav class="py-4">
+      <nav class="mt-4">
         <ul class="tabs">
           <li v-for="tab in tabs" :key="tab.label" :class="['tab-link', { 'active': currentTab === tab.label }]"
             @click="updateRoute(tab.label)">
@@ -39,6 +39,7 @@ function updateRoute(name: string) {
           </li>
         </ul>
       </nav>
+      <div class="divider"></div>
       <SectionSettingsBounties v-if="currentTab === 'bounties'" />
       <div v-else-if="currentTab === 'seasons'" class="w-full flex items-start gap-4">
         <SectionSettingsCurrent v-if="data?.seasonId" />

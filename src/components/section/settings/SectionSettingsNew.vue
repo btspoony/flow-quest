@@ -13,7 +13,7 @@ async function sendTransaction(): Promise<string> {
 </script>
 
 <template>
-  <section class="card card-border non-interactive min-w-[24rem] p-6">
+  <section class="min-w-[24rem] p-6">
     <h4>Setup a new season</h4>
     <form class="mb-0">
       <label for="endDate">
