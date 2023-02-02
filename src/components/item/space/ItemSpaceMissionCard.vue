@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import md from 'markdown-it';
 defineProps<{
   mission: MissionConfig | MissionConfigRequest
 }>();
+
+const mdRenderer = md()
 </script>
 
 <template>
@@ -14,12 +17,15 @@ defineProps<{
           <span><b>Steps: </b>{{ mission.steps }}</span>
         </div>
       </summary>
-      <div>
-        <b>Description: </b><br />
-        {{ (mission as MissionConfigRequest).description ?? (mission as MissionConfig).display.description }}
-      </div>
-      <div>
-        <b>Config JSON: </b><br />{{ mission.stepsCfg }}
+      <div class="flex flex-col gap-2">
+        <h6 class="mb-0">Description: </h6>
+        <div class="prose-sm prose-blockquote:py-0 prose-img:my-0"
+          v-html="mdRenderer.render((mission as MissionConfigRequest).description ?? (mission as MissionConfig).display.description)">
+        </div>
+        <h6 class="mb-0">Config JSON: </h6>
+        <NuxtLink :to="mission.stepsCfg" target="_blank">
+          {{ mission.stepsCfg }}
+        </NuxtLink>
       </div>
     </details>
   </div>

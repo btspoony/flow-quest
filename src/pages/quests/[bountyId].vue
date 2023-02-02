@@ -112,10 +112,7 @@ async function claimFloat(): Promise<string | null> {
 </script>
 
 <template>
-  <main v-if="pending" class="min-h-[80vh] flex-center">
-    <div :aria-busy="true" />
-  </main>
-  <FrameGithubAuth v-else>
+  <FrameGithubAuth :content-loading="pending">
     <template v-slot:header>
       <div class="w-full h-36 relative overflow-hidden -z-10">
         <div class="absolute -inset-5 blur-lg bg-cover bg-center"

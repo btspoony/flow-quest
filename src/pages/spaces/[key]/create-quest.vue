@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { UnwrapNestedRefs } from "vue";
 import type WidgetDialog from '~/components/widget/WidgetDialog.vue';
+import type FormSpaceNewMission from '~/components/form/space/FormSpaceNewMission.vue';
+
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
+const formNewMission = ref<InstanceType<typeof FormSpaceNewMission> | null>(null);
 
 definePageMeta({
   key: route => route.path
@@ -83,6 +86,7 @@ function onOpenDialogue(type: OpenDialogueType) {
       steps: 0,
       stepsCfg: '',
     }))
+    formNewMission.value?.resetForm()
   } else {
     searchMissionKey.value = ""
     searchedMissions.length = 0
@@ -171,17 +175,6 @@ async function sendTransaction(): Promise<string> {
     </div>
     <ItemSpaceMissionCard v-for="one in allValidMissions" :key="one.key" :mission="one" />
     <div class="divider"></div>
-    <!-- <div class="grid">
-      <label for="achievementFLOAT">
-        Achievement FLOAT (Optional)
-        <input type="url" id="achievementFLOAT" placeholder="https://floats.city/..." v-model="floatURL"
-          :aria-invalid="floatURL ? !achievement : undefined" />
-      </label>
-      <div class="flex-center">
-        <span v-if="!achievement">Preview</span>
-        <ItemFLOATEvent v-else :host="achievement.host" :event-id="achievement.eventId" />
-      </div>
-    </div> -->
     <FlowSubmitTransaction :disabled="!isValid" :method="sendTransaction" @success="onTransactionSuccess()">
       <template v-slot:disabled>
         <span>Required parameters should be filled</span>
@@ -193,7 +186,7 @@ async function sendTransaction(): Promise<string> {
       <header class="mb-4">
         <h4 class="mb-0">Create a new Mission</h4>
       </header>
-      <FormSpaceNewMission :index="newMissions.length - 1" />
+      <FormSpaceNewMission ref="formNewMission" :index="newMissions.length - 1" />
       <footer class="mt-4">
         <button class="rounded-xl flex-center mb-0" :disabled="!newMissions[newMissions.length - 1]?.valid"
           @click.stop.prevent="closeDialog">

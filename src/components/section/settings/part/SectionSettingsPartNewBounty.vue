@@ -88,7 +88,7 @@ function onSuccess() {
       <ItemSpaceQuestCard :quest="selectedQuest?.quest" />
       <h5 class="mb-1">Set Reward Points of Missions</h5>
       <div v-for="mission, index in selectedQuest.missions" :key="mission.key"
-        class="card card-border non-interactive flex items-center justify-between gap-4">
+        class="card card-border non-interactive px-4 py-2 flex items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full inline-block w-8 h-8 flex-center bg-gray-100 dark:bg-gray-900">
             {{ index + 1 }}
@@ -98,12 +98,13 @@ function onSuccess() {
         <div class="flex-auto grid">
           <label :for="`rewardPoint_${index}`">
             Reward Points
-            <input type="number" :id="`rewardPoint_${index}`" placeholder="Reward Points" v-model="rewardPoints[index]"
+            <input type="number" :id="`rewardPoint_${index}`" class="!my-1" placeholder="Reward Points"
+              v-model="rewardPoints[index]"
               required />
           </label>
           <label :for="`referralPoint_${index}`">
             Referral Points
-            <input type="number" :id="`referralPoint_${index}`" placeholder="Referral Points"
+            <input type="number" :id="`referralPoint_${index}`" class="!my-1" placeholder="Referral Points"
               v-model="referralPoints[index]" :max="rewardPoints[index]" required />
           </label>
         </div>

@@ -10,6 +10,17 @@ const isStepsCfgURLValid = ref(false)
 const stepsCfgLoading = ref(false)
 const cfgGuideURL = ref("")
 
+defineExpose({
+  resetForm: ref(resetForm),
+})
+
+function resetForm() {
+  cfgPreview.value = ""
+  isStepsCfgURLValid.value = false
+  stepsCfgLoading.value = false
+  cfgGuideURL.value = ""
+}
+
 watch([isStepsCfgURLValid], ([newStepsValidA]) => {
   const data = injected[props.index]
   if (

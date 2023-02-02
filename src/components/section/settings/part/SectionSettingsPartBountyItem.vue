@@ -43,7 +43,7 @@ async function onSuccess() {
 </script>
 
 <template>
-  <div class="card card-border non-interactive w-full">
+  <div class="card card-border non-interactive p-2 w-full">
     <div class="flex justify-between gap-2">
       <span class="tag" :data-tooltip="bounty.config.category">
         {{ bounty.config.category.charAt(0).toUpperCase() }}

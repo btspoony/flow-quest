@@ -7,12 +7,10 @@ const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async
 </script>
 
 <template>
-  <WidgetLoadingCard v-if="pending" />
-  <FrameGithubAuth v-else>
+  <FrameGithubAuth :content-loading="pending">
     <div class="page-container w-full py-8">
       <template v-if="data && data.bounties.length > 0">
-        <h3 class="text-center mb-4">Start with these Quests</h3>
-        <WidgetEndTime v-if="data.seasonId && data.endDate" :deadline="data.endDate">Season</WidgetEndTime>
+        <h2 class="text-center mb-8">Start with these Quests</h2>
         <div class="max-w-full grid grid-cols-1 lg:grid-cols-2">
           <ItemBountyInfoCard v-for="(bounty, index) in data?.bounties" :key="'bounty_idx_' + index" :bounty="bounty" />
         </div>
