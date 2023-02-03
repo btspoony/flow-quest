@@ -19,24 +19,6 @@ const display = reactive<Display>({
   description: "",
   thumbnail: ""
 })
-const achievement = ref<FLOATAchievement | undefined>(undefined)
-
-const floatURL = ref('')
-watch(floatURL, (newVal) => {
-  try {
-    const url = new URL(newVal)
-    const items = url.pathname.split('/')
-    if (items.length === 4) {
-      const [_0, host, _1, eventId] = items
-      achievement.value = { host, eventId }
-    } else {
-      achievement.value = undefined
-    }
-  } catch (e) {
-    achievement.value = undefined
-  }
-})
-
 const existsMissionKeys = reactive<string[]>([])
 
 const newMissions = reactive<UnwrapNestedRefs<MissionConfigRequest>[]>([])
@@ -134,7 +116,7 @@ async function sendTransaction(): Promise<string> {
     toRaw(display),
     toRaw(existsMissionKeys),
     toRaw(newMissions).map(one => toRaw(one)),
-    achievement.value
+    undefined
   )
 }
 

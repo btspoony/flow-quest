@@ -192,7 +192,7 @@ async function completeBounty(): Promise<string | null> {
           :current="currentIndex" />
         <div class="flex-center">
           <article class="relative card non-interactive px-3 pt-2 w-fit">
-            <div v-if="achievementFloat" class="flex-center flex-col gap-2 pb-14">
+            <div v-if="achievementFloat" :class="['flex-center flex-col gap-2', progress >= 100 ? 'pb-14': 'pb-2']">
               <span :class="['tag', { 'success': isCompleted }]">Achievement FLOAT</span>
               <ItemFLOATEvent :host="achievementFloat?.host" :event-id="achievementFloat?.eventId" />
               <div class="absolute bottom-0 w-full !items-end">
@@ -205,10 +205,10 @@ async function completeBounty(): Promise<string | null> {
             </div>
             <div v-else class="min-w-[9rem] min-h-[7rem] py-2 flex-center flex-col gap-2">
               <Icon icon="game-icons:achievement" :class="['h-20 w-20', isCompleted ? 'text-success' : '']" />
-              <TagCompleted />
+              <TagCompleted v-if="isCompleted" />
             </div>
             <div class="shiny" />
-            <template v-if="!isCompleted">
+            <template v-if="user?.profileRecord && !isCompleted">
               <div class="overlay rounded-xl z-10"></div>
               <div class="absolute-full !items-end z-20">
                 <FlowSubmitTransaction v-if="progress >= 100" class="w-full" :half-button="true" :method="completeBounty"

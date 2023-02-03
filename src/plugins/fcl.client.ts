@@ -691,7 +691,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           options: UnlockConditions
         ) {
           let promise: Promise<string>;
-          if (options.type === UnlockConditionTypes.MinimumPoint) {
+          if (options.type === 0) {
             promise = sendTransaction(
               cadence.transactions.adminAddPreconditionMinimumPoint,
               (arg, t) => [
@@ -700,7 +700,7 @@ export default defineNuxtPlugin((nuxtApp) => {
                 arg(options.usePermanentPoint, t.Bool),
               ]
             );
-          } else if (options.type === UnlockConditionTypes.FLOATRequired) {
+          } else if (options.type === 1) {
             promise = sendTransaction(
               cadence.transactions.adminAddPreconditionFLOATRequired,
               (arg, t) => [
@@ -709,7 +709,7 @@ export default defineNuxtPlugin((nuxtApp) => {
                 arg(options.eventId, t.UInt64),
               ]
             );
-          } else if (options.type === UnlockConditionTypes.BountyCompleted) {
+          } else if (options.type === 3) {
             promise = sendTransaction(
               cadence.transactions.adminAddPreconditionBountyCompleted,
               (arg, t) => [
@@ -721,6 +721,12 @@ export default defineNuxtPlugin((nuxtApp) => {
             throw new Error("Unsupported type.");
           }
           return await promise;
+        },
+        async adminRemovePrecondition(bountyId: string, index: number) {
+          return sendTransaction(
+            cadence.transactions.adminRemovePrecondition,
+            (arg, t) => [arg(bountyId, t.UInt64), arg(index.toFixed(0), t.Int)]
+          );
         },
         async adminCreateFLOATinBounty(float: FLOATBasics, bountyId: string) {
           return await sendTransaction(

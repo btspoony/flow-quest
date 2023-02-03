@@ -16,6 +16,7 @@ import adminBountyUpdateProperty from "./transactions/admin-update-bounty-proper
 import adminAddPreconditionBountyCompleted from "./transactions/admin-add-precondition-bounty-completed.cdc?raw";
 import adminAddPreconditionFLOATRequired from "./transactions/admin-add-precondition-float-required.cdc?raw";
 import adminAddPreconditionMinimumPoint from "./transactions/admin-add-precondition-minimum-point.cdc?raw";
+import adminRemovePrecondition from "./transactions/admin-remove-precondition.cdc?raw";
 import adminCreateFLOATinBounty from "./transactions/admin-create-FLOAT-in-bounty.cdc?raw";
 
 /**
@@ -61,6 +62,7 @@ export default {
         adminAddPreconditionBountyCompleted,
         adminAddPreconditionFLOATRequired,
         adminAddPreconditionMinimumPoint,
+        adminRemovePrecondition,
         adminCreateFLOATinBounty,
         spaceApplyFLOATinQuest,
         spaceCreate,

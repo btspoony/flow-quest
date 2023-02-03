@@ -18,10 +18,11 @@ interface ListReqOption {
 }
 
 enum UnlockConditionTypes {
+  None = "",
   MinimumPoint = 0,
-  FLOATRequired,
-  CompletedBountyAmount,
-  BountyCompleted,
+  FLOATRequired = 1,
+  CompletedBountyAmount = 2,
+  BountyCompleted = 3,
 }
 
 interface UnlockCondition {
@@ -300,8 +301,8 @@ interface AccountProfileIdentity {
 // ---- Ranking ----
 
 interface RankingStatus {
-  account?: RankingScore
-  tops: RankingScore[]
+  account?: RankingScore;
+  tops: RankingScore[];
 }
 
 interface RankingScore {

@@ -70,7 +70,7 @@ export function parseBountyInfo(info: any): BountyInfo {
       if (typeof cloned.amount === "string")
         cloned.amount = parseInt(cloned.amount);
       if (typeof cloned.type === "string")
-        cloned.type = parseInt(cloned.type) as UnlockConditionTypes;
+        cloned.type = parseInt(cloned.type);
       return cloned;
     }),
     properties: parseBountyProperties(info.properties),
