@@ -153,7 +153,7 @@ function onCloseDialgue() {
         </div>
       </template>
       <template v-else-if="currentMissionCfg">
-        <small>Mission {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
+        <small>Question {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
         <h4 class="w-full text-center mb-4">{{ currentMissionCfg.question }}</h4>
         <div class="w-full px-4 py-2 flex flex-col gap-2">
           <img v-if="currentMissionCfg.image" class="object-contain justify-items-center max-h-32"

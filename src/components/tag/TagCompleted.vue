@@ -5,6 +5,6 @@ import { Icon } from '@iconify/vue';
 <template>
   <span class="tag success inline-flex-around">
     <Icon icon="heroicons:check-circle-20-solid" class="w-4 h-4" />
-    Completed
+    <b>Completed</b>
   </span>
 </template>
