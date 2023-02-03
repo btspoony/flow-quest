@@ -106,9 +106,9 @@ defineExpose({
           <h5 class="mb-0">{{ action }}</h5>
         </template>
         <template v-slot:append>
-          <p v-if="errorMessage" class="w-full max-h-40 overflow-y-scroll px-4 mb-0 text-xs text-failure">
+          <pre v-if="errorMessage" class="w-full max-h-20 overflow-y-scroll bg-native px-4 mb-0 text-xs text-failure">
             {{ errorMessage }}
-          </p>
+          </pre>
         </template>
       </FlowWaitTransaction>
       </Teleport>
