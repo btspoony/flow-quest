@@ -4,7 +4,7 @@ defineProps<{
   mission: MissionConfig | MissionConfigRequest
 }>();
 
-const mdRenderer = md()
+const mdRenderer = md({ html: true })
 </script>
 
 <template>

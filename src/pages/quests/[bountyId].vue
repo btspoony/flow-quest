@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue';
 import md from 'markdown-it';
+
 definePageMeta({
   key: route => route.path
 })
 
-const mdRenderer = md()
+const mdRenderer = md({ html: true })
 const route = useRoute()
 const user = useUserProfile()
 
@@ -162,7 +164,7 @@ async function completeBounty(): Promise<string | null> {
       </div>
     </template>
     <div class="h-14" />
-    <section class="container max-w-2xl px-4">
+    <section class="container max-w-2xl px-4 pb-16">
       <div class=" -mt-36 mb-4 flex gap-4 items-center flex-col sm:flex-row justify-between sm:justify-center">
         <div class="flex-none" :aria-busy="pending">
           <div class="w-32 h-32 rounded-lg bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden">
@@ -189,13 +191,10 @@ async function completeBounty(): Promise<string | null> {
           :index="index" :isLast="false"
           :current="currentIndex" />
         <div class="flex-center">
-          <article :class="['card non-interactive px-3 pt-2 w-fit']">
+          <article class="relative card non-interactive px-3 pt-2 w-fit">
             <div v-if="achievementFloat" class="flex-center flex-col gap-2 pb-14">
               <span :class="['tag', { 'success': isCompleted }]">Achievement FLOAT</span>
-              <div class="relative">
-                <div class="shiny" />
-                <ItemFLOATEvent :host="achievementFloat?.host" :event-id="achievementFloat?.eventId" />
-              </div>
+              <ItemFLOATEvent :host="achievementFloat?.host" :event-id="achievementFloat?.eventId" />
               <div class="absolute bottom-0 w-full !items-end">
                 <button v-if="floatClaimed" class="secondary outline rounded-b-xl mb-0 w-full" disabled>Claimed</button>
                 <FlowSubmitTransaction v-else-if="floatClaimable" class="w-full" :half-button="true" :method="claimFloat"
@@ -203,19 +202,21 @@ async function completeBounty(): Promise<string | null> {
                   Claim
                 </FlowSubmitTransaction>
               </div>
+            </div>
+            <div v-else class="min-w-[9rem] min-h-[7rem] py-2 flex-center flex-col gap-2">
+              <Icon icon="game-icons:achievement" :class="['h-20 w-20', isCompleted ? 'text-success' : '']" />
+              <TagCompleted />
+            </div>
+            <div class="shiny" />
+            <template v-if="!isCompleted">
+              <div class="overlay rounded-xl z-10"></div>
+              <div class="absolute-full !items-end z-20">
+                <FlowSubmitTransaction v-if="progress >= 100" class="w-full" :half-button="true" :method="completeBounty"
+                  @success="reloadCurrentUser({ ignoreIdentities: true })">
+                  Verify & {{ achievementFloat ? 'Unlock' : 'Complete' }}
+                </FlowSubmitTransaction>
               </div>
-              <div v-else class="min-w-[9rem] min-h-[9rem]">
-                TODO
-              </div>
-              <template v-if="!isCompleted">
-                <div class="overlay rounded-xl z-10"></div>
-                <div class="absolute-full !items-end z-20">
-                  <FlowSubmitTransaction v-if="progress >= 100" class="w-full" :half-button="true" :method="completeBounty"
-                    @success="reloadCurrentUser({ ignoreIdentities: true })">
-                    Verify & {{ achievementFloat ? 'Unlock' : 'Complete' }}
-                  </FlowSubmitTransaction>
-                </div>
-              </template>
+            </template>
             </article>
         </div>
       </div>
@@ -225,7 +226,7 @@ async function completeBounty(): Promise<string | null> {
 
 <style scoped>
 .shiny {
-  @apply absolute pointer-events-none w-80 h-80 -top-24 -left-24 -z-10;
+  @apply absolute pointer-events-none w-80 h-80 -top-20 -left-20 -z-10;
   @apply bg-center bg-[url(/assets/images/shiny.png)] bg-contain;
 
   animation: spin 20s linear infinite;

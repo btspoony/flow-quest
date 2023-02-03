@@ -27,6 +27,13 @@ watchEffect(() => {
   }
 })
 
+const isCompleted = computed(() => {
+  if (user.value && user.value.profileRecord) {
+    return user.value.profileRecord.bountiesCompleted[props.bounty.id] !== undefined
+  } else {
+    return false
+  }
+});
 </script>
 
 <template>
@@ -37,6 +44,7 @@ watchEffect(() => {
         <span class="tag">
           {{ questCfg.missions.length }} missions
         </span>
+        <TagCompleted v-if="isCompleted" />
       </div>
       <div>
         <strong>{{ questCfg.display.name }}</strong>

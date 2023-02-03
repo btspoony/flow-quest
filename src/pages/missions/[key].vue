@@ -6,7 +6,7 @@ definePageMeta({
   key: route => route.path
 })
 
-const mdRenderer = md()
+const mdRenderer = md({ html: true })
 const route = useRoute()
 const user = useUserProfile()
 

@@ -10,7 +10,7 @@ const emit = defineEmits<{
   (e: 'dataUpdated'): void
 }>()
 
-const mdRenderer = md()
+const mdRenderer = md({ html: true })
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 const submitLoading = ref(false);
 
