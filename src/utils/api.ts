@@ -1,64 +1,22 @@
-export async function apiGetActiveSeason(): Promise<CompetitionSeason | null> {
+export async function refreshActiveSeason(
+  includeUnlaunched = false
+): Promise<CompetitionSeason | null> {
   const activeSeason = useActiveSeason();
-  if (activeSeason.value) {
-    return activeSeason.value;
-  } else {
-    const { $scripts } = useNuxtApp();
-    const result = await $scripts.getActiveSeason();
-    activeSeason.value = result;
-    return result;
-  }
+  const { $scripts } = useNuxtApp();
+  const result = await $scripts.getActiveSeason(includeUnlaunched);
+  activeSeason.value = result;
+  return result;
 }
 
-export async function apiGetCurrentChallenge(
-  defaultBountyId: string
-): Promise<BountyInfo | null> {
-  const current = useCurrentChallenge();
-  let challenge: BountyInfo | null;
-  if (current.value) {
-    challenge = current.value;
-  } else {
-    const { $scripts } = useNuxtApp();
-    const season = await apiGetActiveSeason();
-    if (season) {
-      challenge = await $scripts.getBountyById(
-        season.seasonId,
-        defaultBountyId
-      );
-    } else {
-      challenge = null;
-    }
-  }
-  return challenge;
-}
+const communityPromises: {
+  [key: string]: Promise<CommunitySpaceBasics | null>;
+} = {};
 
-export async function apiGetCurrentQuest(
-  defaultQuestKey: string
-): Promise<BountyInfo | null> {
-  const current = useCurrentQuest();
-  let quest: BountyInfo | null;
-  if (current.value) {
-    quest = current.value;
-  } else {
-    const { $scripts } = useNuxtApp();
-    const season = await apiGetActiveSeason();
-    if (season) {
-      quest = await $scripts.getBountyByKey(season.seasonId, defaultQuestKey);
-    } else {
-      quest = null;
-    }
-  }
-  return quest;
-}
-
-const communityPromises: { [key: string]: Promise<CommunityBasics | null> } =
-  {};
-
-export async function apiGetCommunityBasics(
+export async function apiSpaceGetBasics(
   communityId: string
-): Promise<CommunityBasics | null> {
-  const community = useCommunityBasics(communityId);
-  let result: CommunityBasics | null;
+): Promise<CommunitySpaceBasics | null> {
+  const community = useCommunitySpaceBasics(communityId);
+  let result: CommunitySpaceBasics | null;
   if (community.value) {
     result = community.value;
   } else {
@@ -67,37 +25,31 @@ export async function apiGetCommunityBasics(
       result = community.value = await existsPromise;
     } else {
       const { $scripts } = useNuxtApp();
-      communityPromises[communityId] = $scripts.getCommunityBasics(communityId);
+      communityPromises[communityId] = $scripts.spaceGetBasics(communityId);
       result = community.value = await communityPromises[communityId];
     }
   }
   return result;
 }
 
-export async function apiGetCurrentUser(): Promise<ProfileData | null> {
-  const current = useUserProfile();
-  let user: ProfileData | null;
-  if (current.value) {
-    user = current.value;
-  } else {
-    user = await reloadCurrentUser();
-  }
-  return user;
-}
-
 export async function reloadCurrentUser(
-  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {}
+  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {},
+  includes: { adminStatus?: boolean } = {}
 ): Promise<ProfileData | null> {
   const current = useUserProfile();
   const wallet = useFlowAccount();
+  const isLoadingUser = useUserProfileLoading();
+
   if (!wallet.value?.loggedIn) {
     return null;
   }
 
+  isLoadingUser.value = true;
+
   const address = wallet.value.addr!;
   const profile = (await loadUserProfile(address, ignores)) ?? {
     address,
-    activeRecord: undefined,
+    profileRecord: undefined,
     linkedIdentities: {},
   };
 
@@ -106,10 +58,16 @@ export async function reloadCurrentUser(
       profile.linkedIdentities = current.value?.linkedIdentities;
     }
     if (ignores.ignoreSeason) {
-      profile.activeRecord = current.value?.activeRecord;
+      profile.profileRecord = current.value?.profileRecord;
     }
   }
 
+  if (includes.adminStatus) {
+    const { $scripts } = useNuxtApp();
+    profile.adminStatus = await $scripts.getAdminStatus(address);
+  }
+
+  isLoadingUser.value = false;
   current.value = profile;
   return current.value;
 }
@@ -117,7 +75,7 @@ export async function reloadCurrentUser(
 export async function reloadCurrentProfile(
   defaultAddress: string
 ): Promise<ProfileData | null> {
-  const currentProfile = useCurrentProfile();
+  const currentProfile = useCurrentAccountProfile();
   const address = currentProfile.value
     ? currentProfile.value?.address
     : defaultAddress;
@@ -134,7 +92,7 @@ export async function loadUserProfile(
 
   const { $scripts } = useNuxtApp();
 
-  let activeRecord: SeasonRecord | undefined;
+  let profileRecord: ProfileRecord | undefined;
   const linkedIdentities: { [key: string]: ProfileIdentity } = {};
 
   if (!ignores.ignoreIdentities) {
@@ -145,12 +103,12 @@ export async function loadUserProfile(
   }
 
   if (!ignores.ignoreSeason) {
-    activeRecord = await $scripts.loadProfileSeasonRecord(address);
+    profileRecord = await $scripts.loadProfileProfileRecord(address);
   }
 
   return {
     address,
-    activeRecord,
+    profileRecord,
     linkedIdentities,
   };
 }
@@ -198,25 +156,25 @@ function handleResponseError(e: any): { code: string; message: string } {
   }
 }
 
-export async function apiPostVerifyQuest(
-  questIdentifier: BountyIdentifier,
+export async function apiPostVerifyMission(
+  identifier: BountyIdentifier,
   step: number,
-  questParams: { key: string; value: string }[]
-): Promise<ResponseVerifyQuest> {
+  params: { key: string; value: string }[]
+): Promise<ResponseVerifyMission> {
   try {
-    const result = await $fetch("/api/verify-quest", {
+    const result = await $fetch("/api/verify-mission", {
       method: "post",
       body: Object.assign(
         {
-          communityId: questIdentifier.communityId,
-          questKey: questIdentifier.key,
+          communityId: identifier.communityId,
+          missionKey: identifier.key,
           step,
-          questParams,
+          params,
         },
         await fetchAccountProof()
       ),
     });
-    return result;
+    return result as ResponseVerifyMission;
   } catch (e: any) {
     return { ok: false, error: handleResponseError(e) };
   }

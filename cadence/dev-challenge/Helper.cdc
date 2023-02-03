@@ -32,20 +32,20 @@ pub contract Helper {
         }
     }
 
-    // -------- Quest Rewards --------
+    // -------- Mission Rewards --------
 
-    pub enum QuestRewardType: UInt8 {
+    pub enum MissionRewardType: UInt8 {
         pub case Points
         pub case FLOAT
         pub case None
     }
 
     pub struct interface RewardInfo {
-        pub let type: QuestRewardType
+        pub let type: MissionRewardType
     }
 
     pub struct PointReward: RewardInfo {
-        pub let type: QuestRewardType
+        pub let type: MissionRewardType
         pub let rewardPoints: UInt64
         pub let referralPoints: UInt64
 
@@ -53,29 +53,29 @@ pub contract Helper {
             _ points: UInt64,
             _ referralPoints: UInt64?
         ) {
-            self.type = QuestRewardType.Points
+            self.type = MissionRewardType.Points
             self.rewardPoints = points
             self.referralPoints = referralPoints ?? 0
         }
     }
 
     pub struct FLOATReward: RewardInfo {
-        pub let type: QuestRewardType
+        pub let type: MissionRewardType
         pub let eventIdentifier: EventIdentifier
 
         init(
             _ identifier: EventIdentifier
         ) {
-            self.type = QuestRewardType.FLOAT
+            self.type = MissionRewardType.FLOAT
             self.eventIdentifier = identifier
         }
     }
 
     pub struct NoneReward: RewardInfo {
-        pub let type: QuestRewardType
+        pub let type: MissionRewardType
 
         init() {
-            self.type = QuestRewardType.None
+            self.type = MissionRewardType.None
         }
     }
 }

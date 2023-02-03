@@ -6,23 +6,30 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineNuxtConfig({
   // set source dir
   srcDir: "src/",
+  // App Variables
+  appConfig: {
+    title: "Flow Quests",
+    spacesWhitelist:
+      process.env.NUXT_PUBLIC_NETWORK === "mainnet"
+        ? ["0xa2de93114bae3e73"]
+        : ["0xa51d7fe9e0080662"],
+  },
   // Environment Variables
   runtimeConfig: {
     // The private keys which are only available within server-side
     flowAdminAddress: "",
     flowKeyAmount: "100",
     flowPrivateKey: "",
-    flowPublicKey: "",
     oauthGithubClientSecret: "",
     oauthHost: "",
     // Keys within public, will be also exposed to the client-side
     public: {
-      appName: "Flow Challenge Tour",
       network: "",
       accessApi: "",
       walletDiscovery: "",
       flowServiceAddress: "",
       oauthGithubClientId: "",
+      nftStorageToken: "",
     },
   },
   // ts config
@@ -63,7 +70,7 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
   ],
   build: {
-    transpile: ["@heroicons/vue"],
+    transpile: [],
   },
   // vite configure
   vite: {

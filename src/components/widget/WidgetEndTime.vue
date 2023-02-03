@@ -22,7 +22,7 @@ const sec = computed(() => Math.floor(resttime.value % 60));
 </script>
 
 <template>
-  <div class="mb-8 flex-center !gap-2">
+  <div class="flex-center !gap-2">
     <span class="mr-3">
       <slot /> remaining:
     </span>

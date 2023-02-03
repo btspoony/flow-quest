@@ -1,27 +1,23 @@
 <script setup lang="ts">
 const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async () => {
-  return await apiGetActiveSeason()
+  return refreshActiveSeason()
 }, {
   server: false
 });
 </script>
 
 <template>
-  <main v-if="pending" class="min-h-[80vh] flex-center">
-    <div :aria-busy="true" />
-  </main>
-  <FrameGithubAuth v-else>
+  <FrameGithubAuth :content-loading="pending">
     <div class="page-container w-full py-8">
-      <template v-if="data">
-        <h3 class="text-center mb-4">Start with these Challenges</h3>
-        <WidgetEndTime :deadline="data.endDate">Season</WidgetEndTime>
-        <div :aria-busy="pending" class="max-w-full grid grid-cols-1 lg:grid-cols-2">
-          <ItemBountyInfoCard v-for="(bounty, index) in data?.bounties" :key="'idx_' + index" :bounty="bounty" />
+      <template v-if="data && data.bounties.length > 0">
+        <h2 class="text-center mb-8">Start with these Quests</h2>
+        <div class="max-w-full grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <ItemBountyInfoCard v-for="(bounty, index) in data?.bounties" :key="'bounty_idx_' + index" :bounty="bounty" />
         </div>
       </template>
       <div v-else class="hero">
         <div class="hero-content">
-          <h4 class="text-center">No Active Season</h4>
+          <h4 class="text-center">No available quests</h4>
         </div>
       </div>
     </div>

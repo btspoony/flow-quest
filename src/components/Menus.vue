@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { FireIcon, ChartBarSquareIcon } from "@heroicons/vue/24/solid";
+import { Icon } from '@iconify/vue';
 
-const route = useRoute()
+const route = useRoute();
 const isDrawerOpened = useAppDrawerOpened();
 
 function isCurrentInActivePage(pageKey: string): boolean {
@@ -9,8 +9,8 @@ function isCurrentInActivePage(pageKey: string): boolean {
 }
 
 const menus = reactive([
-  { path: 'active', display: 'Competition', icon: FireIcon, iconClass: 'fill-secondary' },
-  { path: 'leaderboard', display: 'Leaderboard', icon: ChartBarSquareIcon, iconClass: 'fill-current' },
+  { path: 'active', display: 'Quests', icon: 'fire-20-solid', iconClass: 'text-secondary' },
+  { path: 'leaderboard', display: 'Leaderboard', icon: 'chart-bar-square-20-solid', iconClass: '' },
 ])
 
 function closeDrawer() {
@@ -24,7 +24,7 @@ function closeDrawer() {
   <li v-for="menu in menus" :key="menu.path" class="menu-item" @click="closeDrawer()">
     <NuxtLink :to="geneReferralLink(`/${menu.path}`)"
       :class="['inline-flex-between', { secondary: isCurrentInActivePage(menu.path) }]">
-      <Component :is="menu.icon" :class="['w-6 h-6', menu.iconClass]" />
+      <Icon :icon="`heroicons:${menu.icon}`" :class="['w-6 h-6', menu.iconClass]" inline />
       {{ menu.display }}
     </NuxtLink>
   </li>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
+import { Icon } from '@iconify/vue';
 import FlowLogo from '~/assets/svgs/flow.svg';
-import { Bars3Icon } from "@heroicons/vue/24/solid";
 
 const router = useRouter()
 
-const config = useRuntimeConfig();
-const appName = ref(config.public.appName)
+const appConfig = useAppConfig()
 
 const menuHidden = ref(false)
 
@@ -19,12 +18,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--background-color)]">
+  <header class="fixed top-0 left-0 right-0 z-50 min-h-[90px] bg-[var(--background-color)] shadow-sm flex items-center">
     <nav class="container">
       <ul>
-        <li class="inline-flex-between !gap-2 cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
+        <li class="inline-flex-between !gap-2  cursor-pointer" @click="() => router.push(geneReferralLinkObject('/'))">
           <FlowLogo class="fill-white w-10 h-10" />
-          <span class="font-semibold text-2xl hidden lg:inline">{{ appName }}</span>
+          <span class="font-semibold hidden lg:text-lg xl:text-xl lg:inline">{{ appConfig.title }}</span>
         </li>
       </ul>
       <ul>
@@ -37,7 +36,7 @@ onMounted(() => {
         </li>
         <li class="cursor-pointer" v-if="menuHidden">
           <label for="page-drawer">
-            <Bars3Icon class="fill-current w-6 h-6" />
+            <Icon icon="heroicons:bars-3" class="w-6 h-6" />
           </label>
         </li>
       </ul>

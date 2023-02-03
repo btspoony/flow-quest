@@ -45,7 +45,7 @@ watchEffect(async () => {
         Loading
       </span>
       <template v-else>
-        <FlowConnect v-if="!wallet?.loggedIn || !user?.activeRecord" :hide-trx="true" />
+        <FlowConnect v-if="!wallet?.loggedIn || !user?.profileRecord" :hide-trx="true" />
         <WidgetProfileHead />
       </template>
     </div>

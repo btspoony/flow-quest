@@ -223,12 +223,12 @@
     @apply relative rounded-xl p-[3px] m-0;
     @apply bg-[var(--card-background-color)];
 
-    .card {
+    > .card {
       @apply rounded-lg p-4;
     }
 
-    &:active {
-      @apply border-gray-200;
+    &:not(.active, .non-interactive):active {
+      @apply border-gray-200 dark:border-gray-800;
     }
   }
 
@@ -241,12 +241,8 @@
       @apply w-full h-full;
     }
 
-    &:hover {
+    &:not(.active, .non-interactive):hover {
       @apply border-gray-400 dark:border-gray-600;
-    }
-
-    &:active {
-      @apply border-gray-200;
     }
   }
 
@@ -287,16 +283,29 @@
     @apply w-full bg-gray-400 dark:bg-gray-600 h-[1px];
   }
 
-  .tab-link {
-    @apply px-8 border-0 border-x-0 border-t-0 border-solid;
-    @apply text-xl font-semibold;
+  .tabs {
+    @apply !mx-0;
 
-    &.active {
-      @apply border-[var(--color)] border-b-4 rounded-b-none;
-    }
+    .tab-link {
+      @apply border-0 border-x-0 border-t-0 border-solid;
+      @apply px-8 text-xl font-semibold opacity-70 cursor-pointer;
 
-    &.disabled {
-      @apply text-gray-400;
+      &.tab-small {
+        @apply px-4 text-sm font-medium py-2;
+      }
+
+      &:not(.active, .disabled):hover {
+        @apply opacity-80;
+      }
+
+      &.active {
+        @apply border-[var(--color)] border-b-4 rounded-b-none;
+        @apply opacity-100 text-[var(--color)];
+      }
+
+      &.disabled {
+        @apply text-gray-400;
+      }
     }
   }
 }
@@ -330,7 +339,15 @@
     @apply inline-flex gap-1 items-center justify-around;
   }
 
+  .bg-native {
+    @apply bg-[var(--card-background-color)];
+  }
+
+  .absolute-full {
+    @apply absolute top-0 left-0 w-full h-full flex-center;
+  }
+
   .overlay {
-    @apply absolute top-0 left-0 w-full h-full flex-center bg-gray-700/60;
+    @apply absolute-full bg-gray-700/60;
   }
 }

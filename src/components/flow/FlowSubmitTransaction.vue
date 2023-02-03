@@ -8,13 +8,15 @@ const props = withDefaults(
     content?: string;
     action?: string;
     disabled?: boolean;
-    hideButton?: boolean
-    hideTrx?: boolean
+    halfButton?: boolean;
+    hideButton?: boolean;
+    hideTrx?: boolean;
   }>(),
   {
     content: "Submit",
     action: '',
     disabled: false,
+    halfButton: false,
     hideButton: false,
     hideTrx: false,
   }
@@ -30,7 +32,7 @@ const emit = defineEmits<{
 const txid = ref<string | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
-const isSealed = ref(false);
+const isSealed = ref(true);
 
 async function startTransaction() {
   if (isLoading.value) return;
@@ -67,7 +69,7 @@ function resetComponent() {
   emit("reset")
   txid.value = null;
   errorMessage.value = null;
-  isSealed.value = false;
+  isSealed.value = true;
 }
 
 // expose members
@@ -80,29 +82,39 @@ defineExpose({
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <button v-if="disabled && !txid" class="rounded-xl flex-center mb-0" disabled>
+  <div class="flex flex-col gap-2 bg-native rounded-xl">
+    <button v-if="disabled && !txid" :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']"
+      role="button"
+      disabled>
       <slot name="disabled">
         Disabled
       </slot>
     </button>
-    <button v-else-if="!hideButton && !txid" class="rounded-xl flex-center mb-0" role="button" :aria-busy="isLoading"
-      :disabled="isLoading" :aria-disabled="isLoading"
+    <button v-else-if="!hideButton && (!txid || !isSealed)"
+      :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
+      :aria-busy="isLoading || !isSealed" :disabled="isLoading || !isSealed" :aria-disabled="isLoading || !isSealed"
       @click="startTransaction">
       <slot>
         {{ content }}
       </slot>
     </button>
-    <FlowWaitTransaction v-if="txid" :hidden="hideTrx" :txid="txid" @sealed="onSealed" @error="onError">
-      <template v-if="action != ''">
-        <h5 class="mb-0">{{ action }}</h5>
-      </template>
-    </FlowWaitTransaction>
-    <p v-if="!hideTrx && errorMessage" class="w-full px-4 mb-0 text-xs text-failure">
-      {{ errorMessage }}
-    </p>
-    <slot v-if="!hideTrx && txid && isSealed" name="next">
-      <button class="mx-0 rounded-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
+    <slot v-if="txid && isSealed" name="next">
+      <button :class="['mx-0 mb-0 text-sm', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
+        @click.stop.prevent="resetComponent">
+        Close
+      </button>
     </slot>
+    <Teleport to="body">
+      <FlowWaitTransaction v-if="txid" :hidden="hideTrx" :txid="txid" @sealed="onSealed" @error="onError">
+        <template v-if="action != ''">
+          <h5 class="mb-0">{{ action }}</h5>
+        </template>
+        <template v-slot:append>
+          <pre v-if="errorMessage" class="w-full max-h-20 overflow-y-scroll bg-native px-4 mb-0 text-xs text-failure">
+            {{ errorMessage }}
+          </pre>
+        </template>
+      </FlowWaitTransaction>
+      </Teleport>
   </div>
 </template>

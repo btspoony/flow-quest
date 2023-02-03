@@ -1,6 +1,7 @@
 import FLOAT from "../deps/FLOAT.cdc"
-import UserProfile from "./UserProfile.cdc"
 import Interfaces from "./Interfaces.cdc"
+import UserProfile from "./UserProfile.cdc"
+import CompetitionService from "./CompetitionService.cdc"
 
 pub contract FLOATVerifiers {
 
@@ -22,13 +23,12 @@ pub contract FLOATVerifiers {
             }
         }
 
-        init(eventHost: Address, eventId: UInt64) {
+        init(eventId: UInt64) {
             self.eventId = eventId
         }
     }
 
     pub struct BountyCompleted: FLOAT.IVerifier {
-        pub let seasonId: UInt64
         pub let bountyId: UInt64
 
         pub fun verify(_ params: {String: AnyStruct}) {
@@ -36,7 +36,7 @@ pub contract FLOATVerifiers {
             if let profile = getAccount(claimee)
                 .getCapability(UserProfile.ProfilePublicPath)
                 .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
-                let isCompleted = profile.isBountyCompleted(seasonId: self.seasonId, bountyId: self.bountyId)
+                let isCompleted = profile.isBountyCompleted(bountyId: self.bountyId)
                 assert(
                     isCompleted,
                     message: "You didn't finish the bounty #:".concat(self.bountyId.toString())
@@ -46,10 +46,32 @@ pub contract FLOATVerifiers {
             }
         }
 
-        init(seasonId: UInt64, bountyId: UInt64) {
-            self.seasonId = seasonId
+        init(bountyId: UInt64) {
             self.bountyId = bountyId
         }
     }
 
+    pub struct MissionCompleted: FLOAT.IVerifier {
+        pub let missionKey: String
+
+        pub fun verify(_ params: {String: AnyStruct}) {
+            let claimee: Address = params["claimee"]! as! Address
+
+            if let profile = getAccount(claimee)
+                .getCapability(UserProfile.ProfilePublicPath)
+                .borrow<&UserProfile.Profile{Interfaces.ProfilePublic}>() {
+                let status = profile.getMissionStatus(missionKey: self.missionKey)
+                assert(
+                    status.completed,
+                    message: "You didn't complete the mission #:".concat(self.missionKey)
+                )
+            } else {
+                panic("You do not have Profile resource")
+            }
+        }
+
+        init(missionKey: String) {
+            self.missionKey = missionKey
+        }
+    }
 }

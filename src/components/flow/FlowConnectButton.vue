@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { UserIcon } from "@heroicons/vue/24/solid";
+import { Icon } from '@iconify/vue';
 
 const current = useFlowAccount();
 
@@ -36,7 +36,7 @@ const narrow = computed(() => width.value < 1280)
 <template>
   <button class="flex-center rounded-full mb-0" @click="login">
     <div class="inline-flex-around">
-      <UserIcon class="fill-current h-4 w-4" />
+      <Icon icon="heroicons:user-20-solid" class="h-4 w-4" />
       <small>{{ narrow ? "Connect" : "Connect Wallet" }}</small>
     </div>
   </button>

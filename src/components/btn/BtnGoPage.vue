@@ -10,7 +10,7 @@ function onClick() {
 </script>
 
 <template>
-  <button class="rounded-full px-6" @click="onClick()">
+  <button class="rounded-full flex-center px-6 mb-0" @click="onClick()">
     <slot>
       Get Start
     </slot>

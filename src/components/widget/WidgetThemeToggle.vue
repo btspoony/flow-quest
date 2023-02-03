@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDark, useToggle } from "@vueuse/core";
-import { SunIcon, MoonIcon } from "@heroicons/vue/24/outline";
+import { Icon } from '@iconify/vue';
 
 const isDark = useDark({
   attribute: "data-theme"
@@ -20,7 +20,7 @@ const toggleDark = useToggle(isDark);
 <template>
   <label class="cursor-pointer focus:outline-none" @click="toggleDark()">
     <span class="sr-only">View ThemeToggle: {{ isDark ? "dark" : "light" }}</span>
-    <SunIcon v-if="isDark" class="fill-current h-6 w-6" />
-    <MoonIcon v-else class="stroke-current h-6 w-6" />
+    <Icon icon="heroicons:sun-solid" v-if="isDark" class="h-6 w-6" />
+    <Icon icon="heroicons:moon" v-else class="h-6 w-6" />
   </label>
 </template>
