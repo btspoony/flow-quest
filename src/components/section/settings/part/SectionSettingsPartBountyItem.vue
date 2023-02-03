@@ -184,8 +184,7 @@ async function onSuccess() {
       <div class="flex-auto flex-center gap-2">
         <Icon :icon="bounty.properties.Launched ? 'heroicons:rocket-launch-solid' : 'heroicons:rocket-launch'"
           :class="['w-6 h-6', bounty.properties.Launched ? 'text-success' : 'opacity-20']" />
-        <Icon :icon="bounty.properties.Featured ? 'heroicons:star-solid' : 'heroicons:star'"
-          :class="['w-6 h-6', bounty.properties.Featured ? 'text-success' : 'opacity-20']" />
+        <!-- <Icon :icon="bounty.properties.Featured ? 'heroicons:star-solid' : 'heroicons:star'" :class="['w-6 h-6', bounty.properties.Featured ? 'text-success' : 'opacity-20']" /> -->
         <Icon icon="heroicons:ticket-solid"
           :class="['w-6 h-6', bounty.preconditions.length > 0 ? 'text-success' : 'opacity-20']" />
         <template v-if="bounty.preconditions.length > 0">

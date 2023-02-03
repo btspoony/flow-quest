@@ -11,7 +11,7 @@ const isOdd = computed(() => props.index % 2 === 0)
 </script>
 
 <template>
-  <div :class="['w-full relative flex gap-0', isOdd ? 'justify-start' : 'justify-end']">
+  <div :class="['first:mt-12 w-full relative flex gap-0', isOdd ? 'justify-start' : 'justify-end']">
     <div class="relative w-[560px]">
       <div class="absolute w-full" v-if="isCurrentProcess">
         <span class="tag tag-sm absolute -top-9 left-1/2" style="transform: translateX(-50%);">Next Mission:</span>

@@ -8,34 +8,6 @@ export async function refreshActiveSeason(
   return result;
 }
 
-export async function apiGetCurrentQuest(
-  defaultBountyId: string
-): Promise<BountyInfo | null> {
-  const current = useCurrentQuest();
-  let quest: BountyInfo | null;
-  if (current.value) {
-    quest = current.value;
-  } else {
-    const { $scripts } = useNuxtApp();
-    quest = await $scripts.getBountyById(defaultBountyId);
-  }
-  return quest;
-}
-
-export async function apiGetCurrentMission(
-  defaultMissionKey: string
-): Promise<BountyInfo | null> {
-  const current = useCurrentMission();
-  let mission: BountyInfo | null;
-  if (current.value) {
-    mission = current.value;
-  } else {
-    const { $scripts } = useNuxtApp();
-    mission = await $scripts.getBountyByKey(defaultMissionKey);
-  }
-  return mission;
-}
-
 const communityPromises: {
   [key: string]: Promise<CommunitySpaceBasics | null>;
 } = {};

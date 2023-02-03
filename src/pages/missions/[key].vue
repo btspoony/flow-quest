@@ -23,7 +23,10 @@ watch(missionKey, (newVal) => {
 });
 
 const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${missionKey.value}`, async () => {
-  const mission = await apiGetCurrentMission(missionKey.value)
+  const current = useCurrentMission();
+  const { $scripts } = useNuxtApp();
+  const mission = current.value = await $scripts.getBountyByKey(missionKey.value);
+
   let guideMD: string | undefined
   let missionDetail: MissionDetailConfig | undefined
 

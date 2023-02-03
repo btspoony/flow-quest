@@ -22,9 +22,10 @@ watch(bountyId, (newVal) => {
 });
 
 const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${bountyId.value}`, async () => {
-  const quest = await apiGetCurrentQuest(bountyId.value);
-
+  const current = useCurrentQuest();
   const { $scripts } = useNuxtApp();
+  const quest = current.value = await $scripts.getBountyById(bountyId.value);
+
   let missions: BountyInfo[] = []
   if (quest) {
     missions = await $scripts.getMissionsDetail((quest.config as QuestConfig).missions)
@@ -185,7 +186,11 @@ async function completeBounty(): Promise<string | null> {
       </div>
       <div class="mb-4 prose-sm prose-blockquote:py-0 prose-img:my-0"
         v-html="mdRenderer.render(questCfg?.display.description)"></div>
-      <div role="separator" class="divider mb-11 mt-4" />
+      <div role="separator" class="divider my-4" />
+      <div v-if="info?.quest?.preconditions.length ?? 0 > 0" class="flex flex-col gap-2">
+        <ItemBountyPreconditionBar v-for="cond,i in info?.quest?.preconditions" :key="`cond_${i}_${cond.type}`"
+          :condition="cond" :check-profile="true" />
+      </div>
       <div class="flex flex-col gap-24">
         <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"
           :index="index" :isLast="false"
