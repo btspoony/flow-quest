@@ -78,10 +78,14 @@ function updateRoute(name: string) {
         </li>
       </ul>
     </nav>
-    <div v-if="currentTab === 'active'" class="card card-border non-interactive p-2 w-full mb-2">
+    <div v-if="currentTab === 'active'" class="card card-border non-interactive p-4 w-full mb-2">
       <WidgetEndTime v-if="info?.season?.seasonId && info?.season?.endDate" :deadline="info?.season?.endDate">
         Season
       </WidgetEndTime>
+      <p class="mb-0" v-if="wallet?.loggedIn && user?.profileRecord">
+        You can earn <b class="text-secondary">extra points</b> in the active season from your friends who invited by your
+        <NuxtLink :to="geneReferralLink(`/account/${user?.address}`)"><b>Referral Code</b></NuxtLink>
+      </p>
     </div>
     <section v-if="wallet?.loggedIn && user?.profileRecord" class="mb-8">
       <h5>Your ranking</h5>
