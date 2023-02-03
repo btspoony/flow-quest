@@ -60,25 +60,19 @@ export async function apiSpaceGetBasics(
   return result;
 }
 
-export async function apiGetCurrentUser(): Promise<ProfileData | null> {
-  const current = useUserProfile();
-  let user: ProfileData | null;
-  if (current.value) {
-    user = current.value;
-  } else {
-    user = await reloadCurrentUser();
-  }
-  return user;
-}
-
 export async function reloadCurrentUser(
-  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {}
+  ignores: { ignoreIdentities?: boolean; ignoreSeason?: boolean } = {},
+  includes: { adminStatus?: boolean } = {}
 ): Promise<ProfileData | null> {
   const current = useUserProfile();
   const wallet = useFlowAccount();
+  const isLoadingUser = useUserProfileLoading();
+
   if (!wallet.value?.loggedIn) {
     return null;
   }
+
+  isLoadingUser.value = true;
 
   const address = wallet.value.addr!;
   const profile = (await loadUserProfile(address, ignores)) ?? {
@@ -96,9 +90,12 @@ export async function reloadCurrentUser(
     }
   }
 
-  const { $scripts } = useNuxtApp();
-  profile.adminStatus = await $scripts.getAdminStatus(address);
+  if (includes.adminStatus) {
+    const { $scripts } = useNuxtApp();
+    profile.adminStatus = await $scripts.getAdminStatus(address);
+  }
 
+  isLoadingUser.value = false;
   current.value = profile;
   return current.value;
 }

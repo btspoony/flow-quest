@@ -29,7 +29,7 @@ const currentMissionOptions = computed(() => {
   if (!currentMissionCfg.value) return []
   return shuffleArray(currentMissionCfg.value.options.map((one, i) => Object.assign({}, one, { i })))
 });
-const isLastQuizMissionion = computed(() => stepCfg.value.type === 'quiz' ? currentMissionIdx.value === stepCfg.value.quiz.length - 1 : false)
+const isLastQuizMission = computed(() => stepCfg.value.type === 'quiz' ? currentMissionIdx.value === stepCfg.value.quiz.length - 1 : false)
 const isAnswerTotallyCorrect = computed(() => {
   if (!currentMissionCfg.value) return false
   return currentMissionCfg.value.type === 'radio'
@@ -153,7 +153,7 @@ function onCloseDialgue() {
         </div>
       </template>
       <template v-else-if="currentMissionCfg">
-        <small>Missionion {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
+        <small>Mission {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
         <h4 class="w-full text-center mb-4">{{ currentMissionCfg.question }}</h4>
         <div class="w-full px-4 py-2 flex flex-col gap-2">
           <img v-if="currentMissionCfg.image" class="object-contain justify-items-center max-h-32"
@@ -180,11 +180,11 @@ function onCloseDialgue() {
       </template>
     </div>
     <footer class="mt-4">
-      <button v-if="stepCfg.type === 'quiz' && !isLastQuizMissionion" class="rounded-xl flex-center mb-0"
+      <button v-if="stepCfg.type === 'quiz' && !isLastQuizMission" class="rounded-xl flex-center mb-0"
         :disabled="!isAnswerTotallyCorrect" @click.stop.prevent="() => currentMissionIdx++">
-        {{ isAnswerTotallyCorrect ? 'Next Missionion' : 'Incorrect 🙅‍♀️' }}
+        {{ isAnswerTotallyCorrect ? 'Next Mission' : 'Incorrect 🙅‍♀️' }}
       </button>
-      <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizMissionion"
+      <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizMission"
         :disabled="!isAnswerCompleted || (stepCfg.type === 'quiz' && !isAnswerTotallyCorrect)" :method="onSubmitAnswer"
         @sealed="resetComp()"
         @error="resetComp()"

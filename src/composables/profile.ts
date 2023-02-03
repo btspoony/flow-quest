@@ -6,6 +6,9 @@ export const useUserProfile = () =>
 export const useUserProfileInitializing = () =>
   useState<boolean>("isCurrentUserProfileInit", () => ref(false));
 
+export const useUserProfileLoading = () =>
+  useState<boolean>("isCurrentUserProfileLoading", () => ref(false));
+
 export const useLinkedWalletAddress = () =>
   useState<string | null>("currentLinkedWalletAddress", () => ref(null));
 

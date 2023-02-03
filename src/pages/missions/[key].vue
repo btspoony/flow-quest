@@ -84,6 +84,7 @@ const imageUrl = computed(() => {
 const lockingArr = computed<boolean[]>(() => {
   const stepAmt = missionCfg.value?.steps ?? 10
   const result = Array(stepAmt).fill(true)
+  if (!user.value?.profileRecord) return result
 
   const doneSteps = profileStatus.value?.steps ?? Array(stepAmt).fill(false)
   // all step before this should be done.
