@@ -59,6 +59,9 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
   server: false
 });
 
+const currentQuest = useCurrentQuest();
+const hasBack = computed(() => !!currentQuest.value)
+
 const bountyId = computed(() => info.value?.mission?.id)
 
 const profileStatus = ref<MissionStatus | null>(null)
@@ -141,7 +144,7 @@ async function completeBounty(): Promise<string | null> {
 <template>
   <FrameGithubAuth :content-loading="pending || !missionCfg">
     <div class="w-full flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 justify-center">
-      <div class="pt-10 flex-none w-full lg:w-5/12 flex flex-col gap-3">
+      <div class="pt-10 flex-none w-full lg:w-auto lg:min-w-[40%] lg:max-w-[50%] flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
           <div class="flex-none flex-center">
             <img class="rounded-full w-20 h-20" :src="imageUrl" alt="Mission Image">
@@ -163,16 +166,19 @@ async function completeBounty(): Promise<string | null> {
             :is-locked="lockingArr[i - 1] ?? false" @success="updateMission" />
         </div>
         <div class="flex flex-col py-2">
-          <FlowSubmitTransaction v-if="bountyId" :disabled="isInvalid || isBountyCompleted" :method="completeBounty"
-            @success="reloadCurrentUser({ ignoreIdentities: true })">
-            Complete
-            <template v-slot:disabled>
-              <div class="inline-flex-between">
-                <Icon icon="heroicons:lock-closed-solid" v-if="!isBountyCompleted" class="w-6 h-6" />
-                <span v-if="isBountyCompleted">Completed</span>
-              </div>
-            </template>
-          </FlowSubmitTransaction>
+          <div class="flex items-center gap-2">
+            <BtnBack v-if="hasBack && isBountyCompleted" class="flex-0" />
+            <FlowSubmitTransaction class="flex-auto" v-if="bountyId" :disabled="isInvalid || isBountyCompleted"
+              :method="completeBounty" @success="reloadCurrentUser({ ignoreIdentities: true })">
+              Complete
+              <template v-slot:disabled>
+                <div class="inline-flex-between">
+                  <Icon icon="heroicons:lock-closed-solid" v-if="!isBountyCompleted" class="w-6 h-6" />
+                  <span v-if="isBountyCompleted">Completed</span>
+                </div>
+              </template>
+            </FlowSubmitTransaction>
+          </div>
           <div role="separator" class="divider my-4" />
           <div class="flex-between">
             <div class="inline-flex-between">

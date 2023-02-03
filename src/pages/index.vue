@@ -16,7 +16,7 @@ const appConfig = useAppConfig();
             Ready to begin?
           </p>
           <div class="flex-center lg:flex-between">
-            <BtnGoPage next="/active" class="max-w-xs">Start the Competition</BtnGoPage>
+            <BtnGoPage next="/active" class="max-w-xs">Start the Tour</BtnGoPage>
           </div>
         </div>
       </div>

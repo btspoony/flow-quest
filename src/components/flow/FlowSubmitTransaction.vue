@@ -83,14 +83,15 @@ defineExpose({
 
 <template>
   <div class="flex flex-col gap-2 bg-native rounded-xl">
-    <button v-if="disabled && !txid" :class="['flex-center mb-0', halfButton ? 'rounded-b-xl' : 'rounded-xl']" role="button"
+    <button v-if="disabled && !txid" :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']"
+      role="button"
       disabled>
       <slot name="disabled">
         Disabled
       </slot>
     </button>
     <button v-else-if="!hideButton && (!txid || !isSealed)"
-      :class="['flex-center mb-0', halfButton ? 'rounded-b-xl' : 'rounded-xl']" role="button"
+      :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
       :aria-busy="isLoading || !isSealed" :disabled="isLoading || !isSealed" :aria-disabled="isLoading || !isSealed"
       @click="startTransaction">
       <slot>
@@ -98,7 +99,10 @@ defineExpose({
       </slot>
     </button>
     <slot v-if="txid && isSealed" name="next">
-      <button class="mx-0 mb-0 rounded-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
+      <button :class="['mx-0 mb-0 text-sm', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
+        @click.stop.prevent="resetComponent">
+        Close
+      </button>
     </slot>
     <Teleport to="body">
       <FlowWaitTransaction v-if="txid" :hidden="hideTrx" :txid="txid" @sealed="onSealed" @error="onError">

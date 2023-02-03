@@ -228,12 +228,12 @@ async function completeBounty(): Promise<string | null> {
               <TagCompleted v-if="isCompleted" />
             </div>
             <div class="shiny" v-if="isCompleted" />
-            <template v-if="(user?.profileRecord || !achievementFloat) && !isCompleted">
+            <template v-if="(user?.profileRecord || !achievementFloat) && isFinished && !isCompleted">
               <div class="overlay rounded-xl z-10"></div>
               <div class="absolute-full !items-end z-20">
                 <FlowSubmitTransaction v-if="isFinished" class="w-full" :half-button="true" :method="completeBounty"
                   @success="reloadCurrentUser({ ignoreIdentities: true })">
-                  Verify & {{ achievementFloat ? 'Unlock' : 'Complete' }}
+                  {{ achievementFloat ? 'Unlock' : 'Complete' }}
                 </FlowSubmitTransaction>
               </div>
             </template>
