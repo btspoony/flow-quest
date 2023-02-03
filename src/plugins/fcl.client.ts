@@ -238,6 +238,19 @@ export default defineNuxtPlugin((nuxtApp) => {
           return parseBountyInfo(result[0]);
         },
         /**
+         * get bounty unlock status
+         */
+        async getBountyUnlockStatus(
+          id: string,
+          profile: string
+        ): Promise<boolean[]> {
+          return await executeScript(
+            cadence.scripts.getBountyUnlockStatus,
+            (arg, t) => [arg(id, t.UInt64), arg(profile, t.Address)],
+            []
+          );
+        },
+        /**
          * get referral address
          */
         async getReferralAddrByCode(code: string): Promise<string | null> {

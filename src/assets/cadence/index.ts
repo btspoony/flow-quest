@@ -22,31 +22,32 @@ import adminCreateFLOATinBounty from "./transactions/admin-create-FLOAT-in-bount
 /**
  * scripts for mission checking
  */
-import getFLOATEvent from "./scripts/get_event.cdc?raw";
-import hasFLOATClaimed from "./scripts/has_claimed_event.cdc?raw";
-import getActiveSeason from "./scripts/get_active_season.cdc?raw";
-import getBountyById from "./scripts/get_bounty_by_id.cdc?raw";
-import getBountiesDetail from "./scripts/get_bounties_detail.cdc?raw";
-import getReferralAddrByCode from "./scripts/get_referral_addr_by_code.cdc?raw";
-import getReferralCodeByAddr from "./scripts/get_referral_code_by_addr.cdc?raw";
-import getRankingStatus from "./scripts/get_ranking_status.cdc?raw";
-import getPlatformLinkedAddress from "./scripts/get_platform_linked_address.cdc?raw";
-import getAdminStatus from "./scripts/is_admin.cdc?raw";
-import profileExists from "./scripts/profile_exists.cdc?raw";
-import profileGetMissionStatus from "./scripts/profile_get_mission_status.cdc?raw";
-import profileIsRegistered from "./scripts/profile_is_registered.cdc?raw";
-import profileGetProfileRecord from "./scripts/profile_get_profile_record.cdc?raw";
-import profileIsBountyCompleted from "./scripts/profile_is_bounty_completed.cdc?raw";
-import profileGetIdentities from "./scripts/profile_get_identities.cdc?raw";
-import profilesGetIdentity from "./scripts/profiles_get_identity.cdc?raw";
-import spaceGetAll from "./scripts/space_get_all.cdc?raw";
-import spaceGetBasics from "./scripts/space_get_basics.cdc?raw";
-import spaceGetBasicsByKey from "./scripts/space_get_basics_by_key.cdc?raw";
-import spaceGetList from "./scripts/space_get_list.cdc?raw";
-import spaceGetQuestList from "./scripts/space_get_quest_list.cdc?raw";
-import spaceGetQuestDetail from "./scripts/space_get_quest_detail.cdc?raw";
-import spaceGetMissionList from "./scripts/space_get_mission_list.cdc?raw";
-import spaceSearchMissions from "./scripts/space_search_missions.cdc?raw";
+import getFLOATEvent from "./scripts/get-event.cdc?raw";
+import hasFLOATClaimed from "./scripts/has-claimed-event.cdc?raw";
+import getActiveSeason from "./scripts/get-active-season.cdc?raw";
+import getBountyById from "./scripts/get-bounty-by-id.cdc?raw";
+import getBountyUnlockStatus from "./scripts/get-bounty-unlock-status.cdc?raw";
+import getBountiesDetail from "./scripts/get-bounties-detail.cdc?raw";
+import getReferralAddrByCode from "./scripts/get-referral-addr-by-code.cdc?raw";
+import getReferralCodeByAddr from "./scripts/get-referral-code-by-addr.cdc?raw";
+import getRankingStatus from "./scripts/get-ranking-status.cdc?raw";
+import getPlatformLinkedAddress from "./scripts/get-platform-linked-address.cdc?raw";
+import getAdminStatus from "./scripts/is-admin.cdc?raw";
+import profileExists from "./scripts/profile-exists.cdc?raw";
+import profileGetMissionStatus from "./scripts/profile-get-mission-status.cdc?raw";
+import profileIsRegistered from "./scripts/profile-is-registered.cdc?raw";
+import profileGetProfileRecord from "./scripts/profile-get-profile-record.cdc?raw";
+import profileIsBountyCompleted from "./scripts/profile-is-bounty-completed.cdc?raw";
+import profileGetIdentities from "./scripts/profile-get-identities.cdc?raw";
+import profilesGetIdentity from "./scripts/profiles-get-identity.cdc?raw";
+import spaceGetAll from "./scripts/space-get-all.cdc?raw";
+import spaceGetBasics from "./scripts/space-get-basics.cdc?raw";
+import spaceGetBasicsByKey from "./scripts/space-get-basics-by-key.cdc?raw";
+import spaceGetList from "./scripts/space-get-list.cdc?raw";
+import spaceGetQuestList from "./scripts/space-get-quest-list.cdc?raw";
+import spaceGetQuestDetail from "./scripts/space-get-quest-detail.cdc?raw";
+import spaceGetMissionList from "./scripts/space-get-mission-list.cdc?raw";
+import spaceSearchMissions from "./scripts/space-search-missions.cdc?raw";
 
 export default {
     transactions: {
@@ -74,6 +75,7 @@ export default {
         hasFLOATClaimed,
         getActiveSeason,
         getBountyById,
+        getBountyUnlockStatus,
         getBountiesDetail,
         getReferralAddrByCode,
         getReferralCodeByAddr,
