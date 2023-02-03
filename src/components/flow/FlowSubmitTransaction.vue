@@ -97,6 +97,9 @@ defineExpose({
         {{ content }}
       </slot>
     </button>
+    <slot v-if="txid && isSealed" name="next">
+      <button class="mx-0 mb-0 rounded-b-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
+    </slot>
     <Teleport to="body">
       <FlowWaitTransaction v-if="txid" :hidden="hideTrx" :txid="txid" @sealed="onSealed" @error="onError">
         <template v-if="action != ''">
@@ -106,11 +109,8 @@ defineExpose({
           <p v-if="errorMessage" class="w-full max-h-40 overflow-y-scroll px-4 mb-0 text-xs text-failure">
             {{ errorMessage }}
           </p>
-          <slot v-if="txid && isSealed" name="next">
-            <button class="mx-0 mb-0 rounded-b-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
-          </slot>
         </template>
-        </FlowWaitTransaction>
-        </Teleport>
+      </FlowWaitTransaction>
+      </Teleport>
   </div>
 </template>
