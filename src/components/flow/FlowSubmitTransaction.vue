@@ -98,7 +98,7 @@ defineExpose({
       </slot>
     </button>
     <slot v-if="txid && isSealed" name="next">
-      <button class="mx-0 mb-0 rounded-b-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
+      <button class="mx-0 mb-0 rounded-xl text-sm" role="button" @click.stop.prevent="resetComponent">Close</button>
     </slot>
     <Teleport to="body">
       <FlowWaitTransaction v-if="txid" :hidden="hideTrx" :txid="txid" @sealed="onSealed" @error="onError">
