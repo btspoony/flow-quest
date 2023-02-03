@@ -45,7 +45,7 @@ enum UnlockConditionTypes {
       <span>is <b class="text-primary">required</b> to unlock the quest</span>
     </template>
     <template v-else-if="condition.type === UnlockConditionTypes.BountyCompleted">
-      <Icon icon="heroicons:check-circle-solid" class="text-secondary h-5 w-5 mx-1" />
+      <Icon icon="heroicons:exclamation-triangle-solid" class="text-secondary h-5 w-5 mx-1" />
       <span>
         You need to complete the previous
         <NuxtLink :to="geneReferralLink(`/quests/${condition.bountyId}`)">Quest</NuxtLink> first

@@ -1,13 +1,18 @@
 <script setup lang="ts">
-const props = defineProps<{
-  current: number,
-  index: number,
-  bounty: BountyInfo
-  isLast: boolean,
-}>()
+const props = withDefaults(defineProps<{
+  bounty: BountyInfo;
+  current: number;
+  index: number;
+  isLast?: boolean;
+  locked?: boolean;
+}>(), {
+  isLast: false,
+  locked: false
+})
 
 const isCurrentProcess = computed(() => props.current === props.index)
 const isOdd = computed(() => props.index % 2 === 0)
+const isLocked = computed(() => props.locked || props.index > props.current)
 </script>
 
 <template>
@@ -16,7 +21,7 @@ const isOdd = computed(() => props.index % 2 === 0)
       <div class="absolute w-full" v-if="isCurrentProcess">
         <span class="tag tag-sm absolute -top-9 left-1/2" style="transform: translateX(-50%);">Next Mission:</span>
       </div>
-      <ItemBountyInfoCard :bounty="bounty" :highlight="isCurrentProcess" :locked="(index > current)" />
+      <ItemBountyInfoCard :bounty="bounty" :highlight="isCurrentProcess && !isLocked" :locked="isLocked" />
       <div v-if="!isLast"
         :class="['card-link absolute right-12 opacity-40 dark:opacity-100', isOdd ? 'left-12' : 'left-auto']" :style="{
         transform: !isOdd ? 'scaleX(-1)' : 'none'

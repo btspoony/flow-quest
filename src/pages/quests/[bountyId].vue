@@ -12,12 +12,13 @@ const user = useUserProfile()
 
 interface QuestDetail {
   quest: BountyInfo | null,
-  missions: BountyInfo[]
+  conditionUnlockStatus: boolean[],
+  missions: BountyInfo[],
 }
 
 const bountyId = computed(() => route.params.bountyId as string)
 
-watch(bountyId, (newVal) => {
+watch([bountyId, user], (newVal) => {
   refresh();
 });
 
@@ -26,17 +27,27 @@ const { data: info, pending, refresh } = useAsyncData<QuestDetail>(`quest:${boun
   const { $scripts } = useNuxtApp();
   const quest = current.value = await $scripts.getBountyById(bountyId.value);
 
+  let conditionUnlockStatus: boolean[] = []
+  if (quest.preconditions.length > 0) {
+    if (user.value?.address) {
+      conditionUnlockStatus = await $scripts.getBountyUnlockStatus(bountyId.value, user.value?.address)
+    } else {
+      conditionUnlockStatus = Array(quest.preconditions.length).fill(false)
+    }
+  }
+
   let missions: BountyInfo[] = []
   if (quest) {
     missions = await $scripts.getMissionsDetail((quest.config as QuestConfig).missions)
   } else {
     missions = []
   }
-  return { quest, missions }
+  return { quest, conditionUnlockStatus, missions }
 }, {
   server: false
 });
 
+const isAllUnlocked = computed(() => info.value?.conditionUnlockStatus.reduce((prev, curr) => prev && curr, true))
 const questCfg = computed(() => (info.value?.quest?.config as QuestConfig));
 const imageUrl = computed(() => {
   if (questCfg.value?.display.thumbnail) {
@@ -81,6 +92,15 @@ watchEffect(() => {
   }
 })
 
+const isFinished = computed(() => progress.value >= 100)
+const isCompleted = computed(() => {
+  if (user.value && user.value.profileRecord) {
+    return user.value.profileRecord.bountiesCompleted[bountyId.value] !== undefined
+  } else {
+    return false
+  }
+})
+
 const achievementFloat = computed<FLOATAchievement | null>(() => {
   if (questCfg?.value?.achievement) {
     return questCfg.value.achievement
@@ -92,14 +112,6 @@ const achievementFloat = computed<FLOATAchievement | null>(() => {
     }
   } else {
     return null
-  }
-})
-
-const isCompleted = computed(() => {
-  if (user.value && user.value.profileRecord) {
-    return user.value.profileRecord.bountiesCompleted[bountyId.value] !== undefined
-  } else {
-    return false
   }
 })
 
@@ -186,18 +198,21 @@ async function completeBounty(): Promise<string | null> {
       </div>
       <div class="mb-4 prose-sm prose-blockquote:py-0 prose-img:my-0"
         v-html="mdRenderer.render(questCfg?.display.description)"></div>
-      <div role="separator" class="divider my-4" />
-      <div v-if="info?.quest?.preconditions.length ?? 0 > 0" class="flex flex-col gap-2">
-        <ItemBountyPreconditionBar v-for="cond,i in info?.quest?.preconditions" :key="`cond_${i}_${cond.type}`"
-          :condition="cond" :check-profile="true" />
+      <div role="separator" class="divider my-2" />
+      <div
+        v-if="(info?.quest?.preconditions.length ?? 0) > 0 && (info?.quest?.preconditions.length === info?.conditionUnlockStatus.length) && !isAllUnlocked"
+        class="flex flex-col gap-2">
+        <template v-for="cond,i in info?.quest?.preconditions" :key="`cond_${i}_${cond.type}`">
+          <ItemBountyPreconditionBar v-if="!info?.conditionUnlockStatus[i]" :condition="cond" :check-profile="true" />
+        </template>
       </div>
-      <div class="flex flex-col gap-24">
+      <div class="flex flex-col gap-24" v-if="info">
         <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"
-          :index="index" :isLast="false"
+          :index="index" :isLast="false" :locked="!user?.profileRecord || !isAllUnlocked"
           :current="currentIndex" />
         <div class="flex-center">
           <article class="relative card non-interactive px-3 pt-2 w-fit">
-            <div v-if="achievementFloat" :class="['flex-center flex-col gap-2', progress >= 100 ? 'pb-14': 'pb-2']">
+            <div v-if="achievementFloat" :class="['flex-center flex-col gap-2', isFinished ? 'pb-14': 'pb-2']">
               <span :class="['tag', { 'success': isCompleted }]">Achievement FLOAT</span>
               <ItemFLOATEvent :host="achievementFloat?.host" :event-id="achievementFloat?.eventId" />
               <div class="absolute bottom-0 w-full !items-end">
@@ -212,11 +227,11 @@ async function completeBounty(): Promise<string | null> {
               <Icon icon="game-icons:achievement" :class="['h-20 w-20', isCompleted ? 'text-success' : '']" />
               <TagCompleted v-if="isCompleted" />
             </div>
-            <div class="shiny" />
-            <template v-if="user?.profileRecord && !isCompleted">
+            <div class="shiny" v-if="isCompleted" />
+            <template v-if="(user?.profileRecord || !achievementFloat) && !isCompleted">
               <div class="overlay rounded-xl z-10"></div>
               <div class="absolute-full !items-end z-20">
-                <FlowSubmitTransaction v-if="progress >= 100" class="w-full" :half-button="true" :method="completeBounty"
+                <FlowSubmitTransaction v-if="isFinished" class="w-full" :half-button="true" :method="completeBounty"
                   @success="reloadCurrentUser({ ignoreIdentities: true })">
                   Verify & {{ achievementFloat ? 'Unlock' : 'Complete' }}
                 </FlowSubmitTransaction>
