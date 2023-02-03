@@ -12,15 +12,6 @@ const user = useUserProfile();
 const isRegistering = useUserProfileInitializing();
 const isLoadingUser = useUserProfileLoading();
 
-// load user profile
-watch(wallet, async (newVal, oldVal) => {
-  if (newVal?.loggedIn && (newVal.addr === linkedAddress.value || !linkedAddress.value)) {
-    user.value = await reloadCurrentUser({}, { adminStatus: true });
-  } else {
-    user.value = null
-  }
-})
-
 // load platform info
 watchEffect(async () => {
   if (github.value) {
@@ -28,6 +19,15 @@ watchEffect(async () => {
     linkedAddress.value = await $scripts.getPlatformLinkedAddress('github', String(github.value.data?.id))
   } else {
     linkedAddress.value = null
+  }
+})
+
+// load user profile
+watch(wallet, async (newVal, oldVal) => {
+  if (newVal?.loggedIn && (newVal.addr === linkedAddress.value || !linkedAddress.value)) {
+    user.value = await reloadCurrentUser({}, { adminStatus: true });
+  } else {
+    user.value = null
   }
 })
 
