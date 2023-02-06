@@ -28,11 +28,11 @@ withDefaults(
     <Meta property="og:image" content="https://flowquest.xyz/social.png" />
 
     <!-- Twitter -->
-    <Meta property="twitter:card" content="summary_large_image" />
-    <Meta property="twitter:title" :content="title" />
-    <Meta property="twitter:description" :content="description" />
-    <Meta property="twitter:url" :content="url" />
-    <Meta property="twitter:image" content="https://flowquest.xyz/social.png" />
+    <Meta name="twitter:card" property="twitter:card" content="summary_large_image" />
+    <Meta name="twitter:title" property="twitter:title" :content="title" />
+    <Meta name="twitter:description" property="twitter:description" :content="description" />
+    <Meta name="twitter:url" property="twitter:url" :content="url" />
+    <Meta name="twitter:image" property="twitter:image" content="https://flowquest.xyz/social.png" />
 
     <!-- Other meta -->
     <slot />
