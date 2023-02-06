@@ -94,9 +94,9 @@ defineExpose({
     </button>
     <button v-else-if="!hideButton && (!txid || !isSealed)"
       :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
-      :aria-busy="isLoading || !isSealed"
-      :disabled="!isNetworkCorrect || isLoading || !isSealed"
-      :aria-disabled="!isNetworkCorrect || isLoading || !isSealed"
+      :aria-busy="isLoading || isSealed === false"
+      :disabled="!isNetworkCorrect || isLoading || isSealed === false"
+      :aria-disabled="!isNetworkCorrect || isLoading || isSealed === false"
       @click="startTransaction">
       <slot>
         {{ content }}
