@@ -24,15 +24,15 @@ const isMatchedWallet = computed(() => {
 
 const submitTx = ref<InstanceType<typeof FlowSubmitTransaction> | null>(null);
 
-watch(user, ensureProfileRegistered, {
-  flush: 'post'
-})
+watch(user, ensureProfileRegistered)
 
 onMounted(() => {
   ensureProfileRegistered(user.value, null)
 })
 
 function ensureProfileRegistered(newVal: ProfileData | null, oldVal: ProfileData | null) {
+  console.log(1, wallet.value?.loggedIn, newVal, !newVal?.profileRecord, isMatchedWallet.value)
+  console.log(2, !inAdmin.value, !submitTx.value?.isLoading, !submitTx.value?.isSealed, !isRegistering.value)
   if (wallet.value?.loggedIn && newVal && !newVal.profileRecord && isMatchedWallet.value) {
     if (!inAdmin.value && !submitTx.value?.isLoading && !submitTx.value?.isSealed && !isRegistering.value) {
       isRegistering.value = true
