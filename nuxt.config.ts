@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   srcDir: "src/",
   // App Variables
   appConfig: {
-    title: "Flow Quests",
+    title: "Flow Quest",
     spacesWhitelist:
       process.env.NUXT_PUBLIC_NETWORK === "mainnet"
         ? ["0xa2de93114bae3e73"]
