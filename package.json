@@ -16,7 +16,8 @@
     "postinstall": "nuxi prepare",
     "prepare": "husky install",
     "lint": "eslint --ext .ts,.vue src && stylelint **/*.vue",
-    "update:testnet": "npx dotenv-cli -e .env.testnet -- flow project deploy --network=testnet --update"
+    "update:testnet": "npx dotenv-cli -e .env.testnet -- flow project deploy --network=testnet --update",
+    "update:mainnet": "npx dotenv-cli -e .env.mainnet -- flow project deploy --network=mainnet --update"
   },
   "devDependencies": {
     "@iconify/vue": "^4.0.2",
