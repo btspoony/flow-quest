@@ -15,18 +15,24 @@ withDefaults(
 <template>
   <Head>
     <Title>{{ title }}</Title>
+    <!-- Primary Meta Tags -->
+    <Meta name="title" :content="title" />
     <Meta name="author" :content="author" />
     <Meta name="description" :content="description" />
 
-    <!--  Essential META Tags -->
-    <Meta property="og:type" content="article" />
+    <!-- Open Graph / Facebook -->
+    <Meta property="og:type" content="website" />
+    <Meta property="og:url" :content="url" />
     <Meta property="og:title" :content="title" />
     <Meta property="og:description" :content="description" />
-    <Meta property="og:url" :content="url" />
+    <Meta property="og:image" content="https://flowquest.xyz/social.png" />
 
-    <!-- Twitter related -->
-    <Meta name="twitter:title" :content="title" />
-    <Meta name="twitter:description" :content="description" />
+    <!-- Twitter -->
+    <Meta property="twitter:card" content="summary_large_image" />
+    <Meta property="twitter:title" :content="title" />
+    <Meta property="twitter:description" :content="description" />
+    <Meta property="twitter:url" :content="url" />
+    <Meta property="twitter:image" content="https://flowquest.xyz/social.png" />
 
     <!-- Other meta -->
     <slot />
