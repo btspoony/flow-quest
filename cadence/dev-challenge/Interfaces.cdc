@@ -1,3 +1,9 @@
+/**
+## The Interfaces of Flow Quest
+
+> Author: Bohao Tang<tech@btang.cn>
+
+*/
 import MetadataViews from "../deps/MetadataViews.cdc"
 import Helper from "./Helper.cdc"
 

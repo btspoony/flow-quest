@@ -1,3 +1,8 @@
+/**
+## The FLOAT Verifiers for FLOATs on Flow Quests
+
+> Author: Bohao Tang<tech@btang.cn>
+*/
 import FLOAT from "../deps/FLOAT.cdc"
 import Interfaces from "./Interfaces.cdc"
 import UserProfile from "./UserProfile.cdc"

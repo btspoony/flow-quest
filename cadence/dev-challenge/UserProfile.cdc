@@ -1,5 +1,5 @@
 /**
-## The contract of user profile
+## The contract of user profile on Flow Quest
 
 > Author: Bohao Tang<tech@btang.cn>
 

@@ -1,5 +1,5 @@
 /**
-## The contract of bounty unlock condition
+## The contract of bounty unlock condition on Flow Quest
 
 > Author: Bohao Tang<tech@btang.cn>
 */

@@ -1,5 +1,5 @@
 /**
-## The contract of Flow dev competition
+## The contract of main service on Flow Quest
 
 > Author: Bohao Tang<tech@btang.cn>
 

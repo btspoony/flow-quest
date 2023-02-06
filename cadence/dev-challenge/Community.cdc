@@ -1,5 +1,5 @@
 /**
-## The contract of Community
+## The contract of Community Space on Flow Quest
 
 > Author: Bohao Tang<tech@btang.cn>
 
