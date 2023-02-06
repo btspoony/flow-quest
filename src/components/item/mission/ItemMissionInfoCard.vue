@@ -22,8 +22,8 @@ const isCompleted = computed(() => {
   <div class="card p-0 w-full h-full flex flex-col gap-4">
     <div class="h-full flex gap-2 justify-between">
       <div class="flex flex-col gap-1 max-w-[380px]">
-        <h4 class="mb-2 truncate">{{ missionCfg?.display.name }}</h4>
-        <div class="mb-2 prose-sm prose-blockquote:py-0 prose-img:my-0"
+        <h4 class="mb-0 truncate">{{ missionCfg?.display.name }}</h4>
+        <div class="mb-0 prose-sm prose-blockquote:py-0 prose-img:my-0 max-h-[72px] overflow-hidden text-ellipsis"
           v-html="mdRenderer.render(missionCfg?.display.description)">
         </div>
       </div>
