@@ -18,7 +18,11 @@ onMounted(() => {
     current.value = user;
     if (user) {
       const accountProof = user.services?.find(one => one.type === "account-proof")
-      isNetworkCorrect.value = accountProof?.network === cfg.public.network
+      if (accountProof?.uid.startsWith("lilico")) {
+        isNetworkCorrect.value = accountProof?.network === cfg.public.network
+      } else {
+        isNetworkCorrect.value = true
+      }
       console.log(`Flow User loggedIn: ${user.addr}, network: ${accountProof?.network}, correct: ${isNetworkCorrect.value}`);
       console.log(`Proof: ${JSON.stringify(accountProof?.data)}`)
       emit('connected', user.addr!)
