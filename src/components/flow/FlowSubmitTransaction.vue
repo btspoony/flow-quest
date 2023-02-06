@@ -98,7 +98,7 @@ defineExpose({
         {{ content }}
       </slot>
     </button>
-    <slot v-if="txid && isSealed" name="next">
+    <slot v-if="!hideButton && (txid && isSealed)" name="next">
       <button :class="['mx-0 mb-0 text-sm', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
         @click.stop.prevent="resetComponent">
         Close
