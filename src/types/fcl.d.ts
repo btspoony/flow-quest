@@ -162,6 +162,7 @@ declare module "@onflow/fcl" {
     type: string;
     uid: string;
     data?: any;
+    network?: string;
   }
 
   export interface UserSnapshot {

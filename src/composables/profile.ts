@@ -22,3 +22,6 @@ export const useGithubProfile = () =>
 
 export const useFlowAccount = () =>
   useState<UserSnapshot | null>("currentFlowAccount", () => ref(null));
+
+export const useNetworkCorrect = () =>
+  useState<boolean>("currentFlowNetworkCorrect", () => ref(false));

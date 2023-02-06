@@ -9,6 +9,7 @@ const github = useGithubProfile();
 const linkedAddress = useLinkedWalletAddress();
 const wallet = useFlowAccount();
 const user = useUserProfile();
+const isNetworkCorrect = useNetworkCorrect();
 const isRegistering = useUserProfileInitializing();
 const isLoadingUser = useUserProfileLoading();
 
@@ -24,7 +25,7 @@ watchEffect(async () => {
 
 // load user profile
 watch(wallet, async (newVal, oldVal) => {
-  if (newVal?.loggedIn && (newVal.addr === linkedAddress.value || !linkedAddress.value)) {
+  if (newVal?.loggedIn && (newVal.addr === linkedAddress.value || !linkedAddress.value) && isNetworkCorrect.value) {
     user.value = await reloadCurrentUser({}, { adminStatus: true });
   } else {
     user.value = null
@@ -79,11 +80,16 @@ function onLogout() {
           <span class="text-xs">{{ linkedAddressShortString }} </span>
         </div>
         <div v-if="wallet?.addr" class="tag secondary" :aria-busy="isMatchedWallet && (isRegistering||isLoadingUser)">
-          <template v-if="isMatchedWallet && user?.profileRecord">
+          <template v-if="!isNetworkCorrect">
+            Wrong Network
+          </template>
+          <template v-else-if="isMatchedWallet && user?.profileRecord">
             {{ user?.profileRecord?.points ?? 0 }} Points
           </template>
           <template v-else>
-            {{ isMatchedWallet ? (isRegistering ? ' Initializing' : ' Loading Profile') : 'Wrong Wallet' }}
+            {{ isMatchedWallet
+            ? (isRegistering ? ' Initializing' : ' Loading Profile')
+            : 'Wrong Wallet' }}
           </template>
         </div>
       </div>

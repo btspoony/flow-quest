@@ -2,6 +2,8 @@
 <script setup lang="ts">
 import type { TransactionReceipt } from "@onflow/fcl";
 
+const isNetworkCorrect = useNetworkCorrect();
+
 const props = withDefaults(
   defineProps<{
     method: () => Promise<string | null>;
@@ -35,7 +37,7 @@ const errorMessage = ref<string | null>(null);
 const isSealed = ref<boolean | undefined>(undefined);
 
 async function startTransaction() {
-  if (isLoading.value) return;
+  if (!isNetworkCorrect.value || isLoading.value) return;
 
   isLoading.value = true;
   errorMessage.value = null;
@@ -92,7 +94,9 @@ defineExpose({
     </button>
     <button v-else-if="!hideButton && (!txid || !isSealed)"
       :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
-      :aria-busy="isLoading || !isSealed" :disabled="isLoading || !isSealed" :aria-disabled="isLoading || !isSealed"
+      :aria-busy="isLoading || !isSealed"
+      :disabled="!isNetworkCorrect || isLoading || !isSealed"
+      :aria-disabled="!isNetworkCorrect || isLoading || !isSealed"
       @click="startTransaction">
       <slot>
         {{ content }}

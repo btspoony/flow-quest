@@ -3,6 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import { Icon } from '@iconify/vue';
 
 const current = useFlowAccount();
+const isNetworkCorrect = useNetworkCorrect();
 
 const emit = defineEmits<{
   (e: 'connected', address: string): void;
@@ -10,12 +11,15 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
+  const cfg = useRuntimeConfig()
   const { $fcl } = useNuxtApp();
+
   $fcl.currentUser.subscribe((user) => {
     current.value = user;
     if (user) {
-      console.log(`Flow User loggedIn: ${user.addr}`);
       const accountProof = user.services?.find(one => one.type === "account-proof")
+      isNetworkCorrect.value = accountProof?.network === cfg.public.network
+      console.log(`Flow User loggedIn: ${user.addr}, network: ${accountProof?.network}, correct: ${isNetworkCorrect.value}`);
       console.log(`Proof: ${JSON.stringify(accountProof?.data)}`)
       emit('connected', user.addr!)
     } else {

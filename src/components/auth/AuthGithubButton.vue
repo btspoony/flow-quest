@@ -2,6 +2,7 @@
 import { StorageSerializers, RemovableRef, useLocalStorage } from '@vueuse/core';
 import { Icon } from '@iconify/vue';
 
+const isNetworkCorrect = useNetworkCorrect();
 const profile = useGithubProfile();
 const loading = ref(false)
 let storageToken: RemovableRef<GithubToken>
@@ -36,6 +37,17 @@ function receiveMessage(event: any) {
     console.info(`Message received by ${event.origin}; IGNORED.`);
     return;
   }
+
+  if (event.data?.type === 'LILICO:NETWORK') {
+    const cfg = useRuntimeConfig()
+    const network = event.data?.network
+    if (cfg.public.network !== network && isNetworkCorrect.value) {
+      isNetworkCorrect.value = false
+    } else if (cfg.public.network === network && !isNetworkCorrect.value) {
+      isNetworkCorrect.value = true
+    }
+  }
+
   if (event.data?.source !== "auth-popup") {
     return;
   }
