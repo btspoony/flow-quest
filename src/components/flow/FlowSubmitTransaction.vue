@@ -32,7 +32,7 @@ const emit = defineEmits<{
 const txid = ref<string | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
-const isSealed = ref(true);
+const isSealed = ref<boolean | undefined>(undefined);
 
 async function startTransaction() {
   if (isLoading.value) return;
@@ -69,7 +69,7 @@ function resetComponent() {
   emit("reset")
   txid.value = null;
   errorMessage.value = null;
-  isSealed.value = true;
+  isSealed.value = undefined;
 }
 
 // expose members
