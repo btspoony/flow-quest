@@ -87,12 +87,27 @@
     "testnet-admin": {
       "address": "${NUXT_PUBLIC_FLOW_SERVICE_ADDRESS}",
       "key": "${NUXT_FLOW_PRIVATE_KEY}"
+    },
+    "mainnet-admin": {
+      "fromFile": "./mainnet-admin.private.json"
     }
   },
   "deployments": {
     "emulator": {},
     "testnet": {
       "testnet-admin": [
+        "Interfaces",
+        "Helper",
+        "QueryStructs",
+        "UserProfile",
+        "FLOATVerifiers",
+        "Community",
+        "BountyUnlockConditions",
+        "CompetitionService"
+      ]
+    },
+    "mainnet": {
+      "mainnet-admin": [
         "Interfaces",
         "Helper",
         "QueryStructs",

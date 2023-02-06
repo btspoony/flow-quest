@@ -5,9 +5,10 @@ import Signer from "../../src/server/helpers/signer.mjs";
 env.config();
 
 export function buildSigner(
-  signerAddress = process.env.NUXT_PUBLIC_FLOW_SERVICE_ADDRESS
+  signerAddress = process.env.NUXT_PUBLIC_FLOW_SERVICE_ADDRESS,
+  privateKey = process.env.NUXT_FLOW_SERVICE_PRIVATE_KEY ||
+    process.env.NUXT_FLOW_PRIVATE_KEY
 ) {
-  const privateKey = process.env.NUXT_FLOW_PRIVATE_KEY;
   const serviceAddress = process.env.NUXT_PUBLIC_FLOW_SERVICE_ADDRESS;
   if (!signerAddress || !privateKey || !serviceAddress) {
     throw new Error("Missing env");
