@@ -5,6 +5,8 @@ const isRedisConfigEnabled = !!(
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
 );
 
+const networkKey = process.env.NUXT_PUBLIC_NETWORK ?? "testnet";
+
 const redisPool: { [key: string]: Redis } = {};
 
 export function getRedisInstance(key = "default"): Redis {
@@ -30,7 +32,7 @@ export async function executeOrLoadFromRedis<T>(
   }
 
   const redis = getRedisInstance();
-  const redisKey = `CHALLENGE_SERVICE_CACHE:KEY_VALUE:${methodKey}`;
+  const redisKey = `SERVICE_CACHE:${networkKey}:KEY_VALUE:${methodKey}`;
   const cacheResult = await redis.get<string>(redisKey);
 
   let result: T;
@@ -61,8 +63,8 @@ export async function acquireKeyIndex(
   }
 
   const redis = getRedisInstance();
-  const redisTotalAmountKey = `CHALLENGE_SERVICE_POOL:ADDRESS:${address}:KEY_VALUE`;
-  const redisKeyPool = `CHALLENGE_SERVICE_POOL:ADDRESS:${address}:SORTED_SET`;
+  const redisTotalAmountKey = `SERVICE_POOL:${networkKey}:ADDRESS:${address}:KEY_VALUE`;
+  const redisKeyPool = `SERVICE_POOL:${networkKey}:ADDRESS:${address}:SORTED_SET`;
 
   const now = Date.now();
   const timeout = now + (ttl ?? 1000 * 60);
@@ -101,7 +103,7 @@ export async function releaseKeyIndex(address: string, keyIndex: number) {
   if (!isRedisConfigEnabled) return;
 
   const redis = getRedisInstance();
-  const redisKeyPool = `CHALLENGE_SERVICE_POOL:ADDRESS:${address}:SORTED_SET`;
+  const redisKeyPool = `SERVICE_POOL:${networkKey}:ADDRESS:${address}:SORTED_SET`;
 
   // set a timeout for key
   await redis.zadd(redisKeyPool, {
