@@ -38,7 +38,7 @@ function receiveMessage(event: any) {
     return;
   }
 
-  if (event.data?.type === 'LILICO:NETWORK') {
+  if (event.data?.type === 'LILICO:NETWORK' && typeof event.data?.network === 'string') {
     const cfg = useRuntimeConfig()
     const network = event.data?.network
     if (cfg.public.network !== network && isNetworkCorrect.value) {
