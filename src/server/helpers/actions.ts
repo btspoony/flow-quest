@@ -234,7 +234,7 @@ export async function scVerifyMission(
       `Request<VerifyMission> - Step.2-2: Mission result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
     );
     return result === stepCfg.test.result;
-  } else {
+  } else if (stepCfg.type === "quiz") {
     // Verify quiz
     if (!Array.isArray(stepCfg.quiz)) {
       throw new Error("Step config: quiz should be an array");
@@ -253,5 +253,9 @@ export async function scVerifyMission(
       isValid = isValid && answers[i] === params[i].value;
     }
     return isValid;
+  } else if (stepCfg.type === 'github') {
+    return false
+  } else {
+    return false
   }
 }
