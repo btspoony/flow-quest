@@ -142,7 +142,7 @@ async function completeBounty(): Promise<string | null> {
 </script>
 
 <template>
-  <FrameGithubAuth :content-loading="pending || !missionCfg">
+  <FrameMain :content-loading="pending || !missionCfg">
     <div class="w-full flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 justify-center">
       <div class="pt-10 flex-none w-full lg:w-auto lg:min-w-[40%] lg:max-w-[50%] flex flex-col gap-3">
         <div class="pb-2 flex gap-4">
@@ -157,7 +157,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
         <!-- Mission Prepare -->
         <div class="flex flex-col gap-2">
-          <FlowConnect v-if="!user?.profileRecord" />
+          <AuthProfileLogin />
         </div>
         <!-- Mission steps -->
         <div class="flex flex-col gap-2">
@@ -198,5 +198,5 @@ async function completeBounty(): Promise<string | null> {
         <div class="prose-sm prose-blockquote:py-0 prose-img:my-0" v-html="mdRenderer.render(info.guideMD)" />
       </article>
     </div>
-  </FrameGithubAuth>
+  </FrameMain>
 </template>

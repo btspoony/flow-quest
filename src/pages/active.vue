@@ -7,7 +7,7 @@ const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async
 </script>
 
 <template>
-  <FrameGithubAuth :content-loading="pending">
+  <FrameMain :content-loading="pending">
     <div class="page-container w-full py-8">
       <template v-if="data && data.bounties.length > 0">
         <h2 class="text-center mb-8">Start with these Quests</h2>
@@ -21,5 +21,5 @@ const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async
         </div>
       </div>
     </div>
-  </FrameGithubAuth>
+  </FrameMain>
 </template>

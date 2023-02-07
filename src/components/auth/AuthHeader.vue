@@ -39,7 +39,7 @@ watchEffect(async () => {
 
 <template>
   <div>
-    <AuthGithubButton v-show="!profile.auth" />
+    <AuthPlatformGithubButton v-show="!profile.auth" />
     <div v-if="profile.auth" class="inline-flex-between !gap-3">
       <span v-if="!profile.data" :aria-busy="loading">
         Loading

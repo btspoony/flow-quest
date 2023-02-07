@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core';
 import { Icon } from '@iconify/vue';
 
 const current = useFlowAccount();
@@ -37,15 +36,13 @@ function login() {
   $fcl.authenticate();
 }
 
-const { width } = useWindowSize()
-const narrow = computed(() => width.value < 1280)
 </script>
 
 <template>
   <button class="flex-center rounded-full mb-0" @click="login">
     <div class="inline-flex-around">
       <Icon icon="heroicons:user-20-solid" class="h-4 w-4" />
-      <small>{{ narrow ? "Connect" : "Connect Wallet" }}</small>
+      <small>Connect<span class="hidden xl:inline"> Wallet</span></small>
     </div>
   </button>
 </template>

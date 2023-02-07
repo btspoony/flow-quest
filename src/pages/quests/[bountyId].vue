@@ -168,7 +168,7 @@ async function completeBounty(): Promise<string | null> {
 </script>
 
 <template>
-  <FrameGithubAuth :content-loading="pending">
+  <FrameMain :content-loading="pending">
     <template v-slot:header>
       <div class="w-full h-36 relative overflow-hidden -z-10">
         <div class="absolute -inset-5 blur-lg bg-cover bg-center"
@@ -208,7 +208,7 @@ async function completeBounty(): Promise<string | null> {
       </div>
       <div class="flex flex-col gap-24" v-if="info">
         <ItemQuestMissionBar v-for="(bounty, index) in info?.missions" :key="'idx_' + index" :bounty="bounty"
-          :index="index" :isLast="false" :locked="!user?.profileRecord || !isAllUnlocked"
+          :index="index" :isLast="false" :locked="!isAllUnlocked"
           :current="currentIndex" />
         <div class="flex-center">
           <article class="relative card non-interactive px-3 pt-2 w-fit">
@@ -241,7 +241,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
       </div>
     </section>
-  </FrameGithubAuth>
+  </FrameMain>
 </template>
 
 <style scoped>

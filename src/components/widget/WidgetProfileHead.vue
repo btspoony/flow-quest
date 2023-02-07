@@ -32,6 +32,26 @@ watch(wallet, async (newVal, oldVal) => {
   }
 })
 
+onMounted(() => {
+  window.addEventListener("message", receiveMessage, false);
+})
+
+onUnmounted(() => {
+  window.removeEventListener("message", receiveMessage, false)
+})
+
+function receiveMessage(event: any) {
+  if (event.data?.type === 'LILICO:NETWORK' && typeof event.data?.network === 'string') {
+    const cfg = useRuntimeConfig()
+    const network = event.data?.network
+    if (cfg.public.network !== network && isNetworkCorrect.value) {
+      isNetworkCorrect.value = false
+    } else if (cfg.public.network === network && !isNetworkCorrect.value) {
+      isNetworkCorrect.value = true
+    }
+  }
+}
+
 const isMatchedWallet = computed(() => {
   return !linkedAddress.value || linkedAddress.value === wallet.value?.addr
 })
