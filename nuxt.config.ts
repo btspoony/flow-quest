@@ -30,6 +30,7 @@ export default defineNuxtConfig({
       flowServiceAddress: "",
       oauthGithubClientId: "",
       nftStorageToken: "",
+      gaId: "",
     },
   },
   // ts config
