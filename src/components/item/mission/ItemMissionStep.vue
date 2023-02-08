@@ -19,7 +19,10 @@ const submitLoading = ref(false);
 const stepCfg = computed(() => props.stepsCfg[props.step]);
 const maxAnswerLength = computed(() => stepCfg.value.type === 'onchain'
   ? stepCfg.value.schema.length
-  : stepCfg.value.quiz.length
+  : stepCfg.value.type === 'quiz'
+    ? stepCfg.value.quiz.length
+    : stepCfg.value.type === 'github'
+      ? 1 : 0
 )
 const answers = reactive<string[][]>(Array(maxAnswerLength.value).fill([]));
 
@@ -52,14 +55,7 @@ function isTheQuizAnswerCorrect(index: number) {
 }
 
 function onOpenDialogue() {
-  let len
-  if (stepCfg.value.type === 'onchain') {
-    len = stepCfg.value.schema.length
-  } else {
-    len = stepCfg.value.quiz.length
-    currentMissionIdx.value = 0
-  }
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < maxAnswerLength.value; i++) {
     answers[i] = [""]
   }
   dialog.value?.openModal()
@@ -71,14 +67,26 @@ const isAnswerCompleted = computed(() => {
 
 async function onSubmitAnswer(): Promise<string | null> {
   submitLoading.value = true
+
+  let params: { key: string, value: string }[] = []
+  switch (stepCfg.value.type) {
+    case 'onchain':
+      params = stepCfg.value.schema.map((param, index) => {
+        return { key: param.key, value: answers[index][0] }
+      })
+      break;
+    case 'quiz':
+      params = answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
+      break;
+    case 'github':
+      // TODO
+      break
+  }
+
   const result = await apiPostVerifyMission(
     props.mission.config,
     props.step,
-    stepCfg.value.type === 'onchain'
-      ? stepCfg.value.schema.map((param, index) => {
-        return { key: param.key, value: answers[index][0] }
-      })
-      : answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
+    params
   )
   if (result) {
     if (result.transactionId) {
@@ -125,7 +133,7 @@ function onCloseDialgue() {
         <button class="mb-0 rounded-full" data-target="modal-dialog"
           @click.stop.prevent="onOpenDialogue">
           <span class="font-semibold">
-            {{ stepCfg.type === 'onchain' ? 'Verify' : 'Quiz' }}
+            {{ stepCfg.type === 'quiz' ? 'Quiz' : 'Verify' }}
           </span>
         </button>
         <a v-if="typeof stepCfg.external === 'string'" :href="stepCfg.external" role="button" class="mb-0 rounded-full outline"
@@ -152,7 +160,7 @@ function onCloseDialgue() {
           </template>
         </div>
       </template>
-      <template v-else-if="currentMissionCfg">
+      <template v-else-if="stepCfg.type === 'quiz' && currentMissionCfg">
         <small>Question {{ currentMissionIdx + 1 }} of {{ stepCfg.quiz.length }}</small>
         <h4 class="w-full text-center mb-4">{{ currentMissionCfg.question }}</h4>
         <div class="w-full px-4 py-2 flex flex-col gap-2">
@@ -178,6 +186,9 @@ function onCloseDialgue() {
           </template>
         </div>
       </template>
+      <template v-else-if="stepCfg.type === 'github'">
+        TODO
+      </template>
     </div>
     <footer class="mt-4">
       <button v-if="stepCfg.type === 'quiz' && !isLastQuizMission" class="rounded-xl flex-center mb-0"
@@ -193,7 +204,7 @@ function onCloseDialgue() {
       >
         Submit
         <template v-slot:disabled>
-          {{ stepCfg.type === 'onchain' ? 'Missing Parameters' : 'Incorrect 🙅‍♀️' }}
+          {{ stepCfg.type === 'onchain' ? 'Missing Parameters' : 'Invalid to Submit' }}
         </template>
       </FlowSubmitTransaction>
     </footer>
