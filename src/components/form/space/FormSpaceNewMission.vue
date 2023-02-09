@@ -52,7 +52,11 @@ async function loadAndValidateCfg() {
         const stepCfg = one as MissionStepsConfig
         return typeof stepCfg.type === 'string'
           && typeof stepCfg.title === 'string'
-          && (stepCfg.type === 'onchain' ? typeof stepCfg.code === 'string' && Array.isArray(stepCfg.schema) : Array.isArray(stepCfg.quiz))
+          && (stepCfg.type === 'onchain'
+            ? typeof stepCfg.code === 'string' && Array.isArray(stepCfg.schema)
+            : stepCfg.type === 'quiz'
+              ? Array.isArray(stepCfg.quiz)
+              : Array.isArray(stepCfg.repos))
       }).length === stepsJson.length
 
       if (valid) {

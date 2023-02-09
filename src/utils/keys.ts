@@ -1,4 +1,4 @@
-import type { InjectionKey, Ref, UnwrapNestedRefs } from "vue";
+import type { InjectionKey, ComputedRef, Ref, UnwrapNestedRefs } from "vue";
 
 interface SpaceInjectType {
   space: Ref<CommunitySpaceBasics | null>;
@@ -11,3 +11,11 @@ export const spaceInjectKey: InjectionKey<SpaceInjectType> =
 export const spaceNewMissionsInjectKey: InjectionKey<
   UnwrapNestedRefs<MissionConfigRequest>[]
 > = Symbol("app.new-missions");
+
+interface MissionStepGitHubVerification {
+  repos: ComputedRef<string[]>;
+  updateValidRepos: (repos: string[]) => void;
+}
+
+export const missionGithubVerifyInjectKey: InjectionKey<MissionStepGitHubVerification> =
+  Symbol("mission.step-github-items");

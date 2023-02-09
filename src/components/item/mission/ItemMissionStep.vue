@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import type WidgetDialog from '../../widget/WidgetDialog.vue';
+import type ItemMissionVerifierGithub from './verifier/ItemMissionVerifierGithub.vue';
+
 const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
+const githubVerifier = ref<InstanceType<typeof ItemMissionVerifierGithub> | null>(null);
 
 const props = defineProps<{
   mission: BountyInfo,
@@ -25,6 +28,18 @@ const maxAnswerLength = computed(() => stepCfg.value.type === 'onchain'
       ? 1 : 0
 )
 const answers = reactive<string[][]>(Array(maxAnswerLength.value).fill([]));
+
+provide(missionGithubVerifyInjectKey, {
+  repos: computed<string[]>(() => stepCfg.value.type === 'github'
+    ? stepCfg.value.repos
+    : []
+  ),
+  updateValidRepos: (repos: string[]) => {
+    if (stepCfg.value.type === 'github') {
+      answers[0] = repos
+    }
+  }
+})
 
 const currentMissionIdx = ref(0);
 const currentMissionCfg = computed(() => stepCfg.value.type === 'quiz' ? stepCfg.value.quiz[currentMissionIdx.value] : undefined);
@@ -59,6 +74,9 @@ function onOpenDialogue() {
     answers[i] = [""]
   }
   dialog.value?.openModal()
+  if (stepCfg.value.type === 'github') {
+    githubVerifier.value?.execute()
+  }
 }
 
 const isAnswerCompleted = computed(() => {
@@ -79,7 +97,7 @@ async function onSubmitAnswer(): Promise<string | null> {
       params = answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
       break;
     case 'github':
-      // TODO
+      // FIXME
       break
   }
 
@@ -186,9 +204,7 @@ function onCloseDialgue() {
           </template>
         </div>
       </template>
-      <template v-else-if="stepCfg.type === 'github'">
-        TODO
-      </template>
+      <ItemMissionVerifierGithub ref="githubVerifier" v-else-if="stepCfg.type === 'github'" />
     </div>
     <footer class="mt-4">
       <button v-if="stepCfg.type === 'quiz' && !isLastQuizMission" class="rounded-xl flex-center mb-0"
