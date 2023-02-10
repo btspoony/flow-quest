@@ -19,3 +19,11 @@ interface MissionStepGitHubVerification {
 
 export const missionGithubVerifyInjectKey: InjectionKey<MissionStepGitHubVerification> =
   Symbol("mission.step-github-items");
+
+interface SettingPointsReward {
+  rewardPoints: UnwrapNestedRefs<number[]>;
+  referralPoints: UnwrapNestedRefs<number[]>;
+}
+
+export const missionSettingPointsRewardInjectKey: InjectionKey<SettingPointsReward> =
+  Symbol("settings.mission.pointRewards");
