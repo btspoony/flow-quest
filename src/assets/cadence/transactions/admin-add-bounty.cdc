@@ -5,7 +5,7 @@ import CompetitionService from "../../../../cadence/dev-challenge/CompetitionSer
 import Helper from "../../../../cadence/dev-challenge/Helper.cdc"
 
 transaction(
-    communityKey: String,
+    communityId: UInt64,
     category: UInt8,
     key: String,
     rewardPoints: UInt64,
@@ -20,9 +20,8 @@ transaction(
     }
 
     execute {
-        let comPubRef= Community.borrowCommunityByKey(key: communityKey)
-        assert(comPubRef != nil, message: "Failed to get community".concat(communityKey))
-        let communityId = comPubRef!.getID()
+        let service = CompetitionService.borrowServicePublic()
+        assert(!service.hasBountyByKey(key), message: "Bounty key is registered.")
 
         let entityIdentifier = Community.BountyEntityIdentifier(
             category: Interfaces.BountyType(rawValue: category) ?? panic("Wrong category value"),

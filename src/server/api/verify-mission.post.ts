@@ -39,6 +39,10 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
     `Request<VerifyMission>[${body.address}] - Step.0: Body verified`
   );
 
+  if (!body.proofSigs.find((one) => one.addr === body.address)) {
+    throw new Error("body.address is not one of the proof sigs.");
+  }
+
   const isProduction = config.public.network === "mainnet";
 
   const signer = await utils.pickOneSigner();
@@ -96,8 +100,9 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
     }, {} as { [key: string]: string });
 
     // Step.2 run a script to ensure transactions
-    isMissionValid = await actions.scVerifyMission(
+    isMissionValid = await actions.verifyMission(
       signer,
+      body.address,
       stepCfg,
       body.params
     );
@@ -111,11 +116,17 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
 
     if (isMissionValid) {
       // run the reward transaction
+      const paramsToSave: { [k: string]: string } = {};
+      for (const key in params) {
+        if (!key.startsWith("_")) {
+          paramsToSave[key] = params[key];
+        }
+      }
       transactionId = await actions.txCtrlerSetMissionAnswer(signer, {
         target: body.address,
         missionKey: body.missionKey,
         step: body.step,
-        params,
+        params: paramsToSave,
       });
     }
 

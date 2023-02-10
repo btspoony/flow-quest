@@ -134,7 +134,15 @@ interface MissionStepOnChain extends MissionStepBasic {
   test: MissionStepTest; // All tests should be OK, then mission passed
 }
 
-type MissionStepsConfig = MissionStepQuiz | MissionStepOnChain;
+interface MissionStepGitHub extends MissionStepBasic {
+  type: "github";
+  repos: string[];
+}
+
+type MissionStepsConfig =
+  | MissionStepQuiz
+  | MissionStepOnChain
+  | MissionStepGitHub;
 
 interface MissionDetailConfig {
   guide?: string;

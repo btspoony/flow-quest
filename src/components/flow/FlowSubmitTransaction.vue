@@ -60,6 +60,12 @@ function onSealed(tx: TransactionReceipt) {
     emit("success")
   }
   emit("sealed", tx);
+  // avoid no closed
+  setTimeout(() => {
+    if (txid.value) {
+      resetComponent()
+    }
+  }, 3000);
 }
 
 function onError(msg: string) {
@@ -92,16 +98,18 @@ defineExpose({
         Disabled
       </slot>
     </button>
-    <button v-else-if="!hideButton && (!txid || !isSealed)"
-      :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
-      :aria-busy="isLoading || isSealed === false"
-      :disabled="!isNetworkCorrect || isLoading || isSealed === false"
-      :aria-disabled="!isNetworkCorrect || isLoading || isSealed === false"
-      @click="startTransaction">
-      <slot>
-        {{ content }}
-      </slot>
-    </button>
+    <template v-else-if="!hideButton && (!txid || !isSealed)">
+      <button :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
+        :aria-busy="isLoading || isSealed === false" :disabled="!isNetworkCorrect || isLoading || isSealed === false"
+        :aria-disabled="!isNetworkCorrect || isLoading || isSealed === false" @click="startTransaction">
+        <slot>
+          {{ content }}
+        </slot>
+      </button>
+      <p v-if="errorMessage" class="w-full max-h-20 overflow-y-scroll bg-native px-4 mb-0 text-xs text-failure">
+        {{ errorMessage }}
+      </p>
+      </template>
     <slot v-if="!hideButton && (txid && isSealed)" name="next">
       <button :class="['mx-0 mb-0 text-sm', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
         @click.stop.prevent="resetComponent">

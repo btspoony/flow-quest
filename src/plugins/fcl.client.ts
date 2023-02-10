@@ -683,6 +683,25 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * add quests to season
+         */
+        async adminAddMissionToSeason(
+          mission: MissionConfig,
+          reward: PointRewardInfo
+        ) {
+          return await sendTransaction(
+            cadence.transactions.adminAddBounty,
+            (arg, t) => [
+              arg(mission.communityId, t.UInt64),
+              arg("0", t.UInt8),
+              arg(mission.key, t.String),
+              arg(reward.referalPoints.toFixed(0), t.UInt64),
+              arg(reward.referalPoints.toFixed(0), t.UInt64),
+              arg(true, t.Bool),
+            ]
+          );
+        },
+        /**
          * Update bounty property
          */
         async adminBountyUpdateProperty(

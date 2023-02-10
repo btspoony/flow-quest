@@ -137,8 +137,27 @@ export async function scCheckPointsToGeneReferralCode(
   );
 }
 
-export async function scVerifyMission(
+export async function scGetUserPlatformUid(
   signer: Signer,
+  acct: string,
+  platform: string
+): Promise<string> {
+  const code = await useStorage().getItem(
+    `assets/server/cadence/scripts/get-user-platform-uid.cdc`
+  );
+  if (typeof code !== "string") {
+    throw new Error("Unknown script.");
+  }
+  return await signer.executeScript(
+    code,
+    (arg, t) => [arg(acct, t.Address), arg(platform, t.String)],
+    ""
+  );
+}
+
+export async function verifyMission(
+  signer: Signer,
+  address: string,
   stepCfg: MissionStepsConfig,
   params: { key: string; value: string }[]
 ): Promise<boolean> {
@@ -234,7 +253,7 @@ export async function scVerifyMission(
       `Request<VerifyMission> - Step.2-2: Mission result: ${result}, expect: ${stepCfg.test.expect}=${stepCfg.test.result}`
     );
     return result === stepCfg.test.result;
-  } else {
+  } else if (stepCfg.type === "quiz") {
     // Verify quiz
     if (!Array.isArray(stepCfg.quiz)) {
       throw new Error("Step config: quiz should be an array");
@@ -253,5 +272,51 @@ export async function scVerifyMission(
       isValid = isValid && answers[i] === params[i].value;
     }
     return isValid;
+  } else if (stepCfg.type === "github") {
+    const token = params.find((one) => one.key === "_accessToken")?.value;
+    const repos = params.find((one) => one.key === "repos")?.value;
+    if (typeof token !== "string" || typeof repos !== "string") return false;
+    const targetUid = await scGetUserPlatformUid(signer, address, "github");
+    if (typeof targetUid !== "string" || targetUid.length === 0) return false;
+    const repoList = repos.split(",");
+    for (const repo of repoList) {
+      const list = await loadRepoContributors(repo, token);
+      const matched = list.find((one) => String(one.id) === targetUid);
+      if (matched) {
+        return true;
+      }
+    }
+    return false;
+  } else {
+    return false;
   }
+}
+
+async function loadRepoContributors(key: string, accessToken: string) {
+  const [owner, repo] = key.split("/");
+  if (!owner || !repo || !accessToken) return [];
+
+  const loadOnePage = async (page: number): Promise<any[]> => {
+    return await $fetch(`/repos/${key}/contributors`, {
+      baseURL: "https://api.github.com",
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      query: {
+        per_page: 100,
+        page: 1 + page,
+      },
+    });
+  };
+
+  let all: any[] = [];
+  let page = 0;
+  let list: any[];
+  do {
+    list = await loadOnePage(page);
+    all = all.concat(list);
+    page++;
+  } while (list.length > 0);
+  return all;
 }

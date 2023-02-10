@@ -11,6 +11,7 @@ import spaceApplyFLOATinQuest from "./transactions/community-apply-FLOAT-in-ques
 import adminInitialize from "./transactions/admin-initialize.cdc?raw";
 import adminStartNewSeason from "./transactions/admin-start-new-season.cdc?raw";
 import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
+import adminAddBounty from "./transactions/admin-add-bounty.cdc?raw";
 import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
 import adminBountyUpdateProperty from "./transactions/admin-update-bounty-property.cdc?raw";
 import adminAddPreconditionBountyCompleted from "./transactions/admin-add-precondition-bounty-completed.cdc?raw";
@@ -58,6 +59,7 @@ export default {
         adminInitialize,
         adminStartNewSeason,
         adminUpdateEndDate,
+        adminAddBounty,
         adminAddBounties,
         adminBountyUpdateProperty,
         adminAddPreconditionBountyCompleted,

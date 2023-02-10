@@ -8,12 +8,9 @@ const loading = ref(false);
 watchEffect(async () => {
   if (profile.value.auth) {
     loading.value = true
+    const { $githubApi } = useNuxtApp()
 
-    const data: any = await $fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${profile.value.auth?.accessToken}`
-      }
-    })
+    const data: any = await $githubApi.getUser()
     if (typeof data === 'object') {
       profile.value.data = {
         id: data.id,

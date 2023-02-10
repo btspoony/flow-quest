@@ -12,6 +12,7 @@ const user = useUserProfile()
 
 interface MissionDetail {
   mission: BountyInfo | null,
+  conditionUnlockStatus: boolean[],
   guideMD?: string,
   stepsCfg: MissionStepsConfig[],
 }
@@ -30,7 +31,16 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
   let guideMD: string | undefined
   let missionDetail: MissionDetailConfig | undefined
 
+  let conditionUnlockStatus: boolean[] = []
   if (mission) {
+    if (mission.preconditions.length > 0) {
+      if (user.value?.address) {
+        conditionUnlockStatus = await $scripts.getBountyUnlockStatus(mission.id, user.value?.address)
+      } else {
+        conditionUnlockStatus = Array(mission.preconditions.length).fill(false)
+      }
+    }
+
     const stepsCfgStr = await $fetch((mission?.config as MissionConfig).stepsCfg)
     if (stepsCfgStr) {
       try {
@@ -41,7 +51,8 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
           missionDetail = json as MissionDetailConfig
         }
         const guideURL = missionDetail.guide ?? (mission?.config as MissionConfig).guideMD
-        if (typeof guideURL === 'string') {
+
+        if (typeof guideURL === 'string' && guideURL.startsWith("http")) {
           guideMD = await $fetch(guideURL)
         }
       } catch (e) {
@@ -52,12 +63,15 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
 
   return {
     mission,
+    conditionUnlockStatus,
     guideMD,
     stepsCfg: missionDetail?.steps ?? []
   }
 }, {
   server: false
 });
+
+const isAllUnlocked = computed(() => info.value?.conditionUnlockStatus.reduce((prev, curr) => prev && curr, true))
 
 const currentQuest = useCurrentQuest();
 const hasBack = computed(() => !!currentQuest.value)
@@ -159,11 +173,18 @@ async function completeBounty(): Promise<string | null> {
         <div class="flex flex-col gap-2">
           <AuthProfileLogin />
         </div>
+        <div
+          v-if="(info?.mission?.preconditions.length ?? 0) > 0 && (info?.mission?.preconditions.length === info?.conditionUnlockStatus.length) && !isAllUnlocked"
+          class="flex flex-col gap-2">
+          <template v-for="cond,i in info?.mission?.preconditions" :key="`cond_${i}_${cond.type}`">
+            <ItemBountyPreconditionBar v-if="!info?.conditionUnlockStatus[i]" :condition="cond" :check-profile="true" />
+          </template>
+        </div>
         <!-- Mission steps -->
         <div class="flex flex-col gap-2">
           <ItemMissionStep v-for="i in missionCfg?.steps" :key="i" :mission="info?.mission!" :step="(i - 1)"
             :steps-cfg="info?.stepsCfg!" :is-completed="profileStatus?.steps[i - 1] ?? false"
-            :is-locked="lockingArr[i - 1] ?? false" @success="updateMission" />
+            :is-locked="!isAllUnlocked || (lockingArr[i - 1] ?? false)" @success="updateMission" />
         </div>
         <div class="flex flex-col py-2">
           <div class="flex items-center gap-2">
