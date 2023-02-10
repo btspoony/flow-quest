@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon, listIcons } from '@iconify/vue';
+import { Icon } from '@iconify/vue';
 
 const github = useGithubProfile()
 const injected = inject(missionGithubVerifyInjectKey)
@@ -20,9 +20,9 @@ async function executeVerification() {
   await Promise.all((injected.repos.value ?? []).map(async (repo, i) => {
     reposLoading[i] = true
     const list = await loadRepoContributors(repo)
-    const matched = list.filter(one => one.id === github.value.data?.id)
-    if (matched.length !== 0) {
-      reposResults[i] = { valid: true, contributions: matched[0].contributions ?? 1, repo }
+    const matched = list.find(one => one.id === github.value.data?.id)
+    if (matched) {
+      reposResults[i] = { valid: true, contributions: matched.contributions ?? 1, repo }
     } else {
       reposResults[i] = { valid: false }
     }

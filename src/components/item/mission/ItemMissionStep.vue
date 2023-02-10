@@ -97,7 +97,13 @@ async function onSubmitAnswer(): Promise<string | null> {
       params = answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
       break;
     case 'github':
-      params = answers[0].map(one => ({ key: one, value: '' }))
+      const github = useGithubProfile()
+      if (github.value.auth) {
+        params = [
+          { key: '_accessToken', value: github.value?.auth?.accessToken },
+          { key: 'repos', value: answers[0].join(',') }
+        ]
+      }
       break
   }
 

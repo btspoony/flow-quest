@@ -60,6 +60,12 @@ function onSealed(tx: TransactionReceipt) {
     emit("success")
   }
   emit("sealed", tx);
+  // avoid no closed
+  setTimeout(() => {
+    if (txid.value) {
+      resetComponent()
+    }
+  }, 3000);
 }
 
 function onError(msg: string) {
