@@ -97,7 +97,7 @@ async function onSubmitAnswer(): Promise<string | null> {
       params = answers.map((val, i) => ({ key: `${i}`, value: toRaw(val).filter(o => !!o).sort().join(',') }))
       break;
     case 'github':
-      // FIXME
+      params = answers[0].map(one => ({ key: one, value: '' }))
       break
   }
 
@@ -211,7 +211,7 @@ function onCloseDialgue() {
         :disabled="!isAnswerTotallyCorrect" @click.stop.prevent="() => currentMissionIdx++">
         {{ isAnswerTotallyCorrect ? 'Next Mission' : 'Incorrect 🙅‍♀️' }}
       </button>
-      <FlowSubmitTransaction v-else-if="stepCfg.type === 'onchain' || isLastQuizMission"
+      <FlowSubmitTransaction v-else-if="stepCfg.type !== 'quiz' || isLastQuizMission"
         :disabled="!isAnswerCompleted || (stepCfg.type === 'quiz' && !isAnswerTotallyCorrect)" :method="onSubmitAnswer"
         @sealed="resetComp()"
         @error="resetComp()"
