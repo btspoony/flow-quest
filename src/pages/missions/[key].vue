@@ -51,7 +51,8 @@ const { data: info, pending, refresh } = useAsyncData<MissionDetail>(`mission:${
           missionDetail = json as MissionDetailConfig
         }
         const guideURL = missionDetail.guide ?? (mission?.config as MissionConfig).guideMD
-        if (typeof guideURL === 'string') {
+
+        if (typeof guideURL === 'string' && guideURL.startsWith("http")) {
           guideMD = await $fetch(guideURL)
         }
       } catch (e) {

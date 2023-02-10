@@ -19,18 +19,20 @@ const isCompleted = computed(() => {
 </script>
 
 <template>
-  <div class="card p-0 w-full h-full flex flex-col gap-4">
+  <div class="card p-0 w-full h-full flex flex-col gap-1">
+    <div class="flex gap-2 justify-between">
+      <TagCommunity :community-id="missionCfg?.communityId" />
+      <TagCompleted v-if="isCompleted" />
+    </div>
     <div class="h-full flex gap-2 justify-between">
-      <div class="flex flex-col gap-1 max-w-[380px]">
-        <h4 class="mb-0 truncate">{{ missionCfg?.display.name }}</h4>
-        <div class="mb-0 prose-sm prose-blockquote:py-0 prose-img:my-0 max-h-[72px] overflow-hidden text-ellipsis"
+      <div class="flex-auto flex flex-col gap-1">
+        <h5 class="mb-0 truncate">{{ missionCfg?.display.name }}</h5>
+        <div
+          class="mb-0 max-h-[60px] prose-sm prose-blockquote:py-0 prose-p:leading-4  prose-p:text-sm prose-img:my-0 overflow-hidden text-ellipsis"
           v-html="mdRenderer.render(missionCfg?.display.description)">
         </div>
       </div>
-      <div class="flex flex-col items-end justify-between">
-        <div>
-          <TagCompleted v-if="isCompleted" />
-        </div>
+      <div class="flex-none flex items-end justify-end">
         <span class="tag" v-if="bounty.rewardType === 'Points'">
           {{ bounty.pointReward?.rewardPoints }} Points
         </span>
