@@ -350,7 +350,16 @@ pub contract CompetitionService {
         }
 
         pub fun getRank(_ addr: Address): Int {
-            return self.leaderboardAddressMap[addr] ?? self.leaderboardRanking.length
+            let profileRef = UserProfile.borrowUserProfilePublic(addr)
+            let point = self.default
+                ? profileRef.getProfilePoints()
+                : profileRef.getSeasonPoints(seasonId: self.getSeasonId())
+            let lastRank = self.leaderboardRanking.length - 1
+            if point == 0 {
+                return lastRank
+            } else {
+                return self.leaderboardRanking.firstIndex(of: point) ?? lastRank
+            }
         }
 
         pub fun getLeaderboardRanking(limit: Int?): {UInt64: [Address]} {
@@ -410,7 +419,7 @@ pub contract CompetitionService {
             let firstIndex = self.leaderboardRanking.firstIndex(of: newPoint)
             if firstIndex == nil {
                 var left = 0
-                var right = oldRank ?? self.leaderboardRanking.length - 1
+                var right = self.leaderboardRanking.length - 1
                 while left <= right {
                     let mid = left == right ? left : (left + right) / 2
                     if self.leaderboardRanking.length <= mid || newPoint > self.leaderboardRanking[mid] {
