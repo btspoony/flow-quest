@@ -220,9 +220,6 @@ pub contract CompetitionService {
         access(contract) fun updateRewardInfo(
             reward: AnyStruct{Helper.RewardInfo}
         ) {
-            if self.rewardType == reward.type {
-                return
-            }
             self.rewardType = reward.type
             self.rewardInfo = reward
 
