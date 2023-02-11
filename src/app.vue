@@ -11,7 +11,7 @@ useHead({
 
 // ----- Data -----
 const description = ref(
-  "A Flow on-chain quests platform. You can learn and earn rewards by completing #onFlow Quests."
+  "A Flow on-chain quests platform. You can learn and earn rewards by completing Quests #onFlow."
 );
 </script>
 

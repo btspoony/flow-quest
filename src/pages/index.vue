@@ -9,7 +9,7 @@ const appConfig = useAppConfig();
         <img src="~/assets/images/home-flow.png" alt="home flow" class="max-w-xs" />
         <div>
           <h3 class="text-5xl font-bold">
-            Learn and earn rewards by completing <strong class="text-primary">#onFlow</strong> Quests
+            Learn and earn rewards by completing Quests <strong class="text-primary">#onFlow</strong>
           </h3>
           <p class="py-6">
             Plan to start the web3 journey? The {{ appConfig.title }} will be your guide.<br />
