@@ -695,7 +695,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               arg(mission.communityId, t.UInt64),
               arg("0", t.UInt8),
               arg(mission.key, t.String),
-              arg(reward.referalPoints.toFixed(0), t.UInt64),
+              arg(reward.rewardPoints.toFixed(0), t.UInt64),
               arg(reward.referalPoints.toFixed(0), t.UInt64),
               arg(true, t.Bool),
             ]
