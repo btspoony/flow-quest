@@ -10,11 +10,12 @@ const editPropertyKey = ref("")
 const editPropertyValue = ref(false)
 const originValue = ref(false)
 
-type TabTypes = 'properties' | 'preconditions'
+type TabTypes = 'properties' | 'preconditions' | 'reward'
 const currentTab = ref<TabTypes>('properties')
 const tabs: { label: string, key: TabTypes }[] = [
   { label: "Properties", key: 'properties' },
   { label: "Preconditions", key: 'preconditions' },
+  { label: "Reward", key: 'reward' }
 ]
 
 function resetEdit() {
@@ -228,7 +229,7 @@ async function onSuccess() {
           <ItemBountyPreconditionBar :condition="cond" class="flex-auto" />
           <FlowSubmitTransaction :method="removePrecondition(i)" @success="onSuccess" content="DEL" />
         </div>
-        <div class="divider my-2"></div>
+        <div class="divider my-2" v-if="bounty.preconditions.length > 0"></div>
         <select class="mb-0" v-model="addPreconditionKey" required>
           <option v-for="cond in preconditionOptions" :key="cond.label" :value="cond.key" :disabled="cond.disabled"
             :selected="addPreconditionKey==cond.key">
@@ -274,6 +275,9 @@ async function onSuccess() {
           </div>
           <FlowSubmitTransaction :disabled="!isValid" :method="sendTransaction" @success="onSuccess" />
           </template>
+      </div>
+      <div v-if="currentTab === 'reward'" class="flex flex-col gap-2">
+        TODO
       </div>
     </div>
   </div>

@@ -14,6 +14,7 @@ import adminUpdateEndDate from "./transactions/admin-update-end-date.cdc?raw";
 import adminAddBounty from "./transactions/admin-add-bounty.cdc?raw";
 import adminAddBounties from "./transactions/admin-add-bounties.cdc?raw";
 import adminBountyUpdateProperty from "./transactions/admin-update-bounty-property.cdc?raw";
+import adminBountyUpdateRewardPoints from "./transactions/admin-update-bounty-reward-points.cdc?raw";
 import adminAddPreconditionBountyCompleted from "./transactions/admin-add-precondition-bounty-completed.cdc?raw";
 import adminAddPreconditionFLOATRequired from "./transactions/admin-add-precondition-float-required.cdc?raw";
 import adminAddPreconditionMinimumPoint from "./transactions/admin-add-precondition-minimum-point.cdc?raw";
@@ -62,6 +63,7 @@ export default {
         adminAddBounty,
         adminAddBounties,
         adminBountyUpdateProperty,
+        adminBountyUpdateRewardPoints,
         adminAddPreconditionBountyCompleted,
         adminAddPreconditionFLOATRequired,
         adminAddPreconditionMinimumPoint,

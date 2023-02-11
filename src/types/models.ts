@@ -56,13 +56,19 @@ interface RewardInfo {
 }
 
 interface PointRewardInfo extends RewardInfo {
+  rewardType: "Points";
   rewardPoints: number;
   referalPoints: number;
 }
 
 interface FLOATRewardInfo extends RewardInfo {
+  rewardType: "FLOAT";
   eventHost: string;
   eventId: string;
+}
+
+interface NoneRewardInfo extends RewardInfo {
+  rewardType: "None";
 }
 
 type BountyType = "mission" | "quest";

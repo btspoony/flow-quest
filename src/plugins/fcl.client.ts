@@ -702,6 +702,23 @@ export default defineNuxtPlugin((nuxtApp) => {
           );
         },
         /**
+         * update bounty reward
+         */
+        async adminBountyUpdateReward(bountyId: string, reward: RewardInfos) {
+          if (reward.rewardType === "Points") {
+            return await sendTransaction(
+              cadence.transactions.adminBountyUpdateRewardPoints,
+              (arg, t) => [
+                arg(bountyId, t.UInt64),
+                arg(reward.rewardPoints.toFixed(0), t.UInt64),
+                arg(reward.referalPoints.toFixed(0), t.UInt64),
+              ]
+            );
+          } else {
+            return null;
+          }
+        },
+        /**
          * Update bounty property
          */
         async adminBountyUpdateProperty(
