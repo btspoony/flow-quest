@@ -96,7 +96,7 @@ function onSuccess() {
     <div v-else-if="selected" class="flex flex-col gap-2">
       <ItemSpaceMissionCard :mission="selected" />
       <h5 class="mb-1">Set Reward</h5>
-      <SectionSettingsPartMissionSetter :mission="selected" :index="0" reward-type="Points" />
+      <SectionSettingsPartMissionSetter :entity="selected" :index="0" reward-type="Points" />
       <FlowSubmitTransaction :method="sendTransaction" :disabled="!isValid" @success="onSuccess">
         <template v-slot:disabled>
           <span>Missing Parameters</span>

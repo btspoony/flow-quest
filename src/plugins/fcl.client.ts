@@ -715,7 +715,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               ]
             );
           } else {
-            return null;
+            throw new Error("Unsupported");
           }
         },
         /**

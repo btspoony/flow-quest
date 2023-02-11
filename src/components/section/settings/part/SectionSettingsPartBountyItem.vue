@@ -20,9 +20,16 @@ const tabs: { label: string, key: TabTypes }[] = [
 
 function resetEdit() {
   if (isEdit.value) {
+    // property
     editPropertyKey.value = ""
     editPropertyValue.value = false
+    // precondition
     addPreconditionKey.value = UnlockConditionTypes.None
+    // reward
+    if (props.bounty.rewardType === 'Points') {
+      rewardPoints[0] = props.bounty.pointReward!.rewardPoints
+      referralPoints[0] = props.bounty.pointReward!.referalPoints
+    }
   }
 }
 
@@ -117,6 +124,14 @@ watch(editPropertyKey, (newVal) => {
   }
 })
 
+const rewardPoints = reactive<number[]>([]);
+const referralPoints = reactive<number[]>([]);
+
+provide(missionSettingPointsRewardInjectKey, {
+  rewardPoints,
+  referralPoints,
+})
+
 const isValid = computed(() => {
   if (!isEdit.value) return false;
   if (currentTab.value === 'properties') {
@@ -131,6 +146,11 @@ const isValid = computed(() => {
         return !!newPreconditionData.value.bountyId;
     }
     return false
+  } else if (currentTab.value === 'reward') {
+    // TODO switch reward type
+    return rewardPoints[0] > 0
+      && referralPoints[0] >= 0 && referralPoints[0] <= rewardPoints[0]
+      && (rewardPoints[0] !== props.bounty.pointReward?.rewardPoints || referralPoints[0] !== props.bounty.pointReward.referalPoints)
   }
   return false
 })
@@ -150,6 +170,17 @@ async function sendTransaction(): Promise<string> {
     return $transactions.adminAddPrecondition(
       props.bounty.id,
       newPreconditionData.value
+    )
+  } else if (currentTab.value === 'reward') {
+    // TODO with different reward
+    const rewardInfo: RewardInfos = {
+      rewardType: 'Points',
+      rewardPoints: toRaw(rewardPoints[0]),
+      referalPoints: toRaw(referralPoints[0])
+    }
+    return $transactions.adminBountyUpdateReward(
+      props.bounty.id,
+      rewardInfo
     )
   } else {
     throw new Error("Invalid parameters")
@@ -274,10 +305,18 @@ async function onSuccess() {
             </div>
           </div>
           <FlowSubmitTransaction :disabled="!isValid" :method="sendTransaction" @success="onSuccess" />
-          </template>
+        </template>
       </div>
-      <div v-if="currentTab === 'reward'" class="flex flex-col gap-2">
-        TODO
+      <div v-if="currentTab === 'reward'" class="flex flex-col gap-1 p-2">
+        <div class="flex gap-1 justify-around">
+          <span>Reward: <b>{{ bounty.rewardType }}</b></span>
+          <span v-if="bounty.rewardType === 'Points'" class="font-semibold">
+            {{ bounty.pointReward?.rewardPoints }}({{ bounty.pointReward?.referalPoints }})
+          </span>
+        </div>
+        <div class="divider my-2"></div>
+        <SectionSettingsPartMissionSetter class="mb-2" :entity="bounty.config" :index="0" :reward-type="bounty.rewardType" />
+        <FlowSubmitTransaction :disabled="!isValid" :method="sendTransaction" @success="onSuccess" />
       </div>
     </div>
   </div>

@@ -92,7 +92,7 @@ function onSuccess() {
     <div v-else-if="selectedQuest" class="flex flex-col gap-2">
       <ItemSpaceQuestCard :quest="selectedQuest?.quest" />
       <h5 class="mb-1">Set Reward Points of Missions</h5>
-      <SectionSettingsPartMissionSetter v-for="mission, index in selectedQuest.missions" :key="mission.key" :mission="mission"
+      <SectionSettingsPartMissionSetter v-for="mission, index in selectedQuest.missions" :key="mission.key" :entity="mission"
         :index="index" reward-type="Points" />
       <FlowSubmitTransaction :method="sendTransaction" :disabled="!isValid" @success="onSuccess">
         <template v-slot:disabled>
