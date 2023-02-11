@@ -66,7 +66,7 @@ async function loadRepoContributors(key: string) {
 <template>
   <div v-if="!!injected" class="w-full my-4">
     <div v-if="github.auth" class="flex flex-col gap-2">
-      <h4 class="mb-2 text-center">Verifing contributions on Github</h4>
+      <h4 class="mb-2 text-center">Verifying contributions on Github</h4>
       <div v-for="repo, i in injected.repos.value" :key="`repo_${repo}`"
         class="card card-border non-interactive px-4 py-2 flex gap-3 items-center justify-between">
         <div v-if="reposLoading[i]" :aria-busy="true"></div>
