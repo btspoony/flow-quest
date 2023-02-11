@@ -416,7 +416,7 @@ pub contract CompetitionService {
                 var right = oldRank ?? self.leaderboardRanking.length - 1
                 while left <= right {
                     let mid = left == right ? left : (left + right) / 2
-                    if self.leaderboardRanking.length == 0 || newPoint > self.leaderboardRanking[mid] {
+                    if self.leaderboardRanking.length <= mid || newPoint > self.leaderboardRanking[mid] {
                         right = mid - 1
                     } else {
                         left = mid + 1
