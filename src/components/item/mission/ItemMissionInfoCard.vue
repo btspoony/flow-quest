@@ -24,14 +24,14 @@ const isCompleted = computed(() => {
       <TagCommunity :community-id="missionCfg?.communityId" />
       <TagCompleted v-if="isCompleted" />
     </div>
-    <div class="h-full flex gap-2 justify-between">
-      <div class="flex-auto flex flex-col gap-1">
-        <h5 class="mb-0 truncate">{{ missionCfg?.display.name }}</h5>
-        <div
-          class="mb-0 max-h-[60px] prose-sm prose-blockquote:py-0 prose-p:leading-4  prose-p:text-sm prose-img:my-0 overflow-hidden text-ellipsis"
-          v-html="mdRenderer.render(missionCfg?.display.description)">
-        </div>
-      </div>
+    <h5 class="mb-0">
+      <div class="w-full truncate">{{ missionCfg?.display.name }}</div>
+    </h5>
+    <div class="w-full h-full flex gap-2 justify-between">
+      <div
+        class="flex-auto mb-0 max-w-[420px] max-h-[60px] prose-sm prose-blockquote:py-0 prose-p:leading-4  prose-p:text-sm prose-img:my-0 overflow-hidden text-ellipsis"
+        v-html="mdRenderer.render(missionCfg?.display.description)"
+      ></div>
       <div class="flex-none flex items-end justify-end">
         <span class="tag" v-if="bounty.rewardType === 'Points'">
           {{ bounty.pointReward?.rewardPoints }} Points
