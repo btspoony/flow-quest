@@ -8,7 +8,7 @@ const isEditEndDate = ref(false)
 const editEndDate = ref<string | undefined>(undefined)
 
 const editEndDatetime = computed(() => editEndDate.value ? new Date(editEndDate.value).valueOf() : -1)
-const isValid = computed(() => editEndDatetime.value > endDate.value.valueOf() + 1000 * 30)
+const isValid = computed(() => editEndDate.value && Date.now() < new Date(editEndDate.value).valueOf() - 1000 * 60 * 60 * 24)
 
 async function sendTransaction(): Promise<string> {
   const { $transactions } = useNuxtApp()
