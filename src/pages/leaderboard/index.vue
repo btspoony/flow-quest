@@ -3,10 +3,10 @@ const wallet = useFlowAccount()
 const user = useUserProfile()
 const route = useRoute()
 
-const currentTab = ref(route.query.tab !== 'active' ? 'overall' : 'active')
+const currentTab = ref(route.query.tab !== 'overall' ? 'active' : 'overall')
 const tabs = [
-  { label: "Overall", key: 'overall' },
   { label: "Active Season", key: 'active' },
+  { label: "Overall", key: 'overall' },
 ]
 
 interface DataResult {
