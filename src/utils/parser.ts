@@ -59,6 +59,21 @@ export function parseQuestInfoDetail(info: any): QuestConfigDetail {
   };
 }
 
+export function parseSeasonInfo(season: any): CompetitionSeason {
+  const bounties: BountyInfo[] = [];
+  for (const id in season.bounties) {
+    bounties.push(parseBountyInfo(season.bounties[id]));
+  }
+  return {
+    seasonId: season.seasonID ?? undefined,
+    endDate: parseInt(season.endDate ?? 0),
+    referralThreshold: parseInt(season.referralThreshold ?? -1),
+    title: season.title ?? "",
+    rankingRewards: season.rankingRewards ?? "",
+    bounties,
+  };
+}
+
 export function parseBountyInfo(info: any): BountyInfo {
   const category = parseIdentifierCategory(info.identifier.category);
   return {
@@ -69,8 +84,7 @@ export function parseBountyInfo(info: any): BountyInfo {
       const cloned = Object.assign({}, one);
       if (typeof cloned.amount === "string")
         cloned.amount = parseInt(cloned.amount);
-      if (typeof cloned.type === "string")
-        cloned.type = parseInt(cloned.type);
+      if (typeof cloned.type === "string") cloned.type = parseInt(cloned.type);
       return cloned;
     }),
     properties: parseBountyProperties(info.properties),
@@ -79,14 +93,14 @@ export function parseBountyInfo(info: any): BountyInfo {
     rewardType: parseRewardType(info.rewardType),
     pointReward: info.pointReward
       ? {
-          rewardType: parseRewardType(info.pointReward.type),
+          rewardType: "Points",
           rewardPoints: parseInt(info.pointReward.rewardPoints),
           referalPoints: parseInt(info.pointReward.referralPoints),
         }
       : undefined,
     floatReward: info.floatReward
       ? {
-          rewardType: parseRewardType(info.floatReward.type),
+          rewardType: "FLOAT",
           eventHost: info.floatReward.eventIdentifier.host,
           eventId: info.floatReward.eventIdentifier.eventId,
         }

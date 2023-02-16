@@ -243,6 +243,8 @@ interface CompetitionSeason {
   seasonId?: string;
   endDate?: number;
   referralThreshold?: number;
+  title?: string;
+  rankingRewards?: string;
   bounties: BountyInfo[];
 }
 

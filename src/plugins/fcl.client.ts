@@ -139,17 +139,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             null
           );
           if (!ret) return null;
-
-          const bounties: BountyInfo[] = [];
-          for (const id in ret.bounties) {
-            bounties.push(parseBountyInfo(ret.bounties[id]));
-          }
-          return {
-            seasonId: ret.seasonID ?? undefined,
-            endDate: parseInt(ret.endDate ?? 0),
-            referralThreshold: parseInt(ret.referralThreshold ?? -1),
-            bounties,
-          };
+          return parseSeasonInfo(ret);
         },
         /**
          * Get float information
@@ -629,10 +619,23 @@ export default defineNuxtPlugin((nuxtApp) => {
         /**
          * update end date of current season
          */
-        async adminUpdateEndDate(endDateTimestamp: number) {
+        async adminUpdateProperties(opts: {
+          endDateTimestamp?: number;
+          title?: string;
+          rankingRewards?: string;
+        }) {
           return await sendTransaction(
-            cadence.transactions.adminUpdateEndDate,
-            (arg, t) => [arg((endDateTimestamp / 1000).toFixed(1), t.UFix64)]
+            cadence.transactions.adminUpdateProperties,
+            (arg, t) => [
+              arg(
+                opts.endDateTimestamp
+                  ? (opts.endDateTimestamp / 1000).toFixed(1)
+                  : null,
+                t.Optional(t.UFix64)
+              ),
+              arg(opts.title ?? null, t.Optional(t.String)),
+              arg(opts.rankingRewards ?? null, t.Optional(t.String)),
+            ]
           );
         },
         /**

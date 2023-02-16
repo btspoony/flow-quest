@@ -44,6 +44,7 @@ pub contract CompetitionService {
     pub event SeasonCreated(seasonId: UInt64)
     pub event SeasonPropertyEndDateUpdated(seasonId: UInt64, key: UInt8, value: UFix64)
     pub event SeasonPropertyReferralThresholdUpdated(seasonId: UInt64, key: UInt8, value: UInt64)
+    pub event SeasonPropertyStringUpdated(seasonId: UInt64, key: UInt8, value: String)
 
     // service events
     pub event ServiceWhitelistUpdated(target: Address, flag: Bool)
@@ -287,14 +288,17 @@ pub contract CompetitionService {
     pub enum CompetitionProperty: UInt8 {
         pub case EndDate
         pub case ReferralThreshold
+        pub case Title
+        pub case RankingRewards
     }
 
     pub resource interface CompetitionPublic {
         pub fun isDefault(): Bool
         // --- Properties ---
         pub fun getEndDate(): UFix64
-        // Referral
         pub fun getReferralThreshold(): UInt64
+        pub fun getTitle(): String
+        pub fun getRankingRewards(): String
     }
 
     pub resource CompetitionSeason: Interfaces.CompetitionPublic, CompetitionPublic {
@@ -347,6 +351,14 @@ pub contract CompetitionService {
 
         pub fun getReferralThreshold(): UInt64 {
             return self.default ? UInt64.max : (self.properties[CompetitionProperty.ReferralThreshold] as! UInt64?)!
+        }
+
+        pub fun getTitle(): String {
+            return self.default ? "" : (self.properties[CompetitionProperty.Title] as! String?) ?? ""
+        }
+
+        pub fun getRankingRewards(): String {
+            return self.default ? "" : (self.properties[CompetitionProperty.RankingRewards] as! String?) ?? ""
         }
 
         pub fun getRank(_ addr: Address): Int {
@@ -455,6 +467,19 @@ pub contract CompetitionService {
                 seasonId: self.getSeasonId(),
                 key: CompetitionProperty.EndDate.rawValue,
                 value: datetime
+            )
+        }
+
+        access(contract) fun updatePropertyString(property: CompetitionProperty, value: String) {
+            pre {
+                property == CompetitionProperty.Title || property == CompetitionProperty.RankingRewards: "Invalid property"
+            }
+            self.properties[property] = value
+
+            emit SeasonPropertyStringUpdated(
+                seasonId: self.getSeasonId(),
+                key: property.rawValue,
+                value: value
             )
         }
     }
@@ -806,6 +831,17 @@ pub contract CompetitionService {
             assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
             let season = serviceIns.borrowSeasonPrivateRef(seasonId)
             season.updateReferralThreshold(threshold: threshold)
+        }
+
+        pub fun updateSeasonPropertyString(
+            seasonId: UInt64,
+            property: CompetitionProperty,
+            value: String,
+        ) {
+            let serviceIns = CompetitionService.borrowServiceRef()
+            assert(serviceIns.isAdminValid(self.owner?.address ?? panic("Missing owner")), message: "Not admin")
+            let season = serviceIns.borrowSeasonPrivateRef(seasonId)
+            season.updatePropertyString(property: property, value: value)
         }
 
         // Internal use
