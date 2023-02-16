@@ -91,7 +91,7 @@ defineExpose({
 
 <template>
   <div class="flex flex-col gap-2 bg-native rounded-xl">
-    <button v-if="disabled && !txid" :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']"
+    <button v-if="disabled && !txid" :class="['mb-0', halfButton ? '!rounded-b-xl' : '!rounded-xl']"
       role="button"
       disabled>
       <slot name="disabled">
@@ -99,7 +99,7 @@ defineExpose({
       </slot>
     </button>
     <template v-else-if="!hideButton && (!txid || !isSealed)">
-      <button :class="['flex-center mb-0', halfButton ? '!rounded-b-xl' : 'rounded-xl']" role="button"
+      <button :class="['mb-0', halfButton ? '!rounded-b-xl' : '!rounded-xl']" role="button"
         :aria-busy="isLoading || isSealed === false" :disabled="!isNetworkCorrect || isLoading || isSealed === false"
         :aria-disabled="!isNetworkCorrect || isLoading || isSealed === false" @click="startTransaction">
         <slot>

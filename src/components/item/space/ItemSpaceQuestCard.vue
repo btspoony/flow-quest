@@ -73,7 +73,7 @@ function resetComp() {
           <h6 class="mb-2">Achievement FLOAT: </h6>
           <ItemFLOATEvent v-if="quest.achievement" :host="quest.achievement.host" :event-id="quest.achievement.eventId" />
           <div v-else>
-            <button class="rounded-full flex-center px-6 mb-0" data-target="modal-dialog" @click.stop.prevent="onOpenDialogue">
+            <button class="!rounded-full px-6 mb-0" data-target="modal-dialog" @click.stop.prevent="onOpenDialogue">
               Create an achievement FLOAT
             </button>
           </div>

@@ -215,7 +215,7 @@ async function completeBounty(): Promise<string | null> {
         </div>
       </div>
       <article v-if="info?.guideMD"
-        class="flex-auto rounded-xl h-[calc(100vh-240px)] overflow-x-clip overflow-y-scroll">
+        class="flex-auto rounded-xl h-[calc(100vh-7rem)] mb-0 overflow-x-clip overflow-y-scroll">
         <div class="prose-sm prose-blockquote:py-0 prose-img:my-0" v-html="mdRenderer.render(info.guideMD)" />
       </article>
     </div>

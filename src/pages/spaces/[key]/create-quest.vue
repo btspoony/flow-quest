@@ -152,8 +152,8 @@ async function sendTransaction(): Promise<string> {
     <div class="divider"></div>
     <h4 class="my-1">Add missions</h4>
     <div class="grid">
-      <button class="rounded-xl flex-center mb-0" @click="onOpenDialogue('new')">Add a new mission</button>
-      <button class="rounded-xl flex-center mb-0" @click="onOpenDialogue('search')">Search existing missions</button>
+      <button class="!rounded-xl mb-0" @click="onOpenDialogue('new')">Add a new mission</button>
+      <button class="!rounded-xl mb-0" @click="onOpenDialogue('search')">Search existing missions</button>
     </div>
     <ItemSpaceMissionCard v-for="one in allValidMissions" :key="one.key" :mission="one" />
     <div class="divider"></div>
@@ -170,7 +170,7 @@ async function sendTransaction(): Promise<string> {
       </header>
       <FormSpaceNewMission ref="formNewMission" :index="newMissions.length - 1" />
       <footer class="mt-4">
-        <button class="rounded-xl flex-center mb-0" :disabled="!newMissions[newMissions.length - 1]?.valid"
+        <button class="!rounded-xl mb-0" :disabled="!newMissions[newMissions.length - 1]?.valid"
           @click.stop.prevent="closeDialog">
           Add
         </button>
@@ -190,7 +190,7 @@ async function sendTransaction(): Promise<string> {
         </div>
       </div>
       <footer class="mt-4">
-        <button class="rounded-xl flex-center mb-0" :disabled="false" @click.stop.prevent="closeDialog">
+        <button class="!rounded-xl mb-0" :disabled="false" @click.stop.prevent="closeDialog">
           Add
         </button>
       </footer>

@@ -48,10 +48,10 @@ function resetEdit() {
       <div v-if="isEdit" class="card card-border non-interactive p-6 flex-auto flex flex-col">
         <div class="flex items-center justify-start gap-2">
           <span class="font-bold text-xl">Edit:</span>
-          <button class="mb-0 rounded-full text-xs max-w-fit" @click="editAction = 'addquest'">
+          <button class="mb-0 !rounded-full text-xs max-w-fit" @click="editAction = 'addquest'">
             Add Quest as bounty
           </button>
-          <button class="mb-0 rounded-full text-xs max-w-fit" @click="editAction = 'addmission'">
+          <button class="mb-0 !rounded-full text-xs max-w-fit" @click="editAction = 'addmission'">
             Add Mission as bounty
           </button>
         </div>

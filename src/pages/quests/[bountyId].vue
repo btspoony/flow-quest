@@ -177,7 +177,7 @@ async function completeBounty(): Promise<string | null> {
       </div>
     </template>
     <div class="h-14" />
-    <section class="container max-w-2xl px-4 pb-16">
+    <section class="page-container !max-w-2xl pb-16">
       <div class=" -mt-36 mb-4 flex gap-4 items-center flex-col sm:flex-row justify-between sm:justify-center">
         <div class="flex-none" :aria-busy="pending">
           <div class="w-32 h-32 rounded-lg bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden">

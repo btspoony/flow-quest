@@ -39,7 +39,7 @@ function login() {
 </script>
 
 <template>
-  <button class="flex-center rounded-full mb-0" @click="login">
+  <button class="!rounded-full mb-0" @click="login">
     <div class="inline-flex-around">
       <Icon icon="heroicons:user-20-solid" class="h-4 w-4" />
       <small>Connect<span class="hidden xl:inline"> Wallet</span></small>

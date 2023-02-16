@@ -154,7 +154,7 @@ function onCloseDialgue() {
     </div>
     <div class="flex-none min-w-[120px] flex gap-2">
       <template v-if="(!isLocked && !isCompleted)">
-        <button class="mb-0 rounded-full" data-target="modal-dialog"
+        <button class="!rounded-full mb-0" data-target="modal-dialog"
           @click.stop.prevent="onOpenDialogue">
           <span class="font-semibold">
             {{ stepCfg.type === 'quiz' ? 'Quiz' : 'Verify' }}
