@@ -63,7 +63,9 @@ watch(() => route.query, (newQuery) => {
 
 function updateRoute(name: string) {
   const router = useRouter()
-  router.replace({ path: route.path, query: { tab: name } })
+  const obj = geneReferralLinkObject(route.path)
+  obj.query = Object.assign({}, obj.query, { tab: name })
+  router.replace(obj)
 }
 </script>
 
@@ -78,15 +80,7 @@ function updateRoute(name: string) {
         </li>
       </ul>
     </nav>
-    <div v-if="currentTab === 'active' && info?.season?.seasonId" class="card card-border non-interactive p-4 w-full mb-4">
-      <WidgetEndTime v-if="info?.season?.endDate" :deadline="info?.season?.endDate">
-        Season
-      </WidgetEndTime>
-      <p class="mb-0" v-if="wallet?.loggedIn && user?.profileRecord">
-        You can earn <b class="text-secondary">extra points</b> in the active season from your friends who invited by your
-        <NuxtLink :to="geneReferralLink(`/account/${user?.address}`)"><b>Referral Code</b></NuxtLink>
-      </p>
-    </div>
+    <SectionLeaderboardActiveInfo v-if="currentTab === 'active' && info?.season?.seasonId" :season="info.season" />
     <div v-if="currentTab === 'active' && !info?.season?.seasonId">
       <div class="hero">
         <div class="hero-content">

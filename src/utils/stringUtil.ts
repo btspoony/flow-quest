@@ -1,4 +1,4 @@
-import type { RouteLocationRaw } from "vue-router";
+import type { RouteLocationPathRaw } from "vue-router";
 
 /**
  * get a ipfs gateway url from ipfs hash
@@ -28,8 +28,8 @@ export function geneReferralLink(uri: string): string {
   return uri;
 }
 
-export function geneReferralLinkObject(uri: string): RouteLocationRaw {
-  const result: RouteLocationRaw = { path: uri };
+export function geneReferralLinkObject(uri: string): RouteLocationPathRaw {
+  const result: RouteLocationPathRaw = { path: uri };
   const store = useReferralCode();
   if (typeof store.value === "string") {
     result.query = {
