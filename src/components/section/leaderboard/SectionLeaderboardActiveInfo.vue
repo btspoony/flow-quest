@@ -9,6 +9,8 @@ const props = defineProps<{
 const wallet = useFlowAccount()
 const user = useUserProfile()
 
+const isLoggedIn = computed(() => wallet?.value?.loggedIn && user?.value?.profileRecord)
+
 interface RankdingRewardInfo {
   rankings: string[];
   reward: string;
@@ -46,19 +48,20 @@ const parsedRewardsInfo = computed<RankdingRewardInfo[]>(() => {
     <h3 class="mb-0">{{ season.title ?? "Hot!" }}</h3>
     <WidgetEndTime v-if="season.endDate" :deadline="season.endDate" class="w-fit text-xs">Season</WidgetEndTime>
   </div>
-  <div class="card card-border non-interactive p-4 flex flex-col gap-2">
+  <div v-if="parsedRewardsInfo.length > 0 || isLoggedIn"
+    class="card card-border non-interactive p-4 flex flex-col gap-2">
     <div class="flex flex-wrap items-center gap-2">
-      <div class="tag success w-fit flex items-center gap-1">
+      <div v-if="parsedRewardsInfo.length > 0" class="tag success w-fit flex items-center gap-1">
         <Icon icon="heroicons:trophy-solid" class="w-4 h-4" />
         <span>Ranking Rewards</span>
       </div>
-      <small class="text-xs" v-if="wallet?.loggedIn && user?.profileRecord">
+      <small class="text-xs" v-if="isLoggedIn">
         You can earn <b class="text-secondary">extra points</b> in the active season from your friends who invited by
         your
         <NuxtLink :to="geneReferralLink(`/account/${user?.address}`)"><b>Referral Code</b></NuxtLink>
       </small>
     </div>
-    <div class="flex flex-wrap items-center justify-start">
+    <div v-if="parsedRewardsInfo.length > 0" class="flex flex-wrap items-center justify-start">
       <div v-for="one, i in parsedRewardsInfo" :key="`rankingReward${i}`"
         :class="['flex items-center justify-start gap-2', one.rankings[1] ? 'basis-full lg:basis-1/2' : 'basis-full md:basis-1/2 lg:basis-1/3']">
         <div class="relative w-14 h-14 flex-center" v-if="!one.rankings[1]">
