@@ -934,6 +934,11 @@
   dependencies:
     "@babel/runtime" "^7.18.6"
 
+"@picocss/pico@^1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@picocss/pico/-/pico-1.5.7.tgz#69485e93c4be0f34b056b14de4a56c7f5e122476"
+  integrity sha512-RygdXNlSXieAs9jMw/AeqA1ki1kldgEYbRn8BnYZIPfRTM5NWZ4uVzMK6uMPhYlRjoT5wD/OplZvIefnCqyDCQ==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"

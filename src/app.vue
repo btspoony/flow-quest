@@ -19,9 +19,7 @@ const description = ref(
 <Html :lang="locale" :data-theme="isDark ? 'dark' : 'light'">
   <noscript>You need to enable JavaScript to run this app.</noscript>
 
-  <HeadMeta :title="String(route.meta.title ?? 'Home')" :description="description" :url="route.fullPath">
-    <Link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
-  </HeadMeta>
+  <HeadMeta :title="String(route.meta.title ?? 'Home')" :description="description" :url="route.fullPath" />
 
   <div class="drawer drawer-end">
     <input id="page-drawer" type="checkbox" class="drawer-toggle" v-model="isDrawerOpened" />
@@ -41,6 +39,8 @@ const description = ref(
 </template>
 
 <style>
+@import "@picocss/pico/css/pico.min.css";
+
 /* Green Light scheme (Default) */
 /* Can be forced with data-theme="light" */
 [data-theme="light"],
