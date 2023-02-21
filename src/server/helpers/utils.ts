@@ -2,7 +2,7 @@ import * as fcl from "@onflow/fcl";
 import * as flow from "./flow.mjs";
 import { default as Signer } from "./signer.mjs";
 
-export async function pickOneSigner(): Promise<Signer> {
+export function createSigner(): Signer {
   const config = useRuntimeConfig();
 
   const signer = new Signer(config.flowAdminAddress, config.flowPrivateKey, 0, {

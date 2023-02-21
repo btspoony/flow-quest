@@ -27,7 +27,7 @@ export default defineEventHandler<ResponseReferralCodeGenerate>(async function (
     `Request<Gene Referral Code>[${body.address}] - Step.0: Body verified`
   );
 
-  const signer = await utils.pickOneSigner();
+  const signer = utils.createSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
   let isPointsEnough = false;

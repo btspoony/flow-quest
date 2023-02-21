@@ -45,7 +45,7 @@ export default defineEventHandler<ResponseVerifyMission>(async function (
 
   const isProduction = config.public.network === "mainnet";
 
-  const signer = await utils.pickOneSigner();
+  const signer = utils.createSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
   let isMissionValid = false;

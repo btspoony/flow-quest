@@ -29,7 +29,7 @@ export default defineEventHandler<ResponseCompleteBounty>(async function (
     `Request<Complete Bounty>[${body.address}] - Step.0: Body verified`
   );
 
-  const signer = await utils.pickOneSigner();
+  const signer = utils.createSigner();
   const isAccountValid = await utils.verifyAccountProof(body);
 
   let isBountyCompleted = false;
