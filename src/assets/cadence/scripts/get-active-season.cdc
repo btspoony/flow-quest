@@ -38,7 +38,12 @@ pub fun main(
         )
     }
 
-    let season = service.borrowLastActiveSeason()
+    var season = service.borrowLastActiveSeason()
+    if let latestSeason = season {
+        if !latestSeason.isActive() {
+            season = nil
+        }
+    }
 
     return ResultInfo(
         seasonID: season?.getSeasonId(),
