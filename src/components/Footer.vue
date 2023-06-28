@@ -13,7 +13,7 @@ import { Icon } from '@iconify/vue';
         <NuxtLink to="https://twitter.com/btspoony" target="_blank" rel="noopener noreferrer">
           <Icon icon="logos:twitter" class="w-5 h-5" />
         </NuxtLink>
-        <NuxtLink to="https://github.com/btspoony/flow-challenge-tour" target="_blank" class="secondary">
+        <NuxtLink to="https://github.com/btspoony/flow-quest" target="_blank" class="secondary">
           <Icon icon="uil:github" class="w-6 h-6" />
         </NuxtLink>
       </div>
