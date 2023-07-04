@@ -5,7 +5,7 @@ const route = useRoute()
 
 const currentTab = ref(route.query.tab !== 'overall' ? 'active' : 'overall')
 const tabs = [
-  { label: "Active Season", key: 'active' },
+  { label: "Active", key: 'active' },
   { label: "Overall", key: 'overall' },
 ]
 
@@ -70,39 +70,41 @@ function updateRoute(name: string) {
 </script>
 
 <template>
-  <FrameMain class="max-w-3xl py-8">
-    <h2 class="mb-0">Leaderboard</h2>
-    <nav class="py-4">
-      <ul class="tabs">
-        <li v-for="tab in tabs" :key="tab.key" :class="['tab-link', { 'active': currentTab === tab.key }]"
-          @click="updateRoute(tab.key)">
-          {{ tab.label }}
-        </li>
-      </ul>
-    </nav>
-    <SectionLeaderboardActiveInfo v-if="currentTab === 'active' && info?.season?.seasonId" :season="info.season" />
-    <div v-if="currentTab === 'active' && !info?.season?.seasonId">
-      <div class="hero">
-        <div class="hero-content">
-          No Active Season
+  <FrameMain>
+    <div class="page-container w-full">
+      <h2 class="mb-0 mt-12">Leaderboard</h2>
+      <nav class="py-4">
+        <ul class="tabs">
+          <li v-for="tab in tabs" :key="tab.key" :class="['tab-link', { 'active': currentTab === tab.key }]"
+            @click="updateRoute(tab.key)">
+            {{ tab.label }}
+          </li>
+        </ul>
+      </nav>
+      <SectionLeaderboardActiveInfo v-if="currentTab === 'active' && info?.season?.seasonId" :season="info.season" />
+      <div v-if="currentTab === 'active' && !info?.season?.seasonId">
+        <div class="hero">
+          <div class="hero-content">
+            No Active Season
+          </div>
         </div>
       </div>
+      <template v-else>
+        <section v-if="wallet?.loggedIn && user?.profileRecord" class="mb-8">
+          <h5>Your ranking</h5>
+          <div v-if="pending" class="w-full h-12" :aria-busy="true" />
+          <template v-else-if="info?.ranking?.account">
+            <ItemLeaderboardBar :score="info?.ranking?.account" />
+          </template>
+        </section>
+        <section class="mb-0">
+          <h5>Top 100</h5>
+          <div v-if="pending" class="w-full h-12" :aria-busy="true" />
+          <div v-else class="flex flex-col gap-4">
+            <ItemLeaderboardBar v-for="(one, index) in info?.ranking?.tops" :key="`item_${index}`" :score="one" />
+          </div>
+        </section>
+      </template>
     </div>
-    <template v-else>
-      <section v-if="wallet?.loggedIn && user?.profileRecord" class="mb-8">
-        <h5>Your ranking</h5>
-        <div v-if="pending" class="w-full h-12" :aria-busy="true" />
-        <template v-else-if="info?.ranking?.account">
-          <ItemLeaderboardBar :score="info?.ranking?.account" />
-        </template>
-      </section>
-      <section class="mb-0">
-        <h5>Top 100</h5>
-        <div v-if="pending" class="w-full h-12" :aria-busy="true" />
-        <div v-else class="flex flex-col gap-4">
-          <ItemLeaderboardBar v-for="(one, index) in info?.ranking?.tops" :key="`item_${index}`" :score="one" />
-        </div>
-      </section>
-    </template>
   </FrameMain>
 </template>

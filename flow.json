@@ -81,15 +81,22 @@
   },
   "accounts": {
     "emulator-account": {
-      "address": "f8d6e0586b0a20c7",
+      "address": "service",
       "key": "24ec0213dc8d62143f66bdc090916ece7fdf09a0b8868ad2486e9a31b2cc1cc3"
     },
     "testnet-admin": {
-      "address": "${NUXT_PUBLIC_FLOW_SERVICE_ADDRESS}",
-      "key": "${NUXT_FLOW_PRIVATE_KEY}"
+      "address": "0xd58242303fc8f03c",
+      "key": {
+        "type": "file",
+        "location": "./admin-testnet.key"
+      }
     },
     "mainnet-admin": {
-      "fromFile": "./mainnet-admin.private.json"
+      "address": "0x907a3b49797cca7a",
+      "key": {
+        "type": "file",
+        "location": "./admin-mainnet.key"
+      }
     }
   },
   "deployments": {

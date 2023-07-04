@@ -117,10 +117,19 @@ watch(targetBountyId, async (newVal) => {
 })
 
 watch(editPropertyKey, (newVal) => {
-  if (newVal === '0') {
-    originValue.value = editPropertyValue.value = props.bounty.properties.Launched
-  } else if (newVal === '1') {
-    originValue.value = editPropertyValue.value = props.bounty.properties.Featured
+  switch (newVal) {
+    case '0':
+      originValue.value = editPropertyValue.value = props.bounty.properties.Launched
+      break
+    case '1':
+      originValue.value = editPropertyValue.value = props.bounty.properties.Featured
+      break
+    case '2':
+      originValue.value = editPropertyValue.value = props.bounty.properties.ForBeginner
+      break
+    case '3':
+      originValue.value = editPropertyValue.value = props.bounty.properties.ForExpert
+      break
   }
 })
 
@@ -206,7 +215,7 @@ async function onSuccess() {
 
 <template>
   <div class="card card-border non-interactive p-2 w-full">
-    <div class="flex justify-between gap-2">
+    <div class="flex justify-between gap-4">
       <span class="tag" :data-tooltip="`${bounty.config.category}: ${bounty.config.display.name}`" data-placement="right">
         {{ bounty.config.category.charAt(0).toUpperCase() }}
       </span>
@@ -216,7 +225,13 @@ async function onSuccess() {
       <div class="flex-auto flex-center gap-2">
         <Icon :icon="bounty.properties.Launched ? 'heroicons:rocket-launch-solid' : 'heroicons:rocket-launch'"
           :class="['w-6 h-6', bounty.properties.Launched ? 'text-success' : 'opacity-20']" />
-        <!-- <Icon :icon="bounty.properties.Featured ? 'heroicons:star-solid' : 'heroicons:star'" :class="['w-6 h-6', bounty.properties.Featured ? 'text-success' : 'opacity-20']" /> -->
+        <Icon v-if="bounty.properties.Featured"
+          :icon="'heroicons:star-solid'" :class="['w-6 h-6 text-success']" />
+        <Icon v-if="bounty.properties.ForBeginner"
+          :icon="'heroicons:book-open-solid'" :class="['w-6 h-6 text-success']" />
+        <Icon v-if="bounty.properties.ForExpert"
+          :icon="'heroicons:academic-cap-solid'" :class="['w-6 h-6 text-success']" />
+        <span class="text-gray-400/50">|</span>
         <Icon icon="heroicons:ticket-solid"
           :class="['w-6 h-6', bounty.preconditions.length > 0 ? 'text-success' : 'opacity-20']" />
         <template v-if="bounty.preconditions.length > 0">
@@ -244,6 +259,9 @@ async function onSuccess() {
         <select class="mb-0" v-model="editPropertyKey" required>
           <option value="" disabled selected>Select a property…</option>
           <option value="0">Property: Launching Status</option>
+          <!-- <option value="1">Property: Feature Status</option> -->
+          <option value="2">Property: For Beginner Flag</option>
+          <option value="3">Property: For Expert Flag</option>
         </select>
         <template v-if="editPropertyKey !== ''">
           <label :for="`bounty${bounty.id}PropertyValue`" class="mb-0 flex justify-between">
