@@ -82,7 +82,7 @@ const filteredBounties = computed(() => {
         >
           <ItemBountyInfoCard
             class="basis-full lg:basis-[48%]"
-            v-for="(bounty, index) in filteredBounties" :key="'bounty_idx_' + index"
+            v-for="bounty in filteredBounties" :key="'bounty_' + bounty.id"
             :bounty="bounty"
           />
         </div>
