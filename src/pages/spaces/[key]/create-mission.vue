@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
+  title: "Space - create mission",
   key: route => route.path
 })
 

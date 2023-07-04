@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
+  title: "Create Space",
   key: route => route.path
 })
 

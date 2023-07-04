@@ -7,6 +7,7 @@ const dialog = ref<InstanceType<typeof WidgetDialog> | null>(null);
 const formNewMission = ref<InstanceType<typeof FormSpaceNewMission> | null>(null);
 
 definePageMeta({
+  title: "Space - create quest",
   key: route => route.path
 })
 
