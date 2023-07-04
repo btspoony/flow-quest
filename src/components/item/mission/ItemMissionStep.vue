@@ -70,9 +70,13 @@ function isTheQuizAnswerCorrect(index: number) {
 }
 
 function onOpenDialogue() {
+  // reset all cached data
   for (let i = 0; i < maxAnswerLength.value; i++) {
     answers[i] = [""]
   }
+  currentMissionIdx.value = 0
+
+  // open dialogue
   dialog.value?.openModal()
   if (stepCfg.value.type === 'github') {
     githubVerifier.value?.execute()
@@ -135,7 +139,7 @@ function resetComp() {
   submitLoading.value = false
 }
 
-function onCloseDialgue() {
+function closeDialgue() {
   dialog.value?.closeModal()
 }
 
@@ -222,7 +226,7 @@ function onCloseDialgue() {
         @sealed="resetComp()"
         @error="resetComp()"
         @success="emit('success')"
-        @reset="onCloseDialgue()"
+        @reset="closeDialgue()"
       >
         Submit
         <template v-slot:disabled>
