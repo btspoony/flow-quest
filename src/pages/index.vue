@@ -11,9 +11,9 @@ const appConfig = useAppConfig();
           <h3 class="text-5xl font-bold">
             Learn and earn rewards by completing Quests <strong class="text-primary">#onFlow</strong>
           </h3>
-          <p class="py-6">
-            Plan to start the web3 journey? The {{ appConfig.title }} will be your guide.<br />
-            Ready to begin?
+          <p class="pt-4 pb-6">
+            Plan to start the Web3 development journey? <br />
+            The {{ appConfig.title }} will be your guide!
           </p>
           <div class="flex-center lg:flex-between">
             <BtnGoPage next="/active" class="max-w-xs">Start the Tour</BtnGoPage>

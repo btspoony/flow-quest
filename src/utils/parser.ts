@@ -76,6 +76,7 @@ export function parseSeasonInfo(season: any): CompetitionSeason {
 
 export function parseBountyInfo(info: any): BountyInfo {
   const category = parseIdentifierCategory(info.identifier.category);
+  const properties = parseBountyProperties(info.properties);
   return {
     id: info.id,
     config:
@@ -87,7 +88,8 @@ export function parseBountyInfo(info: any): BountyInfo {
       if (typeof cloned.type === "string") cloned.type = parseInt(cloned.type);
       return cloned;
     }),
-    properties: parseBountyProperties(info.properties),
+    properties: properties,
+    difficulty: properties.ForBeginner ? 0 : properties.ForExpert ? 2 : 1,
     participants: info.participants,
     participantAmt: parseInt(info.participantAmt),
     rewardType: parseRewardType(info.rewardType),
