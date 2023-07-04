@@ -67,6 +67,8 @@ pub contract CompetitionService {
     pub enum BountyProperty: UInt8 {
         pub case Launched
         pub case Featured
+        pub case ForBeginner
+        pub case ForExpert
     }
 
     pub resource interface BountyInfoPublic {
@@ -136,6 +138,14 @@ pub contract CompetitionService {
 
         pub fun isFeatured(): Bool {
             return self.properties[BountyProperty.Featured] ?? false
+        }
+
+        pub fun isForBeginner(): Bool {
+            return self.properties[BountyProperty.ForBeginner] ?? false
+        }
+
+        pub fun isForExpert(): Bool {
+            return self.properties[BountyProperty.ForExpert] ?? false
         }
 
         pub fun getProperties(): {UInt8: Bool} {

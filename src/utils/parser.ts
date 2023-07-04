@@ -112,6 +112,8 @@ export function parseBountyProperties(properties: any): BountyProperties {
   return {
     Launched: !!properties["0"],
     Featured: !!properties["1"],
+    ForBeginner: !!properties["2"],
+    ForExpert: !!properties["3"],
   };
 }
 

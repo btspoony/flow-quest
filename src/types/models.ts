@@ -225,6 +225,8 @@ interface ParticipantRecord {
 interface BountyProperties {
   Launched: boolean;
   Featured: boolean;
+  ForBeginner: boolean;
+  ForExpert: boolean;
 }
 
 interface BountyInfo {
