@@ -18,6 +18,7 @@ const filteredTabs = computed(() => {
   const allBounties = data.value.bounties
   const difficulties = allBounties.map(bounty => bounty.difficulty)
   const uniqueDifficulties = [...new Set(difficulties)]
+  uniqueDifficulties.sort((a, b) => a - b)
   return uniqueDifficulties.map(difficulty => {
     let label: string
     switch (difficulty) {
@@ -47,7 +48,7 @@ watch(() => route.query, (newQuery) => {
   if (filteredTabs.value.find(tab => tab.label === newQuery.tab)) {
     currentTab.value = newQuery.tab!
   } else {
-    currentTab.value = 'beginner'
+    currentTab.value = filteredTabs.value[0]?.label
   }
 })
 
