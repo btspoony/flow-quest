@@ -3,6 +3,7 @@ import { Icon } from '@iconify/vue';
 import md from 'markdown-it';
 
 definePageMeta({
+  title: 'Quest',
   key: route => route.path
 })
 

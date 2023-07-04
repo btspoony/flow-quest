@@ -3,6 +3,7 @@ import ItemSpaceListQuests from '~/components/item/space/list/ItemSpaceListQuest
 import ItemSpaceListMissions from '~/components/item/space/list/ItemSpaceListMissions.vue'
 
 definePageMeta({
+  title: "Space",
   key: route => route.path
 })
 

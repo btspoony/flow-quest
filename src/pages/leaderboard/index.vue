@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  title: 'Leaderboard'
+})
+
 const wallet = useFlowAccount()
 const user = useUserProfile()
 const route = useRoute()

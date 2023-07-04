@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  title: 'Active Quests'
+})
+
 const { data, pending } = useAsyncData<CompetitionSeason | null>('season', async () => {
   return refreshActiveSeason()
 }, {
