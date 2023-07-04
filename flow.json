@@ -86,13 +86,16 @@
     },
     "testnet-admin": {
       "address": "0xd58242303fc8f03c",
-      "key": "$NUXT_FLOW_PRIVATE_KEY"
+      "key": {
+        "type": "file",
+        "location": "./admin-testnet.key"
+      }
     },
     "mainnet-admin": {
       "address": "0x907a3b49797cca7a",
       "key": {
         "type": "file",
-        "location": "./mainnet-admin.key"
+        "location": "./admin-mainnet.key"
       }
     }
   },
