@@ -5,7 +5,7 @@ const route = useRoute()
 
 const currentTab = ref(route.query.tab !== 'overall' ? 'active' : 'overall')
 const tabs = [
-  { label: "Active Season", key: 'active' },
+  { label: "Active", key: 'active' },
   { label: "Overall", key: 'overall' },
 ]
 

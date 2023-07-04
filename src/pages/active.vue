@@ -62,7 +62,7 @@ const filteredBounties = computed(() => {
   <FrameMain :content-loading="pending">
     <div class="page-container w-full">
       <template v-if="data && data.bounties.length > 0">
-        <h2 class="mb-0 mt-12">Active quests for Developers</h2>
+        <h2 class="mb-0 mt-12">Quests for Developers</h2>
         <nav class="py-4">
           <ul class="tabs">
             <li v-for="tab in filteredTabs" :key="tab.label" :class="['tab-link', { 'active': currentTab === tab.label }]"
